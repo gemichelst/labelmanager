@@ -3,117 +3,199 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#c9a84c">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="LabelManager OS — Independent Label Operating System">
-<title>LabelManager OS</title>
-<link rel="stylesheet" href="assets/css/style_merged.css">
+<title>Label OS · Bunte Panther</title>
+<link rel="stylesheet" href="assets/css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
 </head>
 <body>
 
-<div id="appShell"><div id="app">
-<!-- ─── SIDEBAR ────────────────────────────────────────────────── -->
-<nav class="sb" id="sb">
-  <div class="sb-brand">
-    <div class="sb-logo">♪</div>
-    <div class="sb-name">Label OS</div>
+<!-- ═══════════════════════════════════════════════════════════
+     LOGIN SCREEN (always rendered; hidden after auth)
+════════════════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <i data-lucide="music-2" style="width:22px;color:#0a0a0f"></i>
+      </div>
+      <span class="login-title">LabelManager</span>
+    </div>
+    <p class="login-subtitle">Sign in to your label workspace</p>
+
+    <div id="loginError" class="login-error"></div>
+
+    <div class="login-field">
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" placeholder="you@label.com" autocomplete="email" />
+    </div>
+    <div class="login-field">
+      <label for="loginPass">Password</label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button id="loginBtn" class="login-btn">Sign in</button>
+
+    <div class="login-footer">
+      Default passwords: <code style="color:var(--gold)">email-prefix + 1234</code><br />
+      e.g. <code style="color:var(--muted)">admin@label.com</code> → <code style="color:var(--muted)">admin1234</code><br />
+      Manage accounts in <strong style="color:var(--text)">Users &amp; Roles</strong> section.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HELP MODAL
+════════════════════════════════════════════════════════════ -->
+<div id="helpModal" role="dialog" aria-modal="true" aria-label="Help & Documentation">
+  <div id="helpModalOverlay" style="position:fixed;inset:0;z-index:-1"></div>
+  <div class="help-modal-inner">
+    <div class="help-modal-header">
+      <i data-lucide="book-open" style="width:16px;color:var(--gold)"></i>
+      <h2>LabelManager Manual</h2>
+      <a href="./docs/index.html" target="_blank" class="help-open-ext">
+        <i data-lucide="external-link" style="width:12px"></i> Open in new tab
+      </a>
+      <button id="helpClose" class="btn-ic" title="Close help">
+        <i data-lucide="x" style="width:15px"></i>
+      </button>
+    </div>
+    <iframe id="helpFrame" src="" title="LabelManager Documentation" loading="lazy"></iframe>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN APP SHELL (hidden until authenticated)
+════════════════════════════════════════════════════════════ -->
+<div id="appShell" style="display:none;height:100vh;overflow:hidden;display:flex;flex-direction:column">
+
+<!-- Topbar -->
+<header id="topbar">
+  <button class="btn-ic" id="menuBtn" onclick="LOS.openSb()" title="Menu">
+    <i data-lucide="menu" style="width:18px"></i>
+  </button>
+  <span id="tbTitle" style="font-weight:700;font-size:15px">Dashboard</span>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <!-- Notifications -->
+    <button class="btn-ic" id="notifBtn" title="Notifications" onclick="LOS.toggleNotifPanel()" style="position:relative">
+      <i data-lucide="bell" style="width:16px"></i>
+      <span id="notifBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--gold);border-radius:50%"></span>
+    </button>
+    <!-- Global Search -->
+    <button class="btn-ic" onclick="LOS.openSearch()" title="Search (⌘K)">
+      <i data-lucide="search" style="width:16px"></i>
+    </button>
+    <!-- Role chip -->
+    <button id="role" class="bd b-n" onclick="LOS.cycleRole()" title="Switch role (dev)" style="font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"></button>
+    <!-- Help -->
+    <button id="helpBtnTop" class="btn-ic" onclick="LMHelp.open()" title="Help & Documentation">
+      <i data-lucide="help-circle" style="width:16px"></i>
+    </button>
+  </div>
+</header>
+
+<!-- Notification Panel -->
+<div id="notifPanel" class="notif-panel" style="display:none"></div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sbOverlay" onclick="LOS.closeSb()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199"></div>
+
+<!-- App body -->
+<div style="display:flex;flex:1;overflow:hidden;position:relative">
+
+<!-- SIDEBAR -->
+<aside id="sb">
+  <div class="sb-logo">
+    <div style="width:30px;height:30px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center">
+      <i data-lucide="music-2" style="width:15px;color:#0a0a0f"></i>
+    </div>
+    <span style="font-weight:800;font-size:14px;letter-spacing:-.2px">LabelManager</span>
+    <button class="btn-ic" style="margin-left:auto" onclick="LOS.closeSb()">
+      <i data-lucide="x" style="width:14px"></i>
+    </button>
   </div>
 
-  <div class="nav on" data-view="dash"><i data-lucide="layout-dashboard" style="width:14px"></i> Dashboard</div>
+  <nav style="flex:1;overflow-y:auto;padding:8px 6px">
+    <div class="nav-section-label">Workspace</div>
+    <button class="nav on" data-view="dash"><i data-lucide="layout-dashboard" style="width:14px"></i>Dashboard</button>
+    <button class="nav" data-view="crm"><i data-lucide="user-circle" style="width:14px"></i>Artists &amp; CRM</button>
+    <button class="nav" data-view="anr"><i data-lucide="music-2" style="width:14px"></i>Demos &amp; A&amp;R <span id="navAnr" class="nav-badge" style="display:none"></span></button>
+    <button class="nav" data-view="releases"><i data-lucide="disc-3" style="width:14px"></i>Releases</button>
+    <button class="nav" data-view="contracts"><i data-lucide="file-signature" style="width:14px"></i>Contract Vault <span id="navExp" class="nav-badge nav-badge-warn" style="display:none">!</span></button>
 
-  <div class="sb-group">Core</div>
-  <div class="nav" data-view="crm"><i data-lucide="users" style="width:14px"></i> Artists & CRM</div>
-  <div class="nav" data-view="anr"><i data-lucide="headphones" style="width:14px"></i> Demos & A&R <span class="pill" id="navAnr" style="display:none">0</span></div>
-  <div class="nav" data-view="releases"><i data-lucide="calendar-days" style="width:14px"></i> Releases</div>
+    <div class="nav-section-label" style="margin-top:14px">Finance</div>
+    <button class="nav" data-view="royalties"><i data-lucide="trending-up" style="width:14px"></i>Royalties Pro</button>
+    <button class="nav" data-view="finance"><i data-lucide="wallet" style="width:14px"></i>Finance &amp; Royalties</button>
+    <button class="nav" data-view="bookings"><i data-lucide="mic-2" style="width:14px"></i>Bookings &amp; Events</button>
 
-  <div class="sb-group">Business</div>
-  <div class="nav" data-view="contracts"><i data-lucide="file-signature" style="width:14px"></i> Contracts <span class="pill" id="navExp" style="display:none;background:var(--err);color:#fff">!</span></div>
-  <div class="nav" data-view="finance"><i data-lucide="bar-chart-2" style="width:14px"></i> Finance</div>
-  <div class="nav" data-view="royalties"><i data-lucide="coins" style="width:14px"></i> Royalties Pro</div>
-  <div class="nav" data-view="bookings"><i data-lucide="mic-2" style="width:14px"></i> Bookings</div>
+    <div class="nav-section-label" style="margin-top:14px">Catalog</div>
+    <button class="nav" data-view="media"><i data-lucide="library" style="width:14px"></i>Media Library</button>
+    <button class="nav" data-view="catalog"><i data-lucide="database" style="width:14px"></i>Catalog &amp; Rights</button>
 
-  <div class="sb-group">Assets</div>
-  <div class="nav" data-view="media"><i data-lucide="folder" style="width:14px"></i> Media</div>
-  <div class="nav" data-view="catalog"><i data-lucide="database" style="width:14px"></i> Catalog & Rights</div>
-  <div class="nav" data-view="anrpro"><i data-lucide="telescope" style="width:14px"></i> A&R Intelligence</div>
-  <div class="nav" data-view="marketing"><i data-lucide="megaphone" style="width:14px"></i> Marketing</div>
-  <div class="nav" data-view="analytics"><i data-lucide="bar-chart-2" style="width:14px"></i> Analytics</div>
-  <div class="nav" data-view="collab"><i data-lucide="layers" style="width:14px"></i> Collab & Tasks</div>
-  <div class="nav" data-view="artist-portal"><i data-lucide="user-circle" style="width:14px"></i> Artist Portal</div>
-  <div class="nav" data-view="manager-portal"><i data-lucide="briefcase" style="width:14px"></i> Manager Portal</div>
-  <div class="nav" data-view="integrations"><i data-lucide="plug" style="width:14px"></i> Integrations</div>
+    <div class="nav-section-label" style="margin-top:14px">A&amp;R Intelligence</div>
+    <button class="nav" data-view="anrpro"><i data-lucide="brain-circuit" style="width:14px"></i>A&amp;R Intelligence</button>
+    <button class="nav" data-view="research"><i data-lucide="globe-2" style="width:14px"></i>Research &amp; Scouting</button>
 
-  <div class="sb-group">System</div>
-  <div class="nav" data-view="research"><i data-lucide="telescope" style="width:14px"></i> Research</div>
-  <div class="nav" data-view="users"><i data-lucide="shield-check" style="width:14px"></i> Users & Roles</div>
-  <div class="nav" data-view="actlog"><i data-lucide="scroll-text" style="width:14px"></i> Activity Log</div>
+    <div class="nav-section-label" style="margin-top:14px">Growth</div>
+    <button class="nav" data-view="marketing"><i data-lucide="megaphone" style="width:14px"></i>Marketing</button>
+    <button class="nav" data-view="analytics"><i data-lucide="bar-chart-2" style="width:14px"></i>Analytics</button>
+    <button class="nav" data-view="collab"><i data-lucide="users" style="width:14px"></i>Collab &amp; Tasks</button>
 
-      <div class="sidebar-user">
-      <div class="sidebar-user-avatar" id="sidebarAvatar" style="background:var(--gold)">A</div>
-      <div class="sidebar-user-info">
-        <div class="sidebar-user-name" id="sidebarName">Admin</div>
-        <div class="sidebar-user-role" id="sidebarRole">admin</div>
-      </div>
-      <button class="btn-logout" id="logoutBtn" title="Sign out">
-        <i data-lucide="log-out" style="width:14px"></i>
-      </button>
+    <div class="nav-section-label" style="margin-top:14px">Portals</div>
+    <button class="nav" data-view="artist-portal"><i data-lucide="sparkles" style="width:14px"></i>Artist Portal</button>
+    <button class="nav" data-view="manager-portal"><i data-lucide="briefcase" style="width:14px"></i>Manager Portal</button>
+    <button class="nav" data-view="integrations"><i data-lucide="plug" style="width:14px"></i>Integrations</button>
+
+    <div class="nav-section-label" style="margin-top:14px">System</div>
+    <button class="nav" data-view="users"><i data-lucide="shield" style="width:14px"></i>Users &amp; Roles</button>
+    <button class="nav" data-view="actlog"><i data-lucide="activity" style="width:14px"></i>Activity Log</button>
+  </nav>
+
+  <!-- Sidebar user footer -->
+  <div class="sidebar-user" id="sidebarUser">
+    <div class="sidebar-user-avatar" id="sidebarAvatar" style="background:var(--gold)">?</div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name" id="sidebarName">–</div>
+      <div class="sidebar-user-role" id="sidebarRole">–</div>
     </div>
-  <div class="sb-foot">
-    <div class="nav" onclick="LOS.openAdm()"><i data-lucide="database" style="width:14px"></i> DB Editor</div>
+    <button class="btn-logout" id="logoutBtn" title="Sign out">
+      <i data-lucide="log-out" style="width:14px"></i>
+    </button>
   </div>
-</nav>
-<div id="sbOverlay" onclick="LOS.closeSb()"></div>
+</aside>
+  <!-- <div class="content"> -->
 
-<!-- ─── MAIN ──────────────────────────────────────────────────── -->
-<div class="main">
-  <header class="topbar">
-    <button class="hbg" onclick="LOS.openSb()"><i data-lucide="menu" style="width:16px"></i></button>
-    <div class="topbar-title" id="tbTitle">Dashboard</div>
-    <div class="topbar-r">
-      <button class="btn btn-g" style="font-size:12px;gap:5px;" onclick="LOS.openSearch()">
-        <i data-lucide="search" style="width:12px"></i> Search
-        <kbd style="font-size:10px;opacity:.45;margin-left:3px">⌘K</kbd>
-      </button>
-    <!-- Notification Bell (in header/topbar) -->
-    <!-- <div class="notif-bell" id="notifBell" onclick="LOS.toggleNotifPanel()"> -->
-    <div class="notif-bell" id="notifBell" onclick="LOS.toggleNotifPanel(event)">
-      <i data-lucide="bell" style="width:18px;color:var(--muted)"></i>
-      <div class="notif-badge" id="notifBadge" style="display:none">0</div>
-    </div>
-    <div class="notif-panel" id="notifPanel" style="display:none">
-      <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:13px;font-weight:700">Notifications</span>
-        <button class="btn-ghost" style="font-size:11px" onclick="LOS.markAllRead()">Mark all read</button>
-      </div>
-      <div id="notifList" style="max-height:360px;overflow-y:auto"></div>
-      <div style="padding:10px 14px;border-top:1px solid var(--b1)">
-        <button class="btn btn-g" style="width:100%;font-size:12px" onclick="LOS.clearNotifs()">Clear all</button>
-      </div>
-    </div>
-      <div id="role" onclick="LOS.cycleRole()"></div>
-      <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
-        <i data-lucide="upload" style="width:13px"></i> Submit Demo
-      </button>
-    </div>
-  </header>
+    <!-- MAIN CONTENT -->
+  <main id="main">
+    <div id="toast"></div>
 
-  <div class="content">
-
-    <!-- DASHBOARD -->
     <section id="view-dash" class="view on">
-      <div class="g4 mb6" id="dStats"></div>
-      <div class="g3 mb4">
-        <div class="card"><div class="ct">New Demos</div><div id="dDemos"></div></div>
-        <div class="card"><div class="ct">Active Releases</div><div id="dRels"></div></div>
-        <div class="card"><div class="ct">Confirmed Gigs</div><div id="dGigs"></div></div>
-      </div>
+      <div id="dStats" class="g4" style="margin-bottom:20px"></div>
       <div class="g2">
-        <div class="card"><div class="ct">Open Tasks</div><div id="dTasks"></div></div>
-        <div class="card"><div class="ct">Finance Snapshot</div><div id="dFin"></div></div>
+        <div class="card">
+          <div class="ct-hd">
+            <span>New Demo Submissions</span>
+            <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="document.querySelector('.nav[data-view=anr]').click()">View all</button>
+          </div>
+          <div id="dDemos"></div>
+        </div>
+        <div class="card">
+          <div class="ct-hd"><span>Active Releases</span></div>
+          <div id="dRels"></div>
+        </div>
+        <div class="card">
+          <div class="ct-hd"><span>Confirmed Gigs</span></div>
+          <div id="dGigs"></div>
+        </div>
+        <div class="card">
+          <div class="ct-hd"><span>Open Tasks</span></div>
+          <div id="dTasks"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="ct-hd"><span>Finance Snapshot</span></div>
+        <div id="dFin"></div>
       </div>
     </section>
 
@@ -137,7 +219,27 @@
           <tbody id="crmTbl"></tbody>
         </table>
       </div>
-      <div id="artDrawer" style="display:none;margin-top:14px" class="card"></div>
+
+      <!-- ── SEARCH OVERLAY ──────────────────────────────────── -->
+      <div id="searchOverlay" onclick="LOS.closeSearch()">
+        <div id="searchBox" onclick="event.stopPropagation()">
+          <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--b1)">
+            <i data-lucide="search" style="width:15px;color:var(--muted)"></i>
+            <input id="searchInp" type="text" placeholder="Search artists, demos, releases… (⌘K)"
+              oninput="LOS.doSearch(this.value)" autocomplete="off" />
+          </div>
+          <div id="searchRes" style="padding:8px 0;max-height:380px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- ── FLOATING HELP BUTTON ────────────────────────────── -->
+      <button id="helpBtn" title="Help &amp; Documentation" aria-label="Open manual">
+        <i data-lucide="help-circle" style="width:18px"></i>
+      </button>
+
+      <!-- ── ARTIST DRAWER ───────────────────────────────────── -->
+      <div id="artDrawer" style="display:none;position:fixed;top:0;right:0;width:380px;max-width:100vw;height:100vh;background:var(--s2);border-left:1px solid var(--b1);z-index:500;overflow-y:auto;padding:20px;box-shadow:-8px 0 32px rgba(0,0,0,.5)"></div>
+      <!-- <div id="artDrawer" style="display:none;margin-top:14px" class="card"></div> -->
     </section>
 
     <!-- A&R -->
@@ -1120,14 +1222,17 @@
       </div>
     </section>
 
-  </div><!-- /content -->
-</div><!-- /main -->
+
+
+
+  </main><!-- /main -->
 </div><!-- /app -->
+</div><!-- /appShell -->
 
 
 
 <!-- ─── AUDIO PLAYER ─────────────────────────────────────────────── -->
-<div class="player" id="player">
+<!-- <div class="player" id="player">
   <button id="playBtn" style="width:32px;height:32px;border-radius:50%;background:var(--goldg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
     <i data-lucide="play" id="playIco" style="width:14px;color:#0a0a0f;margin-left:1px"></i>
   </button>
@@ -1138,71 +1243,93 @@
   <div id="waveform" style="flex:1;height:34px;min-width:0;"></div>
   <div id="pTime" style="font-size:11.5px;color:var(--muted);min-width:74px;text-align:right">0:00 / 0:00</div>
   <button class="btn-ic" onclick="LOS.closePlayer()"><i data-lucide="x" style="width:14px"></i></button>
-</div>
+</div> -->
 
-<!-- ─── LIGHTBOX ──────────────────────────────────────────────────── -->
-<div id="lightbox" onclick="this.classList.remove('open')">
-  <img id="lbImg" src="" alt="">
-</div>
-
-<!-- ─── GLOBAL SEARCH ─────────────────────────────────────────────── -->
-<div id="gs">
-  <div class="gs-box">
-    <input class="gs-inp" id="gsInp" placeholder="Search artists, demos, releases, media…" oninput="LOS.gsSearch()">
-    <div class="gs-res" id="gsRes"></div>
-    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Esc to close</div>
-  </div>
-</div>
-
-<!-- ─── TOASTS ────────────────────────────────────────────────────── -->
-<div id="toast"></div>
-
-<!-- ─── UPLOADER MODAL (Embed Preview) ───────────────────────────── -->
-<div class="mbb" id="modal-uploader">
-  <div class="modal modal-lg">
-    <div class="mt flex gap2">
-      Demo Submission
-      <button class="btn-ic" style="margin-left:auto" onclick="LOS.closeModal('uploader')"><i data-lucide="x" style="width:14px"></i></button>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:18px;margin-top:-10px">
-      This form can be embedded on the Bunte Panther website via <code style="background:var(--s3);padding:1px 5px;border-radius:4px;font-size:11px">&lt;iframe src="upload.html"&gt;</code>
-    </p>
-    <div class="ff"><label class="lbl">Your Artist Name *</label><input class="inp" id="upN" placeholder="Stage name or act name"></div>
-    <div class="g2">
-      <div class="ff"><label class="lbl">Email *</label><input class="inp" id="upE" type="email"></div>
-      <div class="ff"><label class="lbl">Genre</label>
-        <select class="inp" id="upG">
-          <option value="">Select genre…</option>
-          <option>Techno</option><option>House</option><option>Electro</option>
-          <option>Industrial</option><option>Ambient</option><option>Other</option>
-        </select>
+  <!-- ── GLOBAL PLAYER ────────────────────────────────────── -->
+  <div id="player">
+    <div style="display:flex;align-items:center;gap:12px;max-width:900px;margin:0 auto">
+      <button id="playBtn" class="btn-ic">
+        <i id="playIco" data-lucide="play" style="width:17px;color:var(--gold)"></i>
+      </button>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pTt">–</div>
+        <div style="font-size:11px;color:var(--muted)" id="pSb">–</div>
       </div>
-    </div>
-    <div class="g2">
-      <div class="ff"><label class="lbl">BPM</label><input class="inp" id="upBpm" type="number" placeholder="138"></div>
-      <div class="ff"><label class="lbl">Key</label><input class="inp" id="upKey" placeholder="A minor"></div>
-    </div>
-    <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="upT" placeholder="Name of the track"></div>
-    <div class="ff"><label class="lbl">Reference Artists / Tracks</label><input class="inp" id="upRef" placeholder="e.g. Surgeon, Blawan, Function"></div>
-    <div class="ff"><label class="lbl">Soundcloud / Streaming URL</label><input class="inp" id="upUrl" placeholder="https://soundcloud.com/…"></div>
-    <div class="ff">
-      <label class="lbl">Upload Audio File (MP3 / WAV / AIFF / FLAC · max 50MB)</label>
-      <div class="dz" id="upDz">
-        <input type="file" accept="audio/*" onchange="LOS.upFile(this)">
-        <i data-lucide="upload-cloud" style="width:24px;margin:0 auto 8px;display:block"></i>
-        <div id="upDzTxt">Drop file here or click to browse</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">MP3, WAV, AIFF, FLAC — max 50 MB</div>
-      </div>
-    </div>
-    <div class="ff"><label class="lbl">Short Note to the Label</label><textarea class="inp" id="upNotes" rows="3" placeholder="Tell us about the track, context, mood…"></textarea></div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
-      <button class="btn btn-g" onclick="LOS.closeModal('uploader')">Cancel</button>
-      <button class="btn btn-p" onclick="LOS.submitUpload()">
-        <i data-lucide="send" style="width:13px"></i> Submit Demo
+      <div id="waveform" style="flex:2;min-width:0;height:34px"></div>
+      <span id="pTime" style="font-size:11px;color:var(--muted);white-space:nowrap">0:00 / 0:00</span>
+      <button class="btn-ic" onclick="LOS.closePlayer()">
+        <i data-lucide="x" style="width:14px"></i>
       </button>
     </div>
   </div>
-</div>
+
+  <!-- ─── LIGHTBOX ──────────────────────────────────────────────────── -->
+  <!-- <div id="lightbox" onclick="this.classList.remove('open')">
+    <img id="lbImg" src="" alt="">
+  </div> -->
+  <div id="lightbox" onclick="this.classList.remove('open')" style="display:none" class="">
+    <img id="lbImg" src="" alt="preview" style="max-width:90vw;max-height:90vh;border-radius:10px" />
+  </div>
+
+
+  <!-- ─── GLOBAL SEARCH ─────────────────────────────────────────────── -->
+  <div id="gs">
+    <div class="gs-box">
+      <input class="gs-inp" id="gsInp" placeholder="Search artists, demos, releases, media…" oninput="LOS.gsSearch()">
+      <div class="gs-res" id="gsRes"></div>
+      <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Esc to close</div>
+    </div>
+  </div>
+
+  <!-- ─── TOASTS ────────────────────────────────────────────────────── -->
+  <div id="toast"></div>
+
+  <!-- ─── UPLOADER MODAL (Embed Preview) ───────────────────────────── -->
+  <div class="mbb" id="modal-uploader">
+    <div class="modal modal-lg">
+      <div class="mt flex gap2">
+        Demo Submission
+        <button class="btn-ic" style="margin-left:auto" onclick="LOS.closeModal('uploader')"><i data-lucide="x" style="width:14px"></i></button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:18px;margin-top:-10px">
+        This form can be embedded on the Bunte Panther website via <code style="background:var(--s3);padding:1px 5px;border-radius:4px;font-size:11px">&lt;iframe src="upload.html"&gt;</code>
+      </p>
+      <div class="ff"><label class="lbl">Your Artist Name *</label><input class="inp" id="upN" placeholder="Stage name or act name"></div>
+      <div class="g2">
+        <div class="ff"><label class="lbl">Email *</label><input class="inp" id="upE" type="email"></div>
+        <div class="ff"><label class="lbl">Genre</label>
+          <select class="inp" id="upG">
+            <option value="">Select genre…</option>
+            <option>Techno</option><option>House</option><option>Electro</option>
+            <option>Industrial</option><option>Ambient</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="ff"><label class="lbl">BPM</label><input class="inp" id="upBpm" type="number" placeholder="138"></div>
+        <div class="ff"><label class="lbl">Key</label><input class="inp" id="upKey" placeholder="A minor"></div>
+      </div>
+      <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="upT" placeholder="Name of the track"></div>
+      <div class="ff"><label class="lbl">Reference Artists / Tracks</label><input class="inp" id="upRef" placeholder="e.g. Surgeon, Blawan, Function"></div>
+      <div class="ff"><label class="lbl">Soundcloud / Streaming URL</label><input class="inp" id="upUrl" placeholder="https://soundcloud.com/…"></div>
+      <div class="ff">
+        <label class="lbl">Upload Audio File (MP3 / WAV / AIFF / FLAC · max 50MB)</label>
+        <div class="dz" id="upDz">
+          <input type="file" accept="audio/*" onchange="LOS.upFile(this)">
+          <i data-lucide="upload-cloud" style="width:24px;margin:0 auto 8px;display:block"></i>
+          <div id="upDzTxt">Drop file here or click to browse</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">MP3, WAV, AIFF, FLAC — max 50 MB</div>
+        </div>
+      </div>
+      <div class="ff"><label class="lbl">Short Note to the Label</label><textarea class="inp" id="upNotes" rows="3" placeholder="Tell us about the track, context, mood…"></textarea></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+        <button class="btn btn-g" onclick="LOS.closeModal('uploader')">Cancel</button>
+        <button class="btn btn-p" onclick="LOS.submitUpload()">
+          <i data-lucide="send" style="width:13px"></i> Submit Demo
+        </button>
+      </div>
+    </div>
+  </div>
 
 <!-- ─── MODALS ────────────────────────────────────────────────────── -->
 
@@ -1864,97 +1991,12 @@
   </div>
 </div>
 
-
-</div><!-- /#app --></div><!-- /#appShell -->
-
-<!-- ═══════════════════════════════════════════════════════════════
-     LOGIN SCREEN
-     ══════════════════════════════════════════════════════════════ -->
-<div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon"><span style="font-size:22px">♪</span></div>
-      <div class="login-title">LabelManager OS</div>
-    </div>
-    <p class="login-subtitle">Independent Label Operating System</p>
-    <div class="login-error" id="loginError">Invalid email or password</div>
-    <div class="login-field">
-      <label>Email</label>
-      <input type="email" class="inp" id="loginEmail" placeholder="admin@label.com"
-             onkeydown="if(event.key==='Enter')LMAuth.attempt()">
-    </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" class="inp" id="loginPass" placeholder="••••••••"
-             onkeydown="if(event.key==='Enter')LMAuth.attempt()">
-    </div>
-    <button class="login-btn btn btn-p" onclick="LMAuth.attempt()" id="loginBtn">Sign in</button>
-    <div class="login-footer">
-      Demo logins: <strong>admin@label.com</strong> / admin1234 &nbsp;·&nbsp;
-      <strong>ar@label.com</strong> / ar1234 &nbsp;·&nbsp;
-      <strong>artist@label.com</strong> / artist1234
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     HELP MODAL
-     ══════════════════════════════════════════════════════════════ -->
-<div id="helpModal">
-  <div class="help-modal-inner">
-    <div class="help-modal-header">
-      <i data-lucide="book-open" style="width:16px;color:var(--gold)"></i>
-      <h2>LabelManager OS — User Manual</h2>
-      <a href="docs/index.html" target="_blank" class="help-open-ext">
-        <i data-lucide="external-link" style="width:12px"></i> Open in tab
-      </a>
-      <button class="btn-ghost" style="margin-left:8px" onclick="LMHelp.close()">
-        <i data-lucide="x" style="width:14px"></i>
-      </button>
-    </div>
-    <iframe id="helpFrame" src="docs/index.html" title="LabelManager Docs"></iframe>
-  </div>
-  <div style="position:absolute;inset:0;z-index:-1" onclick="LMHelp.close()"></div>
-</div>
-
-<!-- Help FAB -->
-<button id="helpBtn" onclick="LMHelp.open()" title="Help & Docs">
-  <i data-lucide="help-circle" style="width:18px"></i>
-</button>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     SEARCH OVERLAY
-     ══════════════════════════════════════════════════════════════ -->
-<div id="searchOverlay" style="display:none;position:fixed;inset:0;z-index:600;
-     background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
-     align-items:flex-start;justify-content:center;padding-top:80px"
-     onclick="if(event.target===this)LOS.closeSearch()">
-  <div style="width:100%;max-width:580px;background:var(--s2);
-       border:1px solid var(--b1);border-radius:14px;overflow:hidden;
-       box-shadow:0 20px 60px rgba(0,0,0,.6)">
-    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--b1)">
-      <i data-lucide="search" style="width:16px;color:var(--muted);flex-shrink:0"></i>
-      <input id="searchInput" class="inp"
-             style="background:transparent;border:none;outline:none;flex:1;font-size:15px;padding:0"
-             placeholder="Search artists, demos, releases, contacts…"
-             oninput="LOS.doSearch(this.value)" autocomplete="off" />
-      <kbd style="font-size:10px;color:var(--muted);padding:2px 6px;background:var(--s3);
-           border-radius:4px;border:1px solid var(--b1)">Esc</kbd>
-    </div>
-    <div id="searchRes" style="padding:8px 0;max-height:380px;overflow-y:auto"></div>
-  </div>
-</div>
-
-<!-- Service Worker Registration -->
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
-  }
+  if ('serviceWorker' in navigator)
+    navigator.serviceWorker.register('./sw.js');
 </script>
 
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/index_merged.js"></script>
 </body>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/script.js"></script>
 </html>

@@ -2,209 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Overview — LabelManager OS Docs</title>
+<title>Overview — LabelManager OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0c0f;--s1:#0e0f14;--s2:#13151c;--s3:#1a1d26;--b1:#2a2d3a;--b2:#3a3f54;
 --text:#e8eaf0;--muted:#7c82a0;--gold:#c9a84c;--teal:#4a9fa8;--ok:#3d9970;
---err:#c0524e;--warn:#d4a043;--info:#4a6fa8;--r:10px;--tr:all .18s ease;
+--err:#c0524e;--warn:#d4a043;--info:#4a6fa8;--r:10px;
 --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
---mono:'JetBrains Mono','Fira Code',monospace;
---sw:264px;--cmax:860px}
+--mono:'JetBrains Mono','Fira Code',monospace;--sw:256px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.75;display:flex;min-height:100vh}
 .sidebar{width:var(--sw);background:var(--s1);border-right:1px solid var(--b1);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;scrollbar-width:thin}
-.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:11px}
-.sidebar-logo .icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),#e8c47a);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 10px rgba(201,168,76,.3)}
-.sidebar-logo .brand{font-size:13.5px;font-weight:800;color:var(--text)}
-.sidebar-logo .sub{font-size:10.5px;color:var(--muted);margin-top:1px}
-.sidebar-section{padding:16px 12px 4px;font-size:9.5px;font-weight:700;color:var(--b2);letter-spacing:.14em;text-transform:uppercase}
-.sidebar nav a{display:flex;align-items:center;gap:9px;padding:8px 12px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:7px;margin:1px 7px;transition:var(--tr)}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
+.sb-logo .icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#e8c47a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-logo .brand{font-size:13px;font-weight:800;color:var(--text)}
+.sb-logo .ver{font-size:10.5px;color:var(--muted)}
+.sb-sec{padding:14px 12px 3px;font-size:9.5px;font-weight:700;color:var(--b2);letter-spacing:.14em;text-transform:uppercase}
+.sidebar nav a{display:flex;align-items:center;gap:8px;padding:7px 11px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:7px;margin:1px 6px;transition:all .15s}
 .sidebar nav a:hover{background:var(--s3);color:var(--text)}
 .sidebar nav a.active{background:rgba(201,168,76,.13);color:var(--gold);font-weight:600}
-.sidebar nav a .ico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
-.sidebar-footer{margin-top:auto;padding:13px 16px;border-top:1px solid var(--b1);font-size:11px;color:var(--muted)}
-.sidebar-footer a{color:var(--teal);text-decoration:none}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--b1);font-size:11px;color:var(--muted)}
+.sb-footer a{color:var(--teal);text-decoration:none}
 .main{margin-left:var(--sw);flex:1;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(11,12,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b1);padding:12px 40px;display:flex;align-items:center;gap:14px}
-.breadcrumb{font-size:12px;color:var(--muted)}
-.breadcrumb span{color:var(--gold);font-weight:500}
-.breadcrumb a{color:var(--muted);text-decoration:none}
-.breadcrumb a:hover{color:var(--gold)}
-.search-bar{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:6px 12px;font-size:13px;color:var(--muted);cursor:pointer;transition:var(--tr)}
-.search-bar:hover{border-color:var(--gold)}
-.search-bar kbd{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 6px;font-size:10px;font-family:var(--mono)}
-.content{max-width:var(--cmax);margin:0 auto;padding:48px 40px 88px}
-/* typography */
-h1{font-size:32px;font-weight:800;color:var(--text);margin:20px 0 14px;letter-spacing:-.02em;line-height:1.2}
-h2{font-size:21px;font-weight:700;color:var(--text);margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--b1);letter-spacing:-.01em}
-h3{font-size:16px;font-weight:700;color:var(--text);margin:28px 0 10px}
-h4{font-size:13px;font-weight:700;color:var(--gold);margin:20px 0 8px;text-transform:uppercase;letter-spacing:.05em}
-p{margin-bottom:14px;color:#c5c8d8}
-.page-intro{font-size:16px;color:var(--muted);line-height:1.65;margin-bottom:28px;max-width:720px}
-a{color:var(--teal);text-decoration:none}
-a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(11,12,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b1);padding:11px 36px;display:flex;align-items:center;gap:12px}
+.bc{font-size:12px;color:var(--muted)}.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--gold)}.bc span{color:var(--gold);font-weight:500}
+.content{max-width:820px;margin:0 auto;padding:44px 36px 80px}
+h1{font-size:30px;font-weight:800;color:var(--text);margin:16px 0 12px;letter-spacing:-.02em;line-height:1.2}
+h2{font-size:20px;font-weight:700;color:var(--text);margin:40px 0 12px;padding-top:12px;border-top:1px solid var(--b1);letter-spacing:-.01em}
+h3{font-size:15.5px;font-weight:700;color:var(--text);margin:26px 0 9px}
+h4{font-size:12.5px;font-weight:700;color:var(--gold);margin:18px 0 7px;text-transform:uppercase;letter-spacing:.05em}
+p{margin-bottom:13px;color:#c5c8d8}
+.lead{font-size:16px;color:var(--muted);line-height:1.65;margin-bottom:24px;max-width:680px}
+.page-intro{font-size:15.5px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 strong{color:var(--text);font-weight:600}
-ul,ol{padding-left:22px;margin-bottom:16px;color:#c5c8d8}
+ul,ol{padding-left:20px;margin-bottom:14px;color:#c5c8d8}
 li{margin-bottom:5px;line-height:1.65}
-/* breadcrumb inside content */
-.breadcrumb.content-bc{margin-bottom:6px;font-size:12px}
-/* toc */
-nav.toc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px 22px;margin-bottom:36px}
-nav.toc strong{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
-nav.toc ul{margin:0;padding-left:18px}
-nav.toc li{margin-bottom:4px}
-nav.toc a{font-size:13px;color:var(--muted)}
-nav.toc a:hover{color:var(--gold)}
-/* tables */
-.table-wrap{overflow-x:auto;margin:20px 0;border-radius:var(--r);border:1px solid var(--b1);box-shadow:0 2px 14px rgba(0,0,0,.2)}
+.toc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px 20px;margin-bottom:32px}
+.toc strong{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.toc ul{margin:0;padding-left:16px}.toc li{margin-bottom:3px}.toc a{font-size:13px;color:var(--muted)}.toc a:hover{color:var(--gold)}
+.table-wrap{overflow-x:auto;margin:18px 0;border-radius:var(--r);border:1px solid var(--b1)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 thead{background:var(--s2)}
-th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--b1);white-space:nowrap}
-td{padding:10px 16px;border-bottom:1px solid var(--b1);color:#c5c8d8;vertical-align:top}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.018)}
+th{padding:10px 15px;text-align:left;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--b1);white-space:nowrap}
+td{padding:10px 15px;border-bottom:1px solid var(--b1);color:#c5c8d8;vertical-align:top}
+tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.018)}
 td code,th code{background:var(--s3);padding:2px 6px;border-radius:4px;font-size:12px;font-family:var(--mono);color:var(--teal)}
-/* callouts */
-.callout{border-radius:var(--r);padding:15px 18px;margin:20px 0;display:flex;gap:12px;align-items:flex-start}
-.callout-icon,.callout>span:first-child{font-size:18px;flex-shrink:0;margin-top:1px}
-.callout-body{flex:1}.callout-body>strong,.callout>strong{display:block;margin-bottom:4px;font-size:13px}
-.callout-body p,.callout>p{margin:0;font-size:13.5px;color:#c5c8d8}
-.callout.tip,.callout.info,.callout.warn,.callout.ok,.callout.err{} /* types below */
-.callout.tip{background:rgba(74,159,168,.07);border-left:3px solid var(--teal)}
-.callout.tip .callout-icon,.callout.tip>span:first-child,.callout.tip>strong,.callout.tip .callout-body>strong{color:var(--teal)}
-.callout.warn{background:rgba(212,160,67,.07);border-left:3px solid var(--warn)}
-.callout.warn .callout-icon,.callout.warn>span:first-child,.callout.warn>strong,.callout.warn .callout-body>strong{color:var(--warn)}
-.callout.info{background:rgba(74,111,168,.07);border-left:3px solid var(--info)}
-.callout.info .callout-icon,.callout.info>span:first-child,.callout.info>strong,.callout.info .callout-body>strong{color:var(--info)}
-.callout.ok{background:rgba(61,153,112,.07);border-left:3px solid var(--ok)}
-.callout.ok .callout-icon,.callout.ok>span:first-child,.callout.ok>strong,.callout.ok .callout-body>strong{color:var(--ok)}
-.callout.err{background:rgba(192,82,78,.07);border-left:3px solid var(--err)}
-.callout.err .callout-icon,.callout.err>span:first-child,.callout.err>strong,.callout.err .callout-body>strong{color:var(--err)}
-/* code */
+.callout{border-radius:var(--r);padding:14px 18px;margin:18px 0;display:flex;gap:11px;align-items:flex-start}
+.ci{font-size:17px;flex-shrink:0;margin-top:1px}.cb{flex:1}.cb>strong{display:block;margin-bottom:4px;font-size:13px}.cb>p,.cb p{margin:0;font-size:13.5px;color:#c5c8d8}
+.callout.tip{background:rgba(74,159,168,.07);border-left:3px solid var(--teal)}.callout.tip .ci,.callout.tip .cb>strong{color:var(--teal)}
+.callout.warn{background:rgba(212,160,67,.07);border-left:3px solid var(--warn)}.callout.warn .ci,.callout.warn .cb>strong{color:var(--warn)}
+.callout.ok{background:rgba(61,153,112,.07);border-left:3px solid var(--ok)}.callout.ok .ci,.callout.ok .cb>strong{color:var(--ok)}
+.callout.err{background:rgba(192,82,78,.07);border-left:3px solid var(--err)}.callout.err .ci,.callout.err .cb>strong{color:var(--err)}
+.callout.info{background:rgba(74,111,168,.07);border-left:3px solid var(--info)}.callout.info .ci,.callout.info .cb>strong{color:var(--info)}
 code{background:var(--s3);padding:2px 7px;border-radius:5px;font-size:12.5px;font-family:var(--mono);color:var(--teal)}
-pre{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:20px;overflow-x:auto;margin:20px 0;line-height:1.65}
+pre{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px;overflow-x:auto;margin:18px 0;line-height:1.65}
 pre code{background:none;padding:0;font-size:13px;color:#a8b8d8}
-/* steps */
-.steps{margin:20px 0}
-.step{display:flex;gap:16px;margin-bottom:20px}
-.step-num{width:32px;height:32px;border-radius:50%;background:rgba(201,168,76,.11);border:1px solid rgba(201,168,76,.28);color:var(--gold);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.step-body{flex:1}.step-body h4{margin:0 0 6px;color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;font-weight:600}
-.step-body p{margin:0;font-size:13.5px}
-/* kbd */
-kbd{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;font-size:11px;font-family:var(--mono);color:var(--text);box-shadow:0 1px 0 var(--b2)}
-/* badges */
+kbd{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;font-size:11px;font-family:var(--mono);color:var(--text)}
 .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
-/* feature grid */
-.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:20px 0}
-.fc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px;transition:var(--tr)}
+.b-gold{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid rgba(201,168,76,.25)}
+.b-teal{background:rgba(74,159,168,.14);color:var(--teal);border:1px solid rgba(74,159,168,.25)}
+.b-ok{background:rgba(61,153,112,.14);color:#5dba90;border:1px solid rgba(61,153,112,.25)}
+.b-err{background:rgba(192,82,78,.14);color:#e07773;border:1px solid rgba(192,82,78,.25)}
+.b-gray{background:var(--s3);color:var(--muted);border:1px solid var(--b1)}
+.steps{margin:18px 0}.step{display:flex;gap:14px;margin-bottom:18px}
+.sn{width:30px;height:30px;border-radius:50%;background:rgba(201,168,76,.11);border:1px solid rgba(201,168,76,.28);color:var(--gold);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.sb2{flex:1}.sb2 h4{margin:0 0 5px;color:var(--text);font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:600}.sb2 p{margin:0;font-size:13.5px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.fc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;transition:all .15s}
 .fc:hover{border-color:var(--teal);transform:translateY(-1px)}
-.fc-icon{font-size:22px;margin-bottom:10px}
-.fc-title{font-weight:700;color:var(--text);margin-bottom:5px;font-size:14px}
-.fc-desc{font-size:13px;color:var(--muted);line-height:1.55}
-/* role grid */
-.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin:20px 0}
-.role-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;transition:var(--tr)}
-.role-card:hover{border-color:var(--gold)}
-.role-name{font-weight:700;color:var(--text);margin-bottom:8px;font-size:15px}
-.role-card ul{padding-left:16px;margin:0}
-.role-card li{font-size:12.5px;color:var(--muted);margin-bottom:3px}
-/* page nav */
-.page-nav{display:flex;justify-content:space-between;margin-top:60px;padding-top:24px;border-top:1px solid var(--b1);gap:14px}
-.page-nav a{display:flex;flex-direction:column;gap:4px;padding:14px 18px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:var(--tr);max-width:260px;flex:1}
+.fc-ico{font-size:20px;margin-bottom:9px}.fc-t{font-weight:700;color:var(--text);margin-bottom:5px;font-size:13.5px}.fc-d{font-size:12.5px;color:var(--muted);line-height:1.55}
+.page-nav{display:flex;justify-content:space-between;margin-top:56px;padding-top:22px;border-top:1px solid var(--b1);gap:12px}
+.page-nav a{display:flex;flex-direction:column;gap:4px;padding:13px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:all .15s;max-width:250px;flex:1}
 .page-nav a:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
-.nav-dir{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.nav-title{font-size:14px;font-weight:600;color:var(--text)}
+.nd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.nt{font-size:13.5px;font-weight:600;color:var(--text)}
 .page-nav a.next{text-align:right}
-@media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.content{padding:28px 18px 60px}.topbar{padding:11px 18px}}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:4px}
+.breadcrumb a{color:var(--muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+@media(max-width:860px){.sidebar{display:none}.main{margin-left:0}.content{padding:24px 16px 56px}.topbar{padding:10px 16px}}
 </style>
 </head>
 <body>
 <aside class="sidebar">
-  <div class="sidebar-logo">
+  <div class="sb-logo">
     <div class="icon">♪</div>
-    <div><div class="brand">LabelManager OS</div><div class="sub">User Manual v1.0</div></div>
+    <div><div class="brand">LabelManager OS</div><div class="ver">Manual v1.0</div></div>
   </div>
-  <div class="sidebar-section">Getting Started</div><nav><a href="index.html" class="active"><span class="ico">📖</span>Overview</a><a href="quickstart.html"><span class="ico">⚡</span>Quick Start</a><a href="roles.html"><span class="ico">🔐</span>Roles & Permissions</a></nav><div class="sidebar-section">Core Modules</div><nav><a href="crm.html"><span class="ico">🎤</span>Artists & CRM</a><a href="anr.html"><span class="ico">🎧</span>Demos & A&R</a><a href="releases.html"><span class="ico">💿</span>Releases</a><a href="media.html"><span class="ico">📁</span>Media Library</a><a href="events.html"><span class="ico">🎪</span>Bookings & Events</a><a href="finance.html"><span class="ico">💰</span>Finance</a><a href="royalties.html"><span class="ico">📊</span>Royalties & Splits</a></nav><div class="sidebar-section">Advanced</div><nav><a href="marketing.html"><span class="ico">📣</span>Marketing</a><a href="analytics.html"><span class="ico">📈</span>Analytics</a><a href="collaboration.html"><span class="ico">🤝</span>Collaboration</a><a href="portals.html"><span class="ico">👤</span>Portals</a><a href="integrations.html"><span class="ico">🔌</span>Integrations</a></nav><div class="sidebar-section">Reference</div><nav><a href="admin.html"><span class="ico">⚙️</span>Settings & Admin</a></nav>
-  <div class="sidebar-footer">v1.0 · <a href="https://github.com/yourusername/labelmanager-os" target="_blank">GitHub ↗</a></div>
+  <div class="sb-sec">Getting Started</div><nav><a href="index.html" class="active">📖 Overview</a><a href="quickstart.html">⚡ Quick Start</a><a href="roles.html">🔐 Roles & Permissions</a></nav><div class="sb-sec">Core Modules</div><nav><a href="crm.html">🎤 Artists & CRM</a><a href="anr.html">🎧 Demos & A&R</a><a href="releases.html">💿 Releases</a><a href="media.html">📁 Media Library</a><a href="events.html">🎪 Bookings & Events</a><a href="finance.html">💰 Finance</a><a href="royalties.html">📊 Royalties & Splits</a></nav><div class="sb-sec">Advanced</div><nav><a href="marketing.html">📣 Marketing</a><a href="analytics.html">📈 Analytics</a><a href="collaboration.html">🤝 Collaboration</a><a href="portals.html">👤 Portals</a><a href="integrations.html">🔌 Integrations</a></nav><div class="sb-sec">Reference</div><nav><a href="admin.html">⚙️ Settings & Admin</a></nav>
+  <div class="sb-footer">v1.0 · <a href="../index.html">← Back to App</a> · <a href="https://github.com/yourusername/labelmanager-os" target="_blank">GitHub</a></div>
 </aside>
 <div class="main">
   <div class="topbar">
-    <div class="breadcrumb">
-      <a href="index.html">LabelManager OS Docs</a> &nbsp;›&nbsp;
-      <span>Getting Started</span> &nbsp;›&nbsp; Overview
-    </div>
-    <div class="search-bar">🔍 &nbsp;Search… &nbsp;<kbd>Ctrl+K</kbd></div>
+    <div class="bc"><a href="index.html">Docs</a> &nbsp;›&nbsp; <span>Getting Started</span> &nbsp;›&nbsp; Overview</div>
   </div>
   <div class="content">
-<div class="breadcrumb"><a href="index.html">Docs</a> <span>›</span> Introduction</div>
-    
 <h1>📖 LabelManager OS — User Manual</h1>
-<p class="page-intro">
-  Welcome to the official documentation for <strong>LabelManager OS</strong> — the all-in-one operating system for independent record labels. This manual covers every module, workflow and setting in the app.
-</p>
+<p class="lead">Welcome to the official documentation for <strong>LabelManager OS</strong> — the all-in-one operating system for independent record labels. This manual covers every module, feature and workflow.</p>
 
-<div class="toc">
-  <div class="toc-title">In this manual</div>
-  <ol>
-    <li><a href="quickstart.html">Quick Start — get up and running in 5 minutes</a></li>
-    <li><a href="roles.html">Roles & Permissions — who can see and do what</a></li>
-    <li><a href="crm.html">Artists & CRM — your label roster and contacts</a></li>
-    <li><a href="anr.html">Demos & A&R — the full demo pipeline</a></li>
-    <li><a href="releases.html">Releases — timelines, tasks and campaigns</a></li>
-    <li><a href="media.html">Media Library — uploads, waveforms and assets</a></li>
-    <li><a href="events.html">Bookings & Events — gig management</a></li>
-    <li><a href="finance.html">Finance — income, expenses and overview</a></li>
-    <li><a href="royalties.html">Royalties & Splits — contracts and statements</a></li>
-    <li><a href="marketing.html">Marketing & Smart Links</a></li>
-    <li><a href="analytics.html">Analytics — performance and funnel data</a></li>
-    <li><a href="collaboration.html">Tasks & Collaboration</a></li>
-    <li><a href="portals.html">Artist & Manager Portals</a></li>
-    <li><a href="integrations.html">Integrations — webhooks, import, export</a></li>
-    <li><a href="settings.html">Settings & Configuration</a></li>
-    <li><a href="faq.html">FAQ & Troubleshooting</a></li>
-  </ol>
+<nav class="toc"><strong>Quick navigation</strong><ul>
+<li><a href="quickstart.html">⚡ Quick Start — get running in 5 minutes</a></li>
+<li><a href="roles.html">🔐 Roles &amp; Permissions — who can do what</a></li>
+<li><a href="crm.html">🎤 Artists &amp; CRM</a></li>
+<li><a href="anr.html">🎧 Demos &amp; A&amp;R pipeline</a></li>
+<li><a href="releases.html">💿 Releases lifecycle</a></li>
+<li><a href="royalties.html">📊 Royalties &amp; splits</a></li>
+</ul></nav>
+
+<h2 id="what">What is LabelManager OS?</h2>
+<p>LabelManager OS is a <strong>single-page web app</strong> (no backend, no server required) that runs entirely in the browser. All data is persisted in <code>localStorage</code>, making it instantly deployable on GitHub Pages, Netlify, or any static host.</p>
+<div class="fg">
+<div class="fc"><div class="fc-ico">🎤</div><div class="fc-t">Artists &amp; CRM</div><div class="fc-d">Full artist roster with bio, social links, contracts, contact history</div></div>
+<div class="fc"><div class="fc-ico">🎧</div><div class="fc-t">Demos &amp; A&amp;R</div><div class="fc-d">7-stage Kanban pipeline, waveform player, scoring engine, A&amp;R intelligence</div></div>
+<div class="fc"><div class="fc-ico">💿</div><div class="fc-t">Releases</div><div class="fc-d">Full release lifecycle with smart task templates, timeline view &amp; distributor export</div></div>
+<div class="fc"><div class="fc-ico">📊</div><div class="fc-t">Royalties Pro</div><div class="fc-d">Multi-contract engine, split calculation, PDF statements, distributor CSV import</div></div>
+<div class="fc"><div class="fc-ico">💰</div><div class="fc-t">Finance</div><div class="fc-d">Income &amp; expenses ledger, recoupment tracking, P&amp;L per release</div></div>
+<div class="fc"><div class="fc-ico">🎪</div><div class="fc-t">Bookings &amp; Events</div><div class="fc-d">Gig pipeline, fee tracking, rider management, calendar view</div></div>
+<div class="fc"><div class="fc-ico">📣</div><div class="fc-t">Marketing</div><div class="fc-d">Smart links, promo pool, EPK generator, campaign board</div></div>
+<div class="fc"><div class="fc-ico">📈</div><div class="fc-t">Analytics</div><div class="fc-d">Release performance, A&amp;R funnel, channel analytics, team productivity</div></div>
+<div class="fc"><div class="fc-ico">🔌</div><div class="fc-t">Integrations</div><div class="fc-d">Webhooks, distributor exports (FUGA/DistroKid/Believe), platform imports</div></div>
 </div>
 
-<h2>What is LabelManager OS?</h2>
-<p>LabelManager OS is a <strong>single-file progressive web app</strong> that runs entirely in your browser. No backend, no installation, no monthly fees. All your label data is stored locally using browser localStorage — encrypted and portable.</p>
-<p>It replaces the fragmented label workflow of Notion + Google Sheets + Dropbox + email chains with one coherent, dark-mode system designed for the way modern independent labels actually work.</p>
+<h2 id="concepts">Core Concepts</h2>
+<table><thead><tr><th>Concept</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>localStorage DB</strong></td><td>All data lives in <code>LOS.db</code>, auto-saved to <code>localStorage</code> on every change. No server needed.</td></tr>
+<tr><td><strong>Role (RBAC)</strong></td><td>Every user has one of four roles: Admin, Label Manager, A&amp;R, Artist. Roles control which modules and actions are visible.</td></tr>
+<tr><td><strong>Views</strong></td><td>Each module is a "view" — rendered on demand by <code>LOS.renderAll()</code>. Navigation switches views without page reload.</td></tr>
+<tr><td><strong>Public Upload</strong></td><td><code>upload.html</code> is a standalone public demo submission form. No login required.</td></tr>
+<tr><td><strong>Docs</strong></td><td>This manual lives in <code>docs/</code> and opens inline via the ❓ help button in the app.</td></tr>
+</tbody></table>
 
-<h2>Core Concepts</h2>
-
-<h3>Single Source of Truth</h3>
-<p>Every piece of data — artists, releases, demos, contracts, events, royalties, media assets — is stored in a single relational JSON structure. Nothing is duplicated. Artists are linked to releases, releases to tracks, tracks to royalties, royalties to contracts. Change an artist name once and it updates everywhere.</p>
-
-<h3>Workflow-First Design</h3>
-<p>Everything is organized around pipelines and timelines — not just lists. The Demo Kanban, Release Timeline, Booking Pipeline and Royalty Statement flow are designed to match how you actually work, not how a database admin thinks you should.</p>
-
-<h3>Roles & Portals</h3>
-<p>Different people on your label see different things. A&R staff work in the demo pipeline. Artists see their own releases, financials and assets. Managers get a read-only overview. Admins see everything. Nobody sees what they shouldn't.</p>
-
-<h2>System Requirements</h2>
-<table>
-  <tr><th>Requirement</th><th>Minimum</th><th>Recommended</th></tr>
-  <tr><td>Browser</td><td>Chrome 90+, Firefox 90+, Safari 15+</td><td>Chrome 120+ / Edge 120+</td></tr>
-  <tr><td>Screen</td><td>1024px wide</td><td>1440px wide</td></tr>
-  <tr><td>localStorage</td><td>5 MB available</td><td>50 MB+ (for media metadata)</td></tr>
-  <tr><td>Internet</td><td>Required on first load (CDN libs)</td><td>Works offline after first load</td></tr>
-</table>
-
-<div class="callout callout-info">
-  <strong>💡 Pro tip:</strong> For the best experience, bookmark the app and use it in a dedicated browser profile for your label. This keeps your data separate from personal browsing and prevents accidental localStorage clears.
-</div>
-
-    <div class="prev-next">
-      
-      <a href="quickstart.html" class="next"><span class="dir">Next →</span><span class="title">Quick Start</span></a>
-    </div>
-    <div class="doc-footer">
-      <span>LabelManager OS — User Manual v1.0</span>
-      <span>Built for independent labels 🖤</span>
-    </div>
-<div class="page-nav"><span></span><a href="quickstart.html" class="next"><div class="nav-dir">Next →</div><div class="nav-title">Quick Start</div></a></div>
+<h2 id="sysreq">System Requirements</h2>
+<ul>
+<li>Any modern browser: Chrome 110+, Firefox 115+, Safari 16+, Edge 110+</li>
+<li>JavaScript enabled</li>
+<li>~5 MB localStorage quota (default browser quota is 5–10 MB)</li>
+<li>Internet connection only needed for Google Fonts + Lucide icons CDN on first load</li>
+</ul>
+<div class="callout tip"><span class="ci">💡</span><div class="cb"><strong>Offline use</strong><p>After the first load, the service worker caches all assets. The app works fully offline thereafter.</p></div></div>
+<div class="page-nav"><span></span><a href="quickstart.html" class="next"><div class="nd">Next →</div><div class="nt">Quick Start</div></a></div>
   </div>
 </div>
 </body>

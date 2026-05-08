@@ -1,0 +1,13 @@
+{
+  "name": "LabelManager OS",
+  "short_name": "LabelManager",
+  "description": "Independent Label OS — CRM, A&R, Releases, Royalties, Finance, Bookings",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b0c0f",
+  "theme_color": "#c9a84c",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

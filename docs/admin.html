@@ -2,288 +2,184 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Settings & Admin — LabelManager OS Docs</title>
+<title>Settings & Admin — LabelManager OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0c0f;--s1:#0e0f14;--s2:#13151c;--s3:#1a1d26;--b1:#2a2d3a;--b2:#3a3f54;
 --text:#e8eaf0;--muted:#7c82a0;--gold:#c9a84c;--teal:#4a9fa8;--ok:#3d9970;
---err:#c0524e;--warn:#d4a043;--info:#4a6fa8;--r:10px;--tr:all .18s ease;
+--err:#c0524e;--warn:#d4a043;--info:#4a6fa8;--r:10px;
 --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
---mono:'JetBrains Mono','Fira Code',monospace;
---sw:264px;--cmax:860px}
+--mono:'JetBrains Mono','Fira Code',monospace;--sw:256px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.75;display:flex;min-height:100vh}
 .sidebar{width:var(--sw);background:var(--s1);border-right:1px solid var(--b1);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;scrollbar-width:thin}
-.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:11px}
-.sidebar-logo .icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),#e8c47a);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 10px rgba(201,168,76,.3)}
-.sidebar-logo .brand{font-size:13.5px;font-weight:800;color:var(--text)}
-.sidebar-logo .sub{font-size:10.5px;color:var(--muted);margin-top:1px}
-.sidebar-section{padding:16px 12px 4px;font-size:9.5px;font-weight:700;color:var(--b2);letter-spacing:.14em;text-transform:uppercase}
-.sidebar nav a{display:flex;align-items:center;gap:9px;padding:8px 12px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:7px;margin:1px 7px;transition:var(--tr)}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
+.sb-logo .icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#e8c47a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-logo .brand{font-size:13px;font-weight:800;color:var(--text)}
+.sb-logo .ver{font-size:10.5px;color:var(--muted)}
+.sb-sec{padding:14px 12px 3px;font-size:9.5px;font-weight:700;color:var(--b2);letter-spacing:.14em;text-transform:uppercase}
+.sidebar nav a{display:flex;align-items:center;gap:8px;padding:7px 11px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:7px;margin:1px 6px;transition:all .15s}
 .sidebar nav a:hover{background:var(--s3);color:var(--text)}
 .sidebar nav a.active{background:rgba(201,168,76,.13);color:var(--gold);font-weight:600}
-.sidebar nav a .ico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
-.sidebar-footer{margin-top:auto;padding:13px 16px;border-top:1px solid var(--b1);font-size:11px;color:var(--muted)}
-.sidebar-footer a{color:var(--teal);text-decoration:none}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--b1);font-size:11px;color:var(--muted)}
+.sb-footer a{color:var(--teal);text-decoration:none}
 .main{margin-left:var(--sw);flex:1;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(11,12,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b1);padding:12px 40px;display:flex;align-items:center;gap:14px}
-.breadcrumb{font-size:12px;color:var(--muted)}
-.breadcrumb span{color:var(--gold);font-weight:500}
-.breadcrumb a{color:var(--muted);text-decoration:none}
-.breadcrumb a:hover{color:var(--gold)}
-.search-bar{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:6px 12px;font-size:13px;color:var(--muted);cursor:pointer;transition:var(--tr)}
-.search-bar:hover{border-color:var(--gold)}
-.search-bar kbd{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 6px;font-size:10px;font-family:var(--mono)}
-.content{max-width:var(--cmax);margin:0 auto;padding:48px 40px 88px}
-/* typography */
-h1{font-size:32px;font-weight:800;color:var(--text);margin:20px 0 14px;letter-spacing:-.02em;line-height:1.2}
-h2{font-size:21px;font-weight:700;color:var(--text);margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--b1);letter-spacing:-.01em}
-h3{font-size:16px;font-weight:700;color:var(--text);margin:28px 0 10px}
-h4{font-size:13px;font-weight:700;color:var(--gold);margin:20px 0 8px;text-transform:uppercase;letter-spacing:.05em}
-p{margin-bottom:14px;color:#c5c8d8}
-.page-intro{font-size:16px;color:var(--muted);line-height:1.65;margin-bottom:28px;max-width:720px}
-a{color:var(--teal);text-decoration:none}
-a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(11,12,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b1);padding:11px 36px;display:flex;align-items:center;gap:12px}
+.bc{font-size:12px;color:var(--muted)}.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--gold)}.bc span{color:var(--gold);font-weight:500}
+.content{max-width:820px;margin:0 auto;padding:44px 36px 80px}
+h1{font-size:30px;font-weight:800;color:var(--text);margin:16px 0 12px;letter-spacing:-.02em;line-height:1.2}
+h2{font-size:20px;font-weight:700;color:var(--text);margin:40px 0 12px;padding-top:12px;border-top:1px solid var(--b1);letter-spacing:-.01em}
+h3{font-size:15.5px;font-weight:700;color:var(--text);margin:26px 0 9px}
+h4{font-size:12.5px;font-weight:700;color:var(--gold);margin:18px 0 7px;text-transform:uppercase;letter-spacing:.05em}
+p{margin-bottom:13px;color:#c5c8d8}
+.lead{font-size:16px;color:var(--muted);line-height:1.65;margin-bottom:24px;max-width:680px}
+.page-intro{font-size:15.5px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 strong{color:var(--text);font-weight:600}
-ul,ol{padding-left:22px;margin-bottom:16px;color:#c5c8d8}
+ul,ol{padding-left:20px;margin-bottom:14px;color:#c5c8d8}
 li{margin-bottom:5px;line-height:1.65}
-/* breadcrumb inside content */
-.breadcrumb.content-bc{margin-bottom:6px;font-size:12px}
-/* toc */
-nav.toc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px 22px;margin-bottom:36px}
-nav.toc strong{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
-nav.toc ul{margin:0;padding-left:18px}
-nav.toc li{margin-bottom:4px}
-nav.toc a{font-size:13px;color:var(--muted)}
-nav.toc a:hover{color:var(--gold)}
-/* tables */
-.table-wrap{overflow-x:auto;margin:20px 0;border-radius:var(--r);border:1px solid var(--b1);box-shadow:0 2px 14px rgba(0,0,0,.2)}
+.toc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px 20px;margin-bottom:32px}
+.toc strong{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.toc ul{margin:0;padding-left:16px}.toc li{margin-bottom:3px}.toc a{font-size:13px;color:var(--muted)}.toc a:hover{color:var(--gold)}
+.table-wrap{overflow-x:auto;margin:18px 0;border-radius:var(--r);border:1px solid var(--b1)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 thead{background:var(--s2)}
-th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--b1);white-space:nowrap}
-td{padding:10px 16px;border-bottom:1px solid var(--b1);color:#c5c8d8;vertical-align:top}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.018)}
+th{padding:10px 15px;text-align:left;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--b1);white-space:nowrap}
+td{padding:10px 15px;border-bottom:1px solid var(--b1);color:#c5c8d8;vertical-align:top}
+tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.018)}
 td code,th code{background:var(--s3);padding:2px 6px;border-radius:4px;font-size:12px;font-family:var(--mono);color:var(--teal)}
-/* callouts */
-.callout{border-radius:var(--r);padding:15px 18px;margin:20px 0;display:flex;gap:12px;align-items:flex-start}
-.callout-icon,.callout>span:first-child{font-size:18px;flex-shrink:0;margin-top:1px}
-.callout-body{flex:1}.callout-body>strong,.callout>strong{display:block;margin-bottom:4px;font-size:13px}
-.callout-body p,.callout>p{margin:0;font-size:13.5px;color:#c5c8d8}
-.callout.tip,.callout.info,.callout.warn,.callout.ok,.callout.err{} /* types below */
-.callout.tip{background:rgba(74,159,168,.07);border-left:3px solid var(--teal)}
-.callout.tip .callout-icon,.callout.tip>span:first-child,.callout.tip>strong,.callout.tip .callout-body>strong{color:var(--teal)}
-.callout.warn{background:rgba(212,160,67,.07);border-left:3px solid var(--warn)}
-.callout.warn .callout-icon,.callout.warn>span:first-child,.callout.warn>strong,.callout.warn .callout-body>strong{color:var(--warn)}
-.callout.info{background:rgba(74,111,168,.07);border-left:3px solid var(--info)}
-.callout.info .callout-icon,.callout.info>span:first-child,.callout.info>strong,.callout.info .callout-body>strong{color:var(--info)}
-.callout.ok{background:rgba(61,153,112,.07);border-left:3px solid var(--ok)}
-.callout.ok .callout-icon,.callout.ok>span:first-child,.callout.ok>strong,.callout.ok .callout-body>strong{color:var(--ok)}
-.callout.err{background:rgba(192,82,78,.07);border-left:3px solid var(--err)}
-.callout.err .callout-icon,.callout.err>span:first-child,.callout.err>strong,.callout.err .callout-body>strong{color:var(--err)}
-/* code */
+.callout{border-radius:var(--r);padding:14px 18px;margin:18px 0;display:flex;gap:11px;align-items:flex-start}
+.ci{font-size:17px;flex-shrink:0;margin-top:1px}.cb{flex:1}.cb>strong{display:block;margin-bottom:4px;font-size:13px}.cb>p,.cb p{margin:0;font-size:13.5px;color:#c5c8d8}
+.callout.tip{background:rgba(74,159,168,.07);border-left:3px solid var(--teal)}.callout.tip .ci,.callout.tip .cb>strong{color:var(--teal)}
+.callout.warn{background:rgba(212,160,67,.07);border-left:3px solid var(--warn)}.callout.warn .ci,.callout.warn .cb>strong{color:var(--warn)}
+.callout.ok{background:rgba(61,153,112,.07);border-left:3px solid var(--ok)}.callout.ok .ci,.callout.ok .cb>strong{color:var(--ok)}
+.callout.err{background:rgba(192,82,78,.07);border-left:3px solid var(--err)}.callout.err .ci,.callout.err .cb>strong{color:var(--err)}
+.callout.info{background:rgba(74,111,168,.07);border-left:3px solid var(--info)}.callout.info .ci,.callout.info .cb>strong{color:var(--info)}
 code{background:var(--s3);padding:2px 7px;border-radius:5px;font-size:12.5px;font-family:var(--mono);color:var(--teal)}
-pre{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:20px;overflow-x:auto;margin:20px 0;line-height:1.65}
+pre{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px;overflow-x:auto;margin:18px 0;line-height:1.65}
 pre code{background:none;padding:0;font-size:13px;color:#a8b8d8}
-/* steps */
-.steps{margin:20px 0}
-.step{display:flex;gap:16px;margin-bottom:20px}
-.step-num{width:32px;height:32px;border-radius:50%;background:rgba(201,168,76,.11);border:1px solid rgba(201,168,76,.28);color:var(--gold);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.step-body{flex:1}.step-body h4{margin:0 0 6px;color:var(--text);font-size:14px;text-transform:none;letter-spacing:0;font-weight:600}
-.step-body p{margin:0;font-size:13.5px}
-/* kbd */
-kbd{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;font-size:11px;font-family:var(--mono);color:var(--text);box-shadow:0 1px 0 var(--b2)}
-/* badges */
+kbd{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;font-size:11px;font-family:var(--mono);color:var(--text)}
 .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
-/* feature grid */
-.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:20px 0}
-.fc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px;transition:var(--tr)}
+.b-gold{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid rgba(201,168,76,.25)}
+.b-teal{background:rgba(74,159,168,.14);color:var(--teal);border:1px solid rgba(74,159,168,.25)}
+.b-ok{background:rgba(61,153,112,.14);color:#5dba90;border:1px solid rgba(61,153,112,.25)}
+.b-err{background:rgba(192,82,78,.14);color:#e07773;border:1px solid rgba(192,82,78,.25)}
+.b-gray{background:var(--s3);color:var(--muted);border:1px solid var(--b1)}
+.steps{margin:18px 0}.step{display:flex;gap:14px;margin-bottom:18px}
+.sn{width:30px;height:30px;border-radius:50%;background:rgba(201,168,76,.11);border:1px solid rgba(201,168,76,.28);color:var(--gold);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.sb2{flex:1}.sb2 h4{margin:0 0 5px;color:var(--text);font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:600}.sb2 p{margin:0;font-size:13.5px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.fc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;transition:all .15s}
 .fc:hover{border-color:var(--teal);transform:translateY(-1px)}
-.fc-icon{font-size:22px;margin-bottom:10px}
-.fc-title{font-weight:700;color:var(--text);margin-bottom:5px;font-size:14px}
-.fc-desc{font-size:13px;color:var(--muted);line-height:1.55}
-/* role grid */
-.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin:20px 0}
-.role-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px;transition:var(--tr)}
-.role-card:hover{border-color:var(--gold)}
-.role-name{font-weight:700;color:var(--text);margin-bottom:8px;font-size:15px}
-.role-card ul{padding-left:16px;margin:0}
-.role-card li{font-size:12.5px;color:var(--muted);margin-bottom:3px}
-/* page nav */
-.page-nav{display:flex;justify-content:space-between;margin-top:60px;padding-top:24px;border-top:1px solid var(--b1);gap:14px}
-.page-nav a{display:flex;flex-direction:column;gap:4px;padding:14px 18px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:var(--tr);max-width:260px;flex:1}
+.fc-ico{font-size:20px;margin-bottom:9px}.fc-t{font-weight:700;color:var(--text);margin-bottom:5px;font-size:13.5px}.fc-d{font-size:12.5px;color:var(--muted);line-height:1.55}
+.page-nav{display:flex;justify-content:space-between;margin-top:56px;padding-top:22px;border-top:1px solid var(--b1);gap:12px}
+.page-nav a{display:flex;flex-direction:column;gap:4px;padding:13px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);text-decoration:none;transition:all .15s;max-width:250px;flex:1}
 .page-nav a:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
-.nav-dir{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.nav-title{font-size:14px;font-weight:600;color:var(--text)}
+.nd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.nt{font-size:13.5px;font-weight:600;color:var(--text)}
 .page-nav a.next{text-align:right}
-@media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.content{padding:28px 18px 60px}.topbar{padding:11px 18px}}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:4px}
+.breadcrumb a{color:var(--muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+@media(max-width:860px){.sidebar{display:none}.main{margin-left:0}.content{padding:24px 16px 56px}.topbar{padding:10px 16px}}
 </style>
 </head>
 <body>
 <aside class="sidebar">
-  <div class="sidebar-logo">
+  <div class="sb-logo">
     <div class="icon">♪</div>
-    <div><div class="brand">LabelManager OS</div><div class="sub">User Manual v1.0</div></div>
+    <div><div class="brand">LabelManager OS</div><div class="ver">Manual v1.0</div></div>
   </div>
-  <div class="sidebar-section">Getting Started</div><nav><a href="index.html"><span class="ico">📖</span>Overview</a><a href="quickstart.html"><span class="ico">⚡</span>Quick Start</a><a href="roles.html"><span class="ico">🔐</span>Roles & Permissions</a></nav><div class="sidebar-section">Core Modules</div><nav><a href="crm.html"><span class="ico">🎤</span>Artists & CRM</a><a href="anr.html"><span class="ico">🎧</span>Demos & A&R</a><a href="releases.html"><span class="ico">💿</span>Releases</a><a href="media.html"><span class="ico">📁</span>Media Library</a><a href="events.html"><span class="ico">🎪</span>Bookings & Events</a><a href="finance.html"><span class="ico">💰</span>Finance</a><a href="royalties.html"><span class="ico">📊</span>Royalties & Splits</a></nav><div class="sidebar-section">Advanced</div><nav><a href="marketing.html"><span class="ico">📣</span>Marketing</a><a href="analytics.html"><span class="ico">📈</span>Analytics</a><a href="collaboration.html"><span class="ico">🤝</span>Collaboration</a><a href="portals.html"><span class="ico">👤</span>Portals</a><a href="integrations.html"><span class="ico">🔌</span>Integrations</a></nav><div class="sidebar-section">Reference</div><nav><a href="admin.html" class="active"><span class="ico">⚙️</span>Settings & Admin</a></nav>
-  <div class="sidebar-footer">v1.0 · <a href="https://github.com/yourusername/labelmanager-os" target="_blank">GitHub ↗</a></div>
+  <div class="sb-sec">Getting Started</div><nav><a href="index.html">📖 Overview</a><a href="quickstart.html">⚡ Quick Start</a><a href="roles.html">🔐 Roles & Permissions</a></nav><div class="sb-sec">Core Modules</div><nav><a href="crm.html">🎤 Artists & CRM</a><a href="anr.html">🎧 Demos & A&R</a><a href="releases.html">💿 Releases</a><a href="media.html">📁 Media Library</a><a href="events.html">🎪 Bookings & Events</a><a href="finance.html">💰 Finance</a><a href="royalties.html">📊 Royalties & Splits</a></nav><div class="sb-sec">Advanced</div><nav><a href="marketing.html">📣 Marketing</a><a href="analytics.html">📈 Analytics</a><a href="collaboration.html">🤝 Collaboration</a><a href="portals.html">👤 Portals</a><a href="integrations.html">🔌 Integrations</a></nav><div class="sb-sec">Reference</div><nav><a href="admin.html" class="active">⚙️ Settings & Admin</a></nav>
+  <div class="sb-footer">v1.0 · <a href="../index.html">← Back to App</a> · <a href="https://github.com/yourusername/labelmanager-os" target="_blank">GitHub</a></div>
 </aside>
 <div class="main">
   <div class="topbar">
-    <div class="breadcrumb">
-      <a href="index.html">LabelManager OS Docs</a> &nbsp;›&nbsp;
-      <span>Reference</span> &nbsp;›&nbsp; Settings & Admin
-    </div>
-    <div class="search-bar">🔍 &nbsp;Search… &nbsp;<kbd>Ctrl+K</kbd></div>
+    <div class="bc"><a href="index.html">Docs</a> &nbsp;›&nbsp; <span>Reference</span> &nbsp;›&nbsp; Settings & Admin</div>
   </div>
   <div class="content">
+<div class="breadcrumb"><a href="index.html">Docs</a> › Settings & Admin</div>
+<h1>⚙️ Settings &amp; Admin</h1>
+<p class="page-intro">Configure every aspect of LabelManager OS — label identity, user accounts, roles, notification rules, integrations, import/export, and data safety.</p>
+<nav class="toc"><strong>On this page</strong><ul>
+<li><a href="#label">Label Settings</a></li>
+<li><a href="#users">User Management</a></li>
+<li><a href="#rbac">Role-Based Access Control</a></li>
+<li><a href="#notif">Notifications &amp; Webhooks</a></li>
+<li><a href="#integrations">Integrations</a></li>
+<li><a href="#import">Import &amp; Export</a></li>
+<li><a href="#backup">Backup &amp; Safety</a></li>
+<li><a href="#danger">Danger Zone</a></li>
+</ul></nav>
 
-<div class="breadcrumb"><a href="index.html">Docs</a> <span>›</span> Settings & Admin</div>
-
-<h1>⚙️ Settings & Admin</h1>
-<p class="page-intro">Configure every aspect of LabelManager OS — user accounts, roles, label identity, notification rules, integrations, backup, and data import/export.</p>
-
-<nav class="toc">
-  <strong>On this page</strong>
-  <ul>
-    <li><a href="#label-settings">Label Settings</a></li>
-    <li><a href="#users">User Management</a></li>
-    <li><a href="#rbac">Role-Based Access Control</a></li>
-    <li><a href="#notifications">Notifications</a></li>
-    <li><a href="#integrations">Integrations</a></li>
-    <li><a href="#import-export">Import & Export</a></li>
-    <li><a href="#backup">Backup & Data Safety</a></li>
-    <li><a href="#danger">Danger Zone</a></li>
-  </ul>
-</nav>
-
-<h2 id="label-settings">Label Settings</h2>
-<p>Set your label's global identity. These values appear in generated PDFs, statements, EPKs and emails.</p>
-<table>
-  <thead><tr><th>Setting</th><th>Description</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Label Name</strong></td><td>Your label's trading name (e.g. Ostgut Ton)</td></tr>
-    <tr><td><strong>Logo</strong></td><td>Upload a PNG/SVG logo (used in PDFs and portals)</td></tr>
-    <tr><td><strong>Primary Genre</strong></td><td>Used as default in new release forms</td></tr>
-    <tr><td><strong>Default Currency</strong></td><td>EUR, USD, GBP — used across Finance and Royalties</td></tr>
-    <tr><td><strong>VAT / Tax Number</strong></td><td>Printed on royalty statements and invoices</td></tr>
-    <tr><td><strong>Bank Details</strong></td><td>IBAN / BIC shown on statements (stored encrypted)</td></tr>
-    <tr><td><strong>Statement Footer</strong></td><td>Legal text appended to royalty statements and EPKs</td></tr>
-    <tr><td><strong>Timezone</strong></td><td>Used for deadline calculations and calendar display</td></tr>
-  </tbody>
-</table>
+<h2 id="label">Label Settings</h2>
+<p>Go to <strong>Settings → Label Profile</strong>. These values appear in generated PDFs, royalty statements, EPKs and emails.</p>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>Label Name</strong></td><td>Your trading name, appears on all exports</td></tr>
+<tr><td><strong>Logo</strong></td><td>PNG/SVG, used in PDFs and portals (recommended: 400×400)</td></tr>
+<tr><td><strong>Default Currency</strong></td><td>EUR / USD / GBP — used across Finance and Royalties</td></tr>
+<tr><td><strong>VAT / Tax Number</strong></td><td>Printed on royalty statements and invoices</td></tr>
+<tr><td><strong>Bank / IBAN</strong></td><td>Shown on statements (stored in localStorage, never transmitted)</td></tr>
+<tr><td><strong>Statement Footer</strong></td><td>Legal text appended to all PDF statements</td></tr>
+<tr><td><strong>Timezone</strong></td><td>Used for deadline calculation and calendar display</td></tr>
+</tbody></table>
 
 <h2 id="users">User Management</h2>
-<p>Go to <strong>Settings → Users</strong> to invite, edit or deactivate team members.</p>
-<h3>Inviting a new user</h3>
-<ol>
-  <li>Click <strong>+ Invite User</strong></li>
-  <li>Enter name, email address and select a role</li>
-  <li>The user receives an email with a one-time sign-in link valid for 48 hours</li>
-  <li>On first login they set their own password</li>
-</ol>
-<h3>Deactivating a user</h3>
-<p>Deactivated accounts can no longer log in but all their history, comments and task assignments are preserved. Deactivation is reversible — click <strong>Reactivate</strong> at any time.</p>
-<div class="callout warn">
-  <span class="callout-icon">⚠️</span>
-  <div class="callout-body"><strong>You cannot deactivate your own account.</strong><p>Ask another Admin to deactivate you, or transfer ownership first.</p></div>
-</div>
+<p>Navigate to <strong>Settings → Users &amp; Roles</strong>. The admin can create, edit and deactivate accounts.</p>
+<h3>Default demo accounts</h3>
+<table><thead><tr><th>Email</th><th>Password</th><th>Role</th></tr></thead><tbody>
+<tr><td><code>admin@label.com</code></td><td><code>admin1234</code></td><td>Admin</td></tr>
+<tr><td><code>manager@label.com</code></td><td><code>manager1234</code></td><td>Label Manager</td></tr>
+<tr><td><code>ar@label.com</code></td><td><code>ar1234</code></td><td>A&amp;R</td></tr>
+<tr><td><code>artist@label.com</code></td><td><code>artist1234</code></td><td>Artist</td></tr>
+</tbody></table>
+<div class="callout warn"><span class="ci">⚠️</span><div class="cb"><strong>Change passwords before going live.</strong><p>Passwords are stored in localStorage as plain strings in this client-side build. For production, replace with a real backend auth system.</p></div></div>
 
 <h2 id="rbac">Role-Based Access Control</h2>
-<p>Each user has exactly one role. Roles control both API access and UI visibility — restricted sections are hidden from the navigation, not just disabled.</p>
-<table>
-  <thead><tr><th>Role</th><th>CRM</th><th>Demos/A&R</th><th>Releases</th><th>Finance</th><th>Royalties</th><th>Users</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Admin</strong></td><td>Full</td><td>Full</td><td>Full</td><td>Full</td><td>Full</td><td>Full</td></tr>
-    <tr><td><strong>Label Manager</strong></td><td>Full</td><td>Full</td><td>Full</td><td>View + Edit</td><td>View + Edit</td><td>Invite only</td></tr>
-    <tr><td><strong>A&R</strong></td><td>View + Edit</td><td>Full</td><td>View</td><td>None</td><td>None</td><td>None</td></tr>
-    <tr><td><strong>Artist</strong></td><td>Own profile</td><td>Own demos</td><td>Own releases</td><td>None</td><td>Own statements</td><td>None</td></tr>
-    <tr><td><strong>Manager</strong></td><td>Linked artists</td><td>Linked demos</td><td>Linked releases</td><td>None</td><td>Linked statements</td><td>None</td></tr>
-  </tbody>
-</table>
+<p>Each user has exactly one role. Roles control both API access and UI visibility — restricted sections are hidden from navigation entirely.</p>
+<table><thead><tr><th>Role</th><th>CRM</th><th>A&amp;R</th><th>Releases</th><th>Finance</th><th>Royalties</th><th>Users</th></tr></thead><tbody>
+<tr><td><strong>Admin</strong></td><td>Full</td><td>Full</td><td>Full</td><td>Full</td><td>Full</td><td>Full</td></tr>
+<tr><td><strong>Label Manager</strong></td><td>Full</td><td>Full</td><td>Full</td><td>View+Edit</td><td>View+Edit</td><td>Invite only</td></tr>
+<tr><td><strong>A&amp;R</strong></td><td>Read</td><td>Full</td><td>Read</td><td>None</td><td>None</td><td>None</td></tr>
+<tr><td><strong>Artist</strong></td><td>Own only</td><td>Own demos</td><td>Own releases</td><td>None</td><td>Own statements</td><td>None</td></tr>
+</tbody></table>
 
-<h2 id="notifications">Notifications</h2>
-<p>Configure when and how LabelManager OS alerts you. Go to <strong>Settings → Notifications</strong>.</p>
-<h3>In-app notifications</h3>
-<p>The 🔔 bell in the top-right shows an activity feed. The following events always generate an in-app notification:</p>
-<ul>
-  <li>New demo submitted (for Admin, Label Manager, A&R roles)</li>
-  <li>Demo status changed to Signed or Rejected</li>
-  <li>Release date changed</li>
-  <li>Task overdue (assigned user + Admin)</li>
-  <li>Contract expiry within 30 days</li>
-  <li>Royalty statement generated for an artist</li>
-</ul>
-<h3>Email notifications</h3>
-<p>Email digests can be set to <em>Immediate</em>, <em>Daily summary</em> or <em>Off</em> per event category. Configure per-user under <strong>Settings → Notifications → Email Preferences</strong>.</p>
-<h3>Slack / Discord webhooks</h3>
-<p>Send real-time alerts to a Slack channel or Discord server. Configure under <strong>Settings → Integrations → Webhooks</strong>. Supported trigger events:</p>
-<table>
-  <thead><tr><th>Event key</th><th>Triggers when…</th></tr></thead>
-  <tbody>
-    <tr><td><code>demo.submitted</code></td><td>A new demo arrives via the public form</td></tr>
-    <tr><td><code>demo.status_changed</code></td><td>A demo moves to any new pipeline stage</td></tr>
-    <tr><td><code>demo.signed</code></td><td>A demo reaches the Signed stage</td></tr>
-    <tr><td><code>release.created</code></td><td>A new release is added</td></tr>
-    <tr><td><code>release.status_changed</code></td><td>A release changes status</td></tr>
-    <tr><td><code>gig.confirmed</code></td><td>A booking reaches Confirmed status</td></tr>
-    <tr><td><code>task.overdue</code></td><td>A task passes its due date without completion</td></tr>
-    <tr><td><code>contract.expiring</code></td><td>A contract expires within the configured warning window</td></tr>
-  </tbody>
-</table>
+<h2 id="notif">Notifications &amp; Webhooks</h2>
+<p>The 🔔 bell in the topbar shows live in-app notifications. Configure Slack/Discord webhooks under <strong>Integrations → Webhooks</strong>.</p>
+<h3>Webhook trigger events</h3>
+<table><thead><tr><th>Event key</th><th>Triggers when…</th></tr></thead><tbody>
+<tr><td><code>demo.submitted</code></td><td>New demo arrives via public upload form</td></tr>
+<tr><td><code>demo.signed</code></td><td>A demo reaches the Signed pipeline stage</td></tr>
+<tr><td><code>release.created</code></td><td>A new release is added</td></tr>
+<tr><td><code>release.status_changed</code></td><td>Release changes any status</td></tr>
+<tr><td><code>gig.confirmed</code></td><td>A booking moves to Confirmed</td></tr>
+<tr><td><code>contract.expiring</code></td><td>Contract expires within the warning window</td></tr>
+<tr><td><code>task.overdue</code></td><td>A task passes its due date incomplete</td></tr>
+</tbody></table>
 
 <h2 id="integrations">Integrations</h2>
-<p>Navigate to <strong>Settings → Integrations</strong> to connect LabelManager OS to external services.</p>
-<h3>Demo Platform Import</h3>
-<p>Drop a CSV from <strong>LabelRadar</strong>, <strong>SubmitHub</strong>, or <strong>Soundplate</strong> to bulk-import demos into your A&R pipeline. The importer maps columns to LabelManager fields and deduplicates by submitter email + track title.</p>
-<h3>Distributor Export</h3>
-<p>Select a Release and click <strong>Export for Distributor</strong>. Choose a template:</p>
-<ul>
-  <li><strong>DistroKid CSV</strong> — track-level upload sheet</li>
-  <li><strong>FUGA XML</strong> — full DDEX-lite package</li>
-  <li><strong>Believe / The Orchard CSV</strong> — metadata sheet + asset manifest</li>
-  <li><strong>Bandcamp</strong> — album CSV with track listing</li>
-</ul>
-<h3>Royalty Statement Delivery</h3>
-<p>When a statement is generated, it can be automatically emailed to the artist using a configured SMTP account (Settings → Email → SMTP Config) or delivered via the Artist Portal.</p>
+<h3>Demo platform import (CSV)</h3>
+<p>Under <strong>Integrations → Platform Import</strong>, drop a CSV from LabelRadar, SubmitHub, or Soundplate to bulk-import demos. The importer deduplicates by submitter email + track title.</p>
+<h3>Distributor export</h3>
+<p>Select any release and click <strong>Export for Distributor</strong>. Supported formats: <strong>DistroKid CSV</strong>, <strong>FUGA XML</strong>, <strong>Believe/Orchard TSV</strong>, <strong>Bandcamp JSON</strong>.</p>
 
-<h2 id="import-export">Import & Export</h2>
-<h3>Bulk import (CSV)</h3>
-<p>Import artists, contacts, demos or releases in bulk via CSV. Go to <strong>Settings → Import → select entity type → upload CSV</strong>. Download the template first to ensure column names match.</p>
-<h3>Full data export</h3>
-<p>Export your entire label dataset as a structured ZIP archive (JSON + CSV + media manifest). Go to <strong>Settings → Export → Export All Data</strong>. The export includes:</p>
-<ul>
-  <li>All artists, contacts, demos, releases, tracks, events, finance entries</li>
-  <li>Royalty statements (PDF + JSON)</li>
-  <li>Media file manifest (URLs or base64 depending on storage mode)</li>
-  <li>All user activity logs</li>
-</ul>
+<h2 id="import">Import &amp; Export</h2>
+<p>Use <strong>Settings → Export → Export All Data</strong> to download a full ZIP archive (JSON + CSV + media manifest) covering all artists, contacts, demos, releases, finance entries, royalty statements and activity logs.</p>
+<p>Bulk CSV import is available for: artists, contacts, demos, releases. Download the template first to match column names.</p>
 
-<h2 id="backup">Backup & Data Safety</h2>
-<div class="callout ok">
-  <span class="callout-icon">✅</span>
-  <div class="callout-body"><strong>PostgreSQL automatic backups (production)</strong><p>When deployed via Railway or Supabase, daily automated backups are managed by the hosting provider. Configure retention period (7–30 days) in your hosting dashboard.</p></div>
-</div>
-<p>For the single-file demo version (localStorage), use <strong>Settings → Export → Export All Data</strong> weekly as your manual backup. Store the ZIP in Google Drive, Dropbox or an S3 bucket.</p>
+<h2 id="backup">Backup &amp; Safety</h2>
+<div class="callout ok"><span class="ci">✅</span><div class="cb"><strong>All data is stored in your browser's localStorage</strong><p>Nothing is sent to any server in this client-side build. Export your data weekly as a safety backup.</p></div></div>
 
 <h2 id="danger">Danger Zone</h2>
-<div class="callout warn">
-  <span class="callout-icon">⚠️</span>
-  <div class="callout-body"><strong>These actions are irreversible.</strong><p>All Danger Zone actions require Admin role and a confirmation dialog where you must type the label name to proceed.</p></div>
-</div>
-<table>
-  <thead><tr><th>Action</th><th>What it does</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Delete Artist</strong></td><td>Removes artist + all linked demos, releases, contracts. Royalty statements are archived.</td></tr>
-    <tr><td><strong>Wipe Demo Pipeline</strong></td><td>Deletes all demos with status Rejected that are older than a configurable date.</td></tr>
-    <tr><td><strong>Reset All Data</strong></td><td>Wipes the entire database. Only available in development mode.</td></tr>
-    <tr><td><strong>Transfer Ownership</strong></td><td>Assigns the Admin role to a different user and downgrades your own role to Label Manager.</td></tr>
-  </tbody>
-</table>
-
-<div class="page-nav"><a href="integrations.html"><div class="nav-dir">← Previous</div><div class="nav-title">Integrations</div></a><span></span></div>
+<div class="callout err"><span class="ci">🔴</span><div class="cb"><strong>These actions are permanent.</strong><p>All Danger Zone actions require Admin role and a confirmation dialog where you must type the label name.</p></div></div>
+<table><thead><tr><th>Action</th><th>Effect</th></tr></thead><tbody>
+<tr><td><strong>Delete Artist</strong></td><td>Removes artist + all linked demos, releases and contracts</td></tr>
+<tr><td><strong>Wipe Rejected Demos</strong></td><td>Purges all demos with Rejected status older than X days</td></tr>
+<tr><td><strong>Reset All Data</strong></td><td>Clears localStorage entirely — only available in dev mode</td></tr>
+<tr><td><strong>Transfer Ownership</strong></td><td>Assigns Admin role to another user, downgrades yours to Label Manager</td></tr>
+</tbody></table>
+<div class="page-nav"><a href="integrations.html"><div class="nd">← Previous</div><div class="nt">Integrations</div></a><span></span></div>
   </div>
 </div>
 </body>

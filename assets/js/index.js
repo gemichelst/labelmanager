@@ -3753,5 +3753,8 @@ const LOS = {
 
 };
 
-// ── INIT ──────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', ()=>{ LOS.init(); });
+// ── INIT — see assets/js/auth.js for the authenticated boot sequence ──────
+// Direct boot (no auth) — used when auth.js is NOT loaded:
+if (typeof LMAuth === 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => { LOS.init(); lucide.createIcons(); });
+}

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LabelManager · Bunte Panther</title>
+  <meta name="description" content="Independent Label OS — CRM, A&R, Releases, Royalties, Finance, Bookings" />
+  <meta name="theme-color" content="#c9a84c" />
+  <link rel="manifest" href="manifest.json" />
+  <!-- ① External CSS (new path) -->
+  <link href="assets/css/style.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     🔒 LOGIN SCREEN
+     Shown by default; hidden by LMAuth.hideLogin() after auth.
+══════════════════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <i data-lucide="music-2" style="width:22px;color:#0a0a0f"></i>
+      </div>
+      <span class="login-title">LabelManager</span>
+    </div>
+    <p class="login-subtitle">Sign in to your label workspace</p>
+
+    <div id="loginError" class="login-error"></div>
+
+    <div class="login-field">
+      <label for="loginEmail">Email Address</label>
+      <input id="loginEmail" type="email" placeholder="you@label.com"
+             autocomplete="email" />
+    </div>
+    <div class="login-field">
+      <label for="loginPass">Password</label>
+      <input id="loginPass" type="password" placeholder="••••••••"
+             autocomplete="current-password" />
+    </div>
+
+    <button id="loginBtn" class="login-btn">Sign In</button>
+
+    <p class="login-footer">
+      Default password = <code style="color:var(--gold)">email&#8209;prefix&nbsp;+&nbsp;1234</code><br/>
+      e.g.&nbsp;<code style="color:var(--muted)">admin@label.com</code>
+      &rarr;&nbsp;<code style="color:var(--muted)">admin1234</code><br/>
+      Manage accounts under <strong style="color:var(--text)">Users &amp; Roles</strong>.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ❓ HELP MODAL  (iframe → ./docs/index.html)
+══════════════════════════════════════════════════════════════ -->
+<div id="helpModal" role="dialog" aria-modal="true" aria-label="Help &amp; Documentation">
+  <!-- click overlay to close -->
+  <div id="helpModalOverlay"
+       style="position:fixed;inset:0;z-index:-1;cursor:pointer"></div>
+  <div class="help-modal-inner">
+    <div class="help-modal-header">
+      <i data-lucide="book-open" style="width:16px;color:var(--gold)"></i>
+      <h2>LabelManager Manual</h2>
+      <a href="./docs/index.html" target="_blank" rel="noopener"
+         class="help-open-ext">
+        <i data-lucide="external-link" style="width:11px"></i> Open in new tab
+      </a>
+      <button id="helpClose" class="btn-ic" title="Close">
+        <i data-lucide="x" style="width:15px"></i>
+      </button>
+    </div>
+    <!-- src injected lazily by LMHelp.open() -->
+    <iframe id="helpFrame" src="" title="LabelManager Documentation"
+            loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     🏠 APP SHELL  (hidden until LMAuth.hideLogin() is called)
+══════════════════════════════════════════════════════════════ -->
+<div id="appShell" style="display:none">
+
+<!-- Topbar -->
+<header id="topbar">
+  <button class="btn-ic" id="menuBtn" onclick="LOS.openSb()" title="Menu">
+    <i data-lucide="menu" style="width:18px"></i>
+  </button>
+  <span id="tbTitle" style="font-weight:700;font-size:15px">Dashboard</span>
+
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+    <!-- Notifications -->
+    <button class="btn-ic" id="notifBtn" title="Notifications"
+            onclick="LOS.toggleNotifPanel()" style="position:relative">
+      <i data-lucide="bell" style="width:16px"></i>
+      <span id="notifBadge"
+            style="display:none;position:absolute;top:3px;right:3px;
+                   width:7px;height:7px;background:var(--gold);border-radius:50%"></span>
+    </button>
+    <!-- Search -->
+    <button class="btn-ic" onclick="LOS.openSearch()" title="Search (⌘K)">
+      <i data-lucide="search" style="width:16px"></i>
+    </button>
+    <!-- Role chip (dev convenience) -->
+    <button id="role" class="bd b-n"
+            onclick="LOS.cycleRole()" title="Cycle role (dev only)"
+            style="font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px"></button>
+    <!-- Help (topbar) -->
+    <button id="helpBtnTop" class="btn-ic" title="Help &amp; Documentation">
+      <i data-lucide="help-circle" style="width:16px"></i>
+    </button>
+  </div>
+</header>
+
+<!-- Notification Panel -->
+<div id="notifPanel" class="notif-panel" style="display:none"></div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sbOverlay" onclick="LOS.closeSb()"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199"></div>
+
+<!-- Layout -->
+<div style="display:flex;flex:1;overflow:hidden;position:relative;height:calc(100vh - 48px)">
+
+<!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+<aside id="sb">
+  <div class="sb-logo">
+    <div style="width:30px;height:30px;background:var(--gold);border-radius:8px;
+                display:flex;align-items:center;justify-content:center">
+      <i data-lucide="music-2" style="width:15px;color:#0a0a0f"></i>
+    </div>
+    <span style="font-weight:800;font-size:14px;letter-spacing:-.2px">LabelManager</span>
+    <button class="btn-ic" style="margin-left:auto" onclick="LOS.closeSb()">
+      <i data-lucide="x" style="width:14px"></i>
+    </button>
+  </div>
+
+  <nav style="flex:1;overflow-y:auto;padding:8px 6px">
+    <div class="nav-section-label">Workspace</div>
+    <button class="nav on" data-view="dash">
+      <i data-lucide="layout-dashboard" style="width:14px"></i>Dashboard</button>
+    <button class="nav" data-view="crm">
+      <i data-lucide="user-circle" style="width:14px"></i>Artists &amp; CRM</button>
+    <button class="nav" data-view="anr">
+      <i data-lucide="music-2" style="width:14px"></i>Demos &amp; A&amp;R
+      <span id="navAnr" class="nav-badge" style="display:none"></span></button>
+    <button class="nav" data-view="releases">
+      <i data-lucide="disc-3" style="width:14px"></i>Releases</button>
+    <button class="nav" data-view="contracts">
+      <i data-lucide="file-signature" style="width:14px"></i>Contract Vault
+      <span id="navExp" class="nav-badge nav-badge-warn" style="display:none">!</span></button>
+
+    <div class="nav-section-label" style="margin-top:14px">Finance</div>
+    <button class="nav" data-view="royalties">
+      <i data-lucide="trending-up" style="width:14px"></i>Royalties Pro</button>
+    <button class="nav" data-view="finance">
+      <i data-lucide="wallet" style="width:14px"></i>Finance &amp; Royalties</button>
+    <button class="nav" data-view="bookings">
+      <i data-lucide="mic-2" style="width:14px"></i>Bookings &amp; Events</button>
+
+    <div class="nav-section-label" style="margin-top:14px">Catalog</div>
+    <button class="nav" data-view="media">
+      <i data-lucide="library" style="width:14px"></i>Media Library</button>
+    <button class="nav" data-view="catalog">
+      <i data-lucide="database" style="width:14px"></i>Catalog &amp; Rights</button>
+
+    <div class="nav-section-label" style="margin-top:14px">Intelligence</div>
+    <button class="nav" data-view="anrpro">
+      <i data-lucide="brain-circuit" style="width:14px"></i>A&amp;R Intelligence</button>
+    <button class="nav" data-view="research">
+      <i data-lucide="globe-2" style="width:14px"></i>Research &amp; Scouting</button>
+
+    <div class="nav-section-label" style="margin-top:14px">Growth</div>
+    <button class="nav" data-view="marketing">
+      <i data-lucide="megaphone" style="width:14px"></i>Marketing</button>
+    <button class="nav" data-view="analytics">
+      <i data-lucide="bar-chart-2" style="width:14px"></i>Analytics</button>
+    <button class="nav" data-view="collab">
+      <i data-lucide="users" style="width:14px"></i>Collab &amp; Tasks</button>
+
+    <div class="nav-section-label" style="margin-top:14px">Portals</div>
+    <button class="nav" data-view="artist-portal">
+      <i data-lucide="sparkles" style="width:14px"></i>Artist Portal</button>
+    <button class="nav" data-view="manager-portal">
+      <i data-lucide="briefcase" style="width:14px"></i>Manager Portal</button>
+    <button class="nav" data-view="integrations">
+      <i data-lucide="plug" style="width:14px"></i>Integrations</button>
+
+    <div class="nav-section-label" style="margin-top:14px">System</div>
+    <button class="nav" data-view="users">
+      <i data-lucide="shield" style="width:14px"></i>Users &amp; Roles</button>
+    <button class="nav" data-view="actlog">
+      <i data-lucide="activity" style="width:14px"></i>Activity Log</button>
+  </nav>
+
+  <!-- ── User footer (populated by LOS.renderSidebarUser) ── -->
+  <div class="sidebar-user" id="sidebarUser">
+    <div class="sidebar-user-avatar" id="sidebarAvatar"
+         style="background:var(--gold)">?</div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name" id="sidebarName">–</div>
+      <div class="sidebar-user-role" id="sidebarRole">–</div>
+    </div>
+    <button class="btn-logout" id="logoutBtn" title="Sign out">
+      <i data-lucide="log-out" style="width:14px"></i>
+    </button>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT (all section views) ──────────────────── -->
+<main id="main">
+  <div id="toast"></div>
+  <!-- ALL VIEW SECTIONS are loaded here at runtime by script.js / index.js.
+       The original index.html had them inline; they are now rendered by
+       LOS.renderAll() into section#view-* containers below. -->
+
+  <section id="view-dash" class="view on"></section>
+  <section id="view-crm"  class="view"></section>
+  <section id="view-anr"  class="view"></section>
+  <section id="view-releases" class="view"></section>
+  <section id="view-contracts" class="view"></section>
+  <section id="view-royalties" class="view"></section>
+  <section id="view-finance"   class="view"></section>
+  <section id="view-bookings"  class="view"></section>
+  <section id="view-media"     class="view"></section>
+  <section id="view-catalog"   class="view"></section>
+  <section id="view-anrpro"    class="view"></section>
+  <section id="view-research"  class="view"></section>
+  <section id="view-marketing" class="view"></section>
+  <section id="view-analytics" class="view"></section>
+  <section id="view-collab"    class="view"></section>
+  <section id="view-artist-portal"  class="view"></section>
+  <section id="view-manager-portal" class="view"></section>
+  <section id="view-integrations"   class="view"></section>
+  <section id="view-users"   class="view"></section>
+  <section id="view-actlog"  class="view"></section>
+</main>
+
+</div><!-- /layout -->
+</div><!-- /#appShell -->
+
+<!-- ── GLOBAL PLAYER ──────────────────────────────────────── -->
+<div id="player">
+  <div style="display:flex;align-items:center;gap:12px;max-width:900px;margin:0 auto">
+    <button id="playBtn" class="btn-ic">
+      <i id="playIco" data-lucide="play" style="width:17px;color:var(--gold)"></i>
+    </button>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12.5px;font-weight:600;white-space:nowrap;
+                  overflow:hidden;text-overflow:ellipsis" id="pTt">–</div>
+      <div style="font-size:11px;color:var(--muted)" id="pSb">–</div>
+    </div>
+    <div id="waveform" style="flex:2;min-width:0;height:34px"></div>
+    <span id="pTime" style="font-size:11px;color:var(--muted);white-space:nowrap">0:00 / 0:00</span>
+    <button class="btn-ic" onclick="LOS.closePlayer()">
+      <i data-lucide="x" style="width:14px"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ── GLOBAL SEARCH OVERLAY ──────────────────────────────── -->
+<div id="searchOverlay" onclick="LOS.closeSearch()">
+  <div id="searchBox" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;
+                border-bottom:1px solid var(--b1)">
+      <i data-lucide="search" style="width:15px;color:var(--muted)"></i>
+      <input id="searchInp" type="text"
+             placeholder="Search artists, demos, releases… (⌘K)"
+             oninput="LOS.doSearch(this.value)" autocomplete="off" />
+    </div>
+    <div id="searchRes"
+         style="padding:8px 0;max-height:380px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ── ARTIST DRAWER ──────────────────────────────────────── -->
+<div id="artDrawer"
+     style="display:none;position:fixed;top:0;right:0;width:380px;
+            max-width:100vw;height:100vh;background:var(--s2);
+            border-left:1px solid var(--b1);z-index:500;overflow-y:auto;
+            padding:20px;box-shadow:-8px 0 32px rgba(0,0,0,.5)"></div>
+
+<!-- ── LIGHTBOX ───────────────────────────────────────────── -->
+<div id="lightbox" onclick="this.classList.remove('open')">
+  <img id="lbImg" src="" alt="preview"
+       style="max-width:90vw;max-height:90vh;border-radius:10px" />
+</div>
+
+<!-- ── FLOATING HELP FAB ─────────────────────────────────── -->
+<button id="helpBtn" title="Help &amp; Documentation"
+        aria-label="Open manual">
+  <i data-lucide="help-circle" style="width:18px"></i>
+</button>
+
+<!-- ────────────────────────────────────────────────────────────
+     SCRIPTS — ORDER MATTERS:
+     1. Lucide  (icons, must be first)
+     2. WaveSurfer
+     3. auth.js  (LMAuth + LMHelp  — must exist before index.js runs)
+     4. index.js (main LOS app object)
+──────────────────────────────────────────────────────────── -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/index.js"></script>
+
+</body>
+</html>
