@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings & Integrations - LabelManager OS Documentation</title>
+    <style>
+        :root {
+            --bg: #0e0f14;
+            --s1: #15171e;
+            --s2: #1c1f28;
+            --text: #ffffff;
+            --muted: #8891aa;
+            --gold: #c9a84c;
+            --teal: #4a9fa8;
+            --b1: #2d3244;
+        }
+        body {
+            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden;
+        }
+        aside {
+            width: 260px; background: var(--s1); border-right: 1px solid var(--b1); padding: 20px 0;
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .brand {
+            padding: 0 20px 20px; border-bottom: 1px solid var(--b1); margin-bottom: 20px;
+            font-weight: bold; font-size: 18px; color: var(--gold); display: flex; align-items: center; gap: 10px;
+        }
+        nav a {
+            display: block; padding: 10px 20px; color: var(--muted); text-decoration: none; font-size: 14px;
+            transition: 0.2s;
+        }
+        nav a:hover, nav a.active { background: var(--s2); color: var(--text); border-left: 3px solid var(--gold); }
+        main {
+            flex: 1; padding: 40px 60px; overflow-y: auto; line-height: 1.6;
+        }
+        h1 { margin-top: 0; color: var(--gold); border-bottom: 1px solid var(--b1); padding-bottom: 10px; }
+        h2 { color: var(--teal); margin-top: 30px; }
+        h3 { color: var(--text); margin-top: 25px; }
+        code { background: var(--s2); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: var(--teal); }
+        pre { background: var(--s2); padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--b1); }
+        pre code { background: none; padding: 0; color: var(--muted); }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--b1); }
+        th { background: var(--s1); color: var(--muted); font-weight: normal; font-size: 13px; }
+        .badge { background: var(--s2); padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="brand">♪ LabelManager OS</div>
+        <nav>
+            <a href="index.html" class="">1. Introduction & Setup</a>
+            <a href="crm.html" class="">2. Artists & Contacts (CRM)</a>
+            <a href="anr.html" class="">3. Demos & A&R</a>
+            <a href="releases.html" class="">4. Releases & Campaigns</a>
+            <a href="royalties.html" class="">5. Royalties & Finance</a>
+            <a href="media.html" class="">6. Media Library</a>
+            <a href="events.html" class="">7. Events & Bookings</a>
+            <a href="portals.html" class="">8. Portals (Artist/Manager)</a>
+            <a href="admin.html" class="active">9. Settings, RBAC & Integrations</a>
+        </nav>
+    </aside>
+    <main>
+        
+<h1>Settings, RBAC & Integrations</h1>
+
+<h2>Role-Based Access Control (RBAC)</h2>
+<p>Assign roles in the Users tab. Permissions dictate UI visibility:</p>
+<ul>
+    <li><strong>Admin:</strong> Full access.</li>
+    <li><strong>Label Manager:</strong> Access to everything except critical system settings.</li>
+    <li><strong>A&R:</strong> Can manage Demos and view CRM/Releases. No financial access.</li>
+    <li><strong>Artist:</strong> Restricted to the Artist Portal.</li>
+</ul>
+
+<h2>Integrations</h2>
+<p>Navigate to the Integrations tab to connect the OS to the outside world.</p>
+<ul>
+    <li><strong>Platform Import:</strong> Drop a CSV from LabelRadar, SubmitHub, or Soundplate to bulk-import demos into your pipeline.</li>
+    <li><strong>Distributor Export:</strong> Select a Release and generate a delivery package (CSV/XML) for DistroKid, FUGA, Believe, or Bandcamp.</li>
+    <li><strong>Webhooks:</strong> Configure outbound webhooks to Slack or Discord. Trigger events on <code>demo.new</code>, <code>release.created</code>, or <code>gig.confirmed</code>.</li>
+</ul>
+
+<h2>Notifications</h2>
+<p>The bell icon in the top right provides an activity feed of new demos, expiring contracts, and due tasks.</p>
+
+    </main>
+</body>
+</html>

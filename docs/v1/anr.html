@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demos & A&R — LabelManager OS Docs</title>
+  <style>
+  :root {
+    --bg: #0e0f14;
+    --s1: #13141a;
+    --s2: #181920;
+    --s3: #1e1f27;
+    --b1: #2d3244;
+    --b2: #3d4460;
+    --gold: #c9a84c;
+    --teal: #4a9fa8;
+    --ok: #3d9970;
+    --err: #c0524e;
+    --warn: #e8a045;
+    --text: #e8eaf0;
+    --muted: #8891aa;
+    --r: 10px;
+    --tr: all .18s ease;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; color: var(--gold); }
+
+  /* Layout */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px; flex-shrink: 0;
+    background: var(--s1);
+    border-right: 1px solid var(--b1);
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto; padding: 0 0 40px;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--b1);
+    margin-bottom: 10px;
+  }
+  .sidebar-logo .mark {
+    width: 36px; height: 36px;
+    background: var(--gold);
+    border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-right: 10px;
+    vertical-align: middle;
+  }
+  .sidebar-logo span { font-weight: 700; font-size: 15px; color: var(--text); vertical-align: middle; }
+  .sidebar-logo small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; padding-left: 46px; }
+  .nav-section { padding: 6px 12px 2px; font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 16px; font-size: 13px; color: var(--muted);
+    cursor: pointer; transition: var(--tr); border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: var(--s2); text-decoration: none; }
+  .nav-item.active { color: var(--gold); background: rgba(201,168,76,.08); border-left-color: var(--gold); }
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  /* Main content */
+  .main { flex: 1; max-width: 900px; padding: 48px 56px 80px; }
+  .breadcrumb { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+  .breadcrumb a { color: var(--muted); }
+  .breadcrumb span { margin: 0 6px; }
+
+  /* Typography */
+  h1 { font-size: 30px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+  h2 { font-size: 20px; font-weight: 700; color: var(--text); margin: 40px 0 14px; padding-top: 40px; border-top: 1px solid var(--b1); }
+  h2:first-of-type { border-top: none; margin-top: 24px; padding-top: 0; }
+  h3 { font-size: 16px; font-weight: 600; color: var(--gold); margin: 28px 0 10px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--teal); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8cad8; }
+  ul, ol { margin: 0 0 16px 20px; color: #c8cad8; }
+  li { margin-bottom: 5px; }
+  strong { color: var(--text); }
+  code {
+    background: var(--s3); border: 1px solid var(--b1);
+    color: var(--teal); padding: 1px 6px; border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px;
+  }
+  pre {
+    background: var(--s2); border: 1px solid var(--b1);
+    border-radius: var(--r); padding: 18px 20px;
+    overflow-x: auto; margin: 16px 0 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px; line-height: 1.7; color: #c8cad8;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+
+  /* Callouts */
+  .callout {
+    border-radius: var(--r); padding: 14px 18px;
+    margin: 18px 0; border-left: 4px solid;
+    font-size: 14px;
+  }
+  .callout-tip    { background: rgba(74,159,168,.1);  border-color: var(--teal);  color: #a8d8dc; }
+  .callout-warn   { background: rgba(232,160,69,.1);  border-color: var(--warn);  color: #e8c08a; }
+  .callout-danger { background: rgba(192,82,78,.1);   border-color: var(--err);   color: #e8a8a6; }
+  .callout-info   { background: rgba(201,168,76,.08); border-color: var(--gold);  color: #d4b97a; }
+  .callout strong { color: inherit; font-weight: 700; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13.5px; }
+  th { background: var(--s3); color: var(--muted); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--b1); color: #c8cad8; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--s2); }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; margin: 1px;
+  }
+  .badge-gold   { background: rgba(201,168,76,.18);  color: var(--gold); }
+  .badge-teal   { background: rgba(74,159,168,.18);  color: var(--teal); }
+  .badge-green  { background: rgba(61,153,112,.18);  color: var(--ok); }
+  .badge-red    { background: rgba(192,82,78,.18);   color: var(--err); }
+  .badge-gray   { background: rgba(136,145,170,.12); color: var(--muted); }
+  .badge-purple { background: rgba(124,111,168,.18); color: #a8a0d8; }
+
+  /* Cards */
+  .card {
+    background: var(--s2); border: 1px solid var(--b1);
+    border-radius: var(--r); padding: 20px 24px; margin: 16px 0;
+  }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+
+  /* Steps */
+  .steps { counter-reset: step; margin: 16px 0 24px; }
+  .step {
+    display: flex; gap: 16px; margin-bottom: 20px;
+    counter-increment: step;
+  }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gold); color: #0e0f14;
+    font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-body strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--text); }
+
+  /* Pipeline flow */
+  .pipeline {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 6px; margin: 16px 0 24px;
+  }
+  .pipeline-step {
+    background: var(--s3); border: 1px solid var(--b1);
+    border-radius: 6px; padding: 6px 12px;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+  }
+  .pipeline-step.gold { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.08); }
+  .pipeline-step.teal { border-color: var(--teal); color: var(--teal); background: rgba(74,159,168,.08); }
+  .pipeline-step.green { border-color: var(--ok); color: var(--ok); background: rgba(61,153,112,.08); }
+  .pipeline-step.red { border-color: var(--err); color: var(--err); background: rgba(192,82,78,.08); }
+  .pipeline-arrow { color: var(--b2); font-size: 16px; }
+
+  /* Page intro */
+  .page-intro { font-size: 16px; color: var(--muted); margin-bottom: 32px; line-height: 1.7; border-bottom: 1px solid var(--b1); padding-bottom: 24px; }
+
+  /* TOC */
+  .toc { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r); padding: 18px 22px; margin: 0 0 36px; }
+  .toc-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  .toc ol { margin: 0 0 0 16px; }
+  .toc li { margin-bottom: 4px; font-size: 13px; }
+  .toc a { color: var(--teal); }
+  .toc a:hover { color: var(--gold); }
+
+  /* Keyboard shortcut */
+  kbd {
+    background: var(--s3); border: 1px solid var(--b2);
+    border-bottom: 2px solid var(--b2); border-radius: 4px;
+    padding: 2px 7px; font-family: monospace; font-size: 12px;
+    color: var(--text);
+  }
+
+  /* Role grid */
+  .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0 24px; }
+  .role-card { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r); padding: 16px; }
+  .role-card .role-name { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .role-card ul { margin: 0 0 0 14px; font-size: 12.5px; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 28px 20px 60px; }
+    .role-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Footer */
+  .doc-footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--b1); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+  .prev-next { display: flex; gap: 16px; margin-top: 48px; }
+  .prev-next a {
+    flex: 1; background: var(--s2); border: 1px solid var(--b1);
+    border-radius: var(--r); padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px; transition: var(--tr);
+    text-decoration: none; font-size: 13px;
+  }
+  .prev-next a:hover { border-color: var(--gold); background: rgba(201,168,76,.05); text-decoration: none; }
+  .prev-next .dir { font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px; }
+  .prev-next .title { color: var(--text); font-weight: 600; }
+  .prev-next .next { justify-content: flex-end; text-align: right; }
+</style>
+</head>
+<body>
+<div class="layout">
+  
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div>
+          <span class="mark">♪</span>
+          <span>LabelManager OS</span>
+        </div>
+        <small>User Manual v1.0</small>
+      </div>
+
+      <div class="nav-section">Getting Started</div>
+      <a class="nav-item " href="index.html"><span class="icon">🏠</span> Introduction</a>
+      <a class="nav-item " href="quickstart.html"><span class="icon">⚡</span> Quick Start</a>
+      <a class="nav-item " href="roles.html"><span class="icon">🔐</span> Roles & Permissions</a>
+
+      <div class="nav-section">Core Modules</div>
+      <a class="nav-item " href="crm.html"><span class="icon">🎤</span> Artists & CRM</a>
+      <a class="nav-item active" href="anr.html"><span class="icon">🎧</span> Demos & A&R</a>
+      <a class="nav-item " href="releases.html"><span class="icon">💿</span> Releases</a>
+      <a class="nav-item " href="media.html"><span class="icon">📁</span> Media Library</a>
+      <a class="nav-item " href="events.html"><span class="icon">🎪</span> Bookings & Events</a>
+
+      <div class="nav-section">Finance</div>
+      <a class="nav-item " href="finance.html"><span class="icon">💰</span> Finance Overview</a>
+      <a class="nav-item " href="royalties.html"><span class="icon">📊</span> Royalties & Splits</a>
+
+      <div class="nav-section">Advanced</div>
+      <a class="nav-item " href="marketing.html"><span class="icon">📣</span> Marketing & Smart Links</a>
+      <a class="nav-item " href="analytics.html"><span class="icon">📈</span> Analytics</a>
+      <a class="nav-item " href="collaboration.html"><span class="icon">🤝</span> Tasks & Collaboration</a>
+      <a class="nav-item " href="portals.html"><span class="icon">👤</span> Artist & Manager Portals</a>
+      <a class="nav-item " href="integrations.html"><span class="icon">🔌</span> Integrations</a>
+
+      <div class="nav-section">Reference</div>
+      <a class="nav-item " href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      <a class="nav-item " href="faq.html"><span class="icon">❓</span> FAQ & Troubleshooting</a>
+      <a class="nav-item" href="../index.html"><span class="icon">←</span> Back to App</a>
+    </aside>
+
+  <main class="main">
+    <div class="breadcrumb"><a href="index.html">Docs</a> <span>›</span> Demos & A&R</div>
+    
+<h1>🎧 Demos & A&R</h1>
+<p class="page-intro">The Demos & A&R module is your complete demo management system — from public submission through to a signed deal. It replaces email inboxes and spreadsheets with a structured, visual pipeline.</p>
+
+<h2>The A&R Pipeline</h2>
+<p>All demos move through a 7-stage Kanban board. Drag cards between columns or use the quick-move dropdown on each card.</p>
+<div class="pipeline">
+  <div class="pipeline-step">📬 New</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step teal">👁 Reviewed</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step gold">⭐ Shortlist</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step gold">💬 In Talk</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">📄 Offer</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step green">✅ Signed</div>
+  <div class="pipeline-arrow">|</div>
+  <div class="pipeline-step red">❌ Rejected</div>
+</div>
+
+<h3>Pipeline Stage Definitions</h3>
+<table>
+  <tr><th>Stage</th><th>Meaning</th><th>Typical action</th></tr>
+  <tr><td><span class="badge badge-gray">New</span></td><td>Just received, not yet listened to</td><td>Listen and rate</td></tr>
+  <tr><td><span class="badge badge-teal">Reviewed</span></td><td>Listened to, initial impression noted</td><td>Rate 1–5 stars, add comment</td></tr>
+  <tr><td><span class="badge badge-gold">Shortlist</span></td><td>Strong contender, worth deeper discussion</td><td>Share with team, discuss internally</td></tr>
+  <tr><td><span class="badge badge-gold">In Talk</span></td><td>Active conversation with artist / manager</td><td>Negotiate terms, request stems</td></tr>
+  <tr><td><span class="badge badge-purple">Offer</span></td><td>Formal offer sent or in progress</td><td>Draft contract, await signature</td></tr>
+  <tr><td><span class="badge badge-green">Signed ✓</span></td><td>Deal closed, release planned</td><td>Create release record</td></tr>
+  <tr><td><span class="badge badge-red">Rejected</span></td><td>Not a fit — polite decline sent</td><td>Optional: send auto-response</td></tr>
+</table>
+
+<h2>Demo Submission Form</h2>
+<p>The public submission form lives at <code>/submit</code> (or via the <strong>Submit Demo</strong> button in the A&R view). You can embed it on your label website as an iframe or share the direct URL.</p>
+
+<h3>Submission Form Fields</h3>
+<table>
+  <tr><th>Field</th><th>Required</th><th>Notes</th></tr>
+  <tr><td>Submitter Name</td><td>✅</td><td>The person submitting (may differ from artist name)</td></tr>
+  <tr><td>Email</td><td>✅</td><td>Used for auto-response emails</td></tr>
+  <tr><td>Track Title</td><td>✅</td><td></td></tr>
+  <tr><td>Genre</td><td>—</td><td>Free text or dropdown (configurable in Settings)</td></tr>
+  <tr><td>BPM</td><td>—</td><td>Numeric, used in demo cards and scoring</td></tr>
+  <tr><td>Key</td><td>—</td><td>E.g. "A minor", "F# major"</td></tr>
+  <tr><td>Artist (Roster link)</td><td>—</td><td>Links submission to existing artist profile</td></tr>
+  <tr><td>Notes / References</td><td>—</td><td>Artist's message, influences, Soundcloud link</td></tr>
+  <tr><td>Audio File</td><td>✅</td><td>MP3, WAV, AIFF, FLAC, M4A — max 50 MB</td></tr>
+</table>
+
+<div class="callout callout-info">
+  <strong>📨 Auto-response:</strong> After submission, the artist receives an automatic confirmation email (configurable in Settings → A&R → Auto-responses). You can customise the subject and body. A separate rejection template is available for when you move a demo to Rejected.
+</div>
+
+<h2>The Demo Detail View</h2>
+<p>Click any demo card to open the full detail view. It contains:</p>
+
+<h3>Waveform Audio Player</h3>
+<p>Powered by WaveSurfer.js. Click anywhere on the waveform to seek. Keyboard <kbd>Space</kbd> to play/pause. The player shows duration, current position and responds to the scrollwheel for volume.</p>
+
+<h3>Star Rating</h3>
+<p>Rate 1–5 stars directly on the Kanban card or in the detail view. Ratings feed into the <strong>A&R Scoring Engine</strong> (see below). The rating persists per user — different team members can rate independently.</p>
+
+<h3>Internal Comments</h3>
+<p>Add timestamped comments visible only to the team. Supports @mention of team members (they receive a notification). Comments cannot be deleted — only appended — to preserve the full review history.</p>
+
+<h3>Status Quick-Change</h3>
+<p>The status dropdown in the detail view moves the demo to any pipeline stage. Status changes are logged in the activity feed with the user's name and timestamp.</p>
+
+<h2>A&R Scoring Engine</h2>
+<p>The scoring engine automatically calculates a score out of 100 for each demo based on four weighted factors:</p>
+<table>
+  <tr><th>Factor</th><th>Weight</th><th>Source</th></tr>
+  <tr><td>Internal star rating (avg. across team)</td><td>40%</td><td>Team ratings in app</td></tr>
+  <tr><td>Artist history on label</td><td>20%</td><td>Number of existing releases by linked artist</td></tr>
+  <tr><td>Pipeline velocity</td><td>20%</td><td>Time spent in current stage vs. historical average</td></tr>
+  <tr><td>External signals</td><td>20%</td><td>Social links present, Spotify/Beatport links, follower data</td></tr>
+</table>
+<p>The score is shown as a coloured bar on each Kanban card. Go to <strong>A&R → Scoring</strong> tab for the full sorted scoring table with filter by genre, score range and pipeline stage.</p>
+
+<h2>Watchlist</h2>
+<p>Artists or demos that aren't ready for signing but look promising can be added to the <strong>Watchlist</strong>. The Watchlist appears as a separate section in the A&R view. Watchlist entries can have a follow-up date — you'll receive a notification when it's due.</p>
+
+<h2>Bulk Actions</h2>
+<p>Select multiple demos using the checkbox on each card (hold <kbd>Shift</kbd> to range-select), then use the bulk action bar that appears at the bottom:</p>
+<ul>
+  <li>Move all selected to a pipeline stage</li>
+  <li>Assign to a team member</li>
+  <li>Delete selected</li>
+  <li>Export selected as CSV</li>
+</ul>
+
+<div class="callout callout-tip">
+  <strong>💡 A&R tip:</strong> Set up the Shortlist → In Talk automation (Integrations → Automations) to auto-notify your label manager via Slack webhook whenever a demo reaches the Offer stage. This keeps the whole team in sync without manual pinging.
+</div>
+
+    <div class="prev-next">
+      <a href="crm.html"><span class="dir">← Previous</span><span class="title">Artists & CRM</span></a>
+      <a href="releases.html" class="next"><span class="dir">Next →</span><span class="title">Releases</span></a>
+    </div>
+    <div class="doc-footer">
+      <span>LabelManager OS — User Manual v1.0</span>
+      <span>Built for independent labels 🖤</span>
+    </div>
+  </main>
+</div>
+</body>
+</html>

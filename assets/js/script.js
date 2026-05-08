@@ -770,7 +770,8 @@ const LOS = {
     </div>`;
   },
 
-  dragStart(e, id) { this.dragId=id; e.dataTransfer.setData('text/plain',id); },
+
+    dragStart(e, id) { this.dragId=id; e.dataTransfer.setData('text/plain',id); },
   dropDemo(e, status) {
     e.preventDefault();
     document.querySelectorAll('.kcb').forEach(b=>b.classList.remove('dov'));
@@ -782,15 +783,61 @@ const LOS = {
     const d = this.db.demos.find(x=>x.id===id);
     if (!d) return;
     d.status = status;
-    this.save(); 
-    if(newStatus === 'offer')  this._runAutomations('demo_status_offer',  { artist_id: demo.artist_id });
-    if(newStatus === 'signed') this._runAutomations('demo_status_signed', { artist_id: demo.artist_id });
-    this.renderANR(); this.renderDash();
+    this.save(); this.renderANR(); this.renderDash();
     this.log(`Demo "${d.title}" → ${status}`,'A&R');
     const newD = this.db.demos.filter(x=>x.status==='Neu').length;
     document.getElementById('navAnr').textContent=newD;
     document.getElementById('navAnr').style.display=newD?'inline':'none';
   },
+  // dragStart(e, id) { this.dragId=id; e.dataTransfer.setData('text/plain',id); },
+  //   // Drag start — auf der Karte
+  // dragStart(e, demoId) {
+  //   e.dataTransfer.effectAllowed = 'move'
+  //   e.dataTransfer.setData('demoId', String(demoId))
+  //   e.currentTarget.classList.add('dragging')
+  // },
+
+  dragEnd(e) {
+    e.currentTarget.classList.remove('dragging')
+  },
+
+  // Drag over — auf der Spalte (preventDefault = drop erlauben)
+  dragOver(e) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    e.currentTarget.classList.add('drag-over')
+  },
+
+  dragLeave(e) {
+    e.currentTarget.classList.remove('drag-over')
+  },
+  // dropDemo(e,id) {
+  //   e.preventDefault()
+  //   e.currentTarget.classList.remove('drag-over')
+
+  //   const demoId   = e.dataTransfer.getData('demoId')
+  //   const column   = e.currentTarget.closest('[data-status]')
+  //   const newStatus = column?.dataset.status   // ← hier kommt newStatus her
+
+  //   if (!demoId)    return console.warn('dropDemo: no demoId in dataTransfer')
+  //   if (!newStatus) return console.warn('dropDemo: no data-status on drop target')
+
+  //   this.moveDemoStatus(demoId, newStatus)
+  // },
+  // moveDemoStatus(id, status) {
+  //   const d = this.db.demos.find(x=>x.id===id);
+  //   if (!d) return;
+  //   d.status = status;
+  //   this.save();
+  //   let newStatus = status; 
+  //   if(newStatus === 'offer')  this._runAutomations('demo_status_offer',  { artist_id: demo.artist_id });
+  //   if(newStatus === 'signed') this._runAutomations('demo_status_signed', { artist_id: demo.artist_id });
+  //   this.renderANR(); this.renderDash();
+  //   this.log(`Demo "${d.title}" → ${status}`,'A&R');
+  //   const newD = this.db.demos.filter(x=>x.status==='Neu').length;
+  //   document.getElementById('navAnr').textContent=newD;
+  //   document.getElementById('navAnr').style.display=newD?'inline':'none';
+  // },
   rateDemo(id, r) {
     const d = this.db.demos.find(x=>x.id===id);
     if (d) { d.rating=r; this.save(); this.renderANR(); this.log(`Demo "${d.title}" rated ${r}★`,'A&R'); }
