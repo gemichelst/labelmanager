@@ -1,84 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Releases & Campaigns - LabelManager OS Documentation</title>
-    <style>
-        :root {
-            --bg: #0e0f14;
-            --s1: #15171e;
-            --s2: #1c1f28;
-            --text: #ffffff;
-            --muted: #8891aa;
-            --gold: #c9a84c;
-            --teal: #4a9fa8;
-            --b1: #2d3244;
-        }
-        body {
-            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden;
-        }
-        aside {
-            width: 260px; background: var(--s1); border-right: 1px solid var(--b1); padding: 20px 0;
-            display: flex; flex-direction: column; overflow-y: auto;
-        }
-        .brand {
-            padding: 0 20px 20px; border-bottom: 1px solid var(--b1); margin-bottom: 20px;
-            font-weight: bold; font-size: 18px; color: var(--gold); display: flex; align-items: center; gap: 10px;
-        }
-        nav a {
-            display: block; padding: 10px 20px; color: var(--muted); text-decoration: none; font-size: 14px;
-            transition: 0.2s;
-        }
-        nav a:hover, nav a.active { background: var(--s2); color: var(--text); border-left: 3px solid var(--gold); }
-        main {
-            flex: 1; padding: 40px 60px; overflow-y: auto; line-height: 1.6;
-        }
-        h1 { margin-top: 0; color: var(--gold); border-bottom: 1px solid var(--b1); padding-bottom: 10px; }
-        h2 { color: var(--teal); margin-top: 30px; }
-        h3 { color: var(--text); margin-top: 25px; }
-        code { background: var(--s2); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: var(--teal); }
-        pre { background: var(--s2); padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--b1); }
-        pre code { background: none; padding: 0; color: var(--muted); }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--b1); }
-        th { background: var(--s1); color: var(--muted); font-weight: normal; font-size: 13px; }
-        .badge { background: var(--s2); padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Releases — LabelManager OS Docs</title>
+  <style>
+  :root {
+    --bg: #0e0f14;
+    --s1: #13141a;
+    --s2: #181920;
+    --s3: #1e1f27;
+    --b1: #2d3244;
+    --b2: #3d4460;
+    --gold: #c9a84c;
+    --teal: #4a9fa8;
+    --ok: #3d9970;
+    --err: #c0524e;
+    --warn: #e8a045;
+    --text: #e8eaf0;
+    --muted: #8891aa;
+    --r: 10px;
+    --tr: all .18s ease;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; color: var(--gold); }
+
+  /* Layout */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px; flex-shrink: 0;
+    background: var(--s1);
+    border-right: 1px solid var(--b1);
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto; padding: 0 0 40px;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--b1);
+    margin-bottom: 10px;
+  }
+  .sidebar-logo .mark {
+    width: 36px; height: 36px;
+    background: var(--gold);
+    border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-right: 10px;
+    vertical-align: middle;
+  }
+  .sidebar-logo span { font-weight: 700; font-size: 15px; color: var(--text); vertical-align: middle; }
+  .sidebar-logo small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; padding-left: 46px; }
+  .nav-section { padding: 6px 12px 2px; font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 16px; font-size: 13px; color: var(--muted);
+    cursor: pointer; transition: var(--tr); border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: var(--s2); text-decoration: none; }
+  .nav-item.active { color: var(--gold); background: rgba(201,168,76,.08); border-left-color: var(--gold); }
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  /* Main content */
+  .main { flex: 1; max-width: 900px; padding: 48px 56px 80px; }
+  .breadcrumb { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+  .breadcrumb a { color: var(--muted); }
+  .breadcrumb span { margin: 0 6px; }
+
+  /* Typography */
+  h1 { font-size: 30px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+  h2 { font-size: 20px; font-weight: 700; color: var(--text); margin: 40px 0 14px; padding-top: 40px; border-top: 1px solid var(--b1); }
+  h2:first-of-type { border-top: none; margin-top: 24px; padding-top: 0; }
+  h3 { font-size: 16px; font-weight: 600; color: var(--gold); margin: 28px 0 10px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--teal); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8cad8; }
+  ul, ol { margin: 0 0 16px 20px; color: #c8cad8; }
+  li { margin-bottom: 5px; }
+  strong { color: var(--text); }
+  code {
+    background: var(--s3); border: 1px solid var(--b1);
+    color: var(--teal); padding: 1px 6px; border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px;
+  }
+  pre {
+    background: var(--s2); border: 1px solid var(--b1);
+    border-radius: var(--r); padding: 18px 20px;
+    overflow-x: auto; margin: 16px 0 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px; line-height: 1.7; color: #c8cad8;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+
+  /* Callouts */
+  .callout {
+    border-radius: var(--r); padding: 14px 18px;
+    margin: 18px 0; border-left: 4px solid;
+    font-size: 14px;
+  }
+  .callout-tip    { background: rgba(74,159,168,.1);  border-color: var(--teal);  color: #a8d8dc; }
+  .callout-warn   { background: rgba(232,160,69,.1);  border-color: var(--warn);  color: #e8c08a; }
+  .callout-danger { background: rgba(192,82,78,.1);   border-color: var(--err);   color: #e8a8a6; }
+  .callout-info   { background: rgba(201,168,76,.08); border-color: var(--gold);  color: #d4b97a; }
+  .callout strong { color: inherit; font-weight: 700; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13.5px; }
+  th { background: var(--s3); color: var(--muted); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--b1); color: #c8cad8; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--s2); }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; margin: 1px;
+  }
+  .badge-gold   { background: rgba(201,168,76,.18);  color: var(--gold); }
+  .badge-teal   { background: rgba(74,159,168,.18);  color: var(--teal); }
+  .badge-green  { background: rgba(61,153,112,.18);  color: var(--ok); }
+  .badge-red    { background: rgba(192,82,78,.18);   color: var(--err); }
+  .badge-gray   { background: rgba(136,145,170,.12); color: var(--muted); }
+  .badge-purple { background: rgba(124,111,168,.18); color: #a8a0d8; }
+
+  /* Cards */
+  .card {
+    background: var(--s2); border: 1px solid var(--b1);
+    border-radius: var(--r); padding: 20px 24px; margin: 16px 0;
+  }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+
+  /* Steps */
+  .steps { counter-reset: step; margin: 16px 0 24px; }
+  .step {
+    display: flex; gap: 16px; margin-bottom: 20px;
+    counter-increment: step;
+  }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gold); color: #0e0f14;
+    font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-body strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--text); }
+
+  /* Pipeline flow */
+  .pipeline {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 6px; margin: 16px 0 24px;
+  }
+  .pipeline-step {
+    background: var(--s3); border: 1px solid var(--b1);
+    border-radius: 6px; padding: 6px 12px;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+  }
+  .pipeline-step.gold { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.08); }
+  .pipeline-step.teal { border-color: var(--teal); color: var(--teal); background: rgba(74,159,168,.08); }
+  .pipeline-step.green { border-color: var(--ok); color: var(--ok); background: rgba(61,153,112,.08); }
+  .pipeline-step.red { border-color: var(--err); color: var(--err); background: rgba(192,82,78,.08); }
+  .pipeline-arrow { color: var(--b2); font-size: 16px; }
+
+  /* Page intro */
+  .page-intro { font-size: 16px; color: var(--muted); margin-bottom: 32px; line-height: 1.7; border-bottom: 1px solid var(--b1); padding-bottom: 24px; }
+
+  /* TOC */
+  .toc { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r); padding: 18px 22px; margin: 0 0 36px; }
+  .toc-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  .toc ol { margin: 0 0 0 16px; }
+  .toc li { margin-bottom: 4px; font-size: 13px; }
+  .toc a { color: var(--teal); }
+  .toc a:hover { color: var(--gold); }
+
+  /* Keyboard shortcut */
+  kbd {
+    background: var(--s3); border: 1px solid var(--b2);
+    border-bottom: 2px solid var(--b2); border-radius: 4px;
+    padding: 2px 7px; font-family: monospace; font-size: 12px;
+    color: var(--text);
+  }
+
+  /* Role grid */
+  .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0 24px; }
+  .role-card { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r); padding: 16px; }
+  .role-card .role-name { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .role-card ul { margin: 0 0 0 14px; font-size: 12.5px; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 28px 20px 60px; }
+    .role-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Footer */
+  .doc-footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--b1); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+  .prev-next { display: flex; gap: 16px; margin-top: 48px; }
+  .prev-next a {
+    flex: 1; background: var(--s2); border: 1px solid var(--b1);
+    border-radius: var(--r); padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px; transition: var(--tr);
+    text-decoration: none; font-size: 13px;
+  }
+  .prev-next a:hover { border-color: var(--gold); background: rgba(201,168,76,.05); text-decoration: none; }
+  .prev-next .dir { font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px; }
+  .prev-next .title { color: var(--text); font-weight: 600; }
+  .prev-next .next { justify-content: flex-end; text-align: right; }
+</style>
 </head>
 <body>
-    <aside>
-        <div class="brand">♪ LabelManager OS</div>
-        <nav>
-            <a href="index.html" class="">1. Introduction & Setup</a>
-            <a href="crm.html" class="">2. Artists & Contacts (CRM)</a>
-            <a href="anr.html" class="">3. Demos & A&R</a>
-            <a href="releases.html" class="active">4. Releases & Campaigns</a>
-            <a href="royalties.html" class="">5. Royalties & Finance</a>
-            <a href="media.html" class="">6. Media Library</a>
-            <a href="events.html" class="">7. Events & Bookings</a>
-            <a href="portals.html" class="">8. Portals (Artist/Manager)</a>
-            <a href="admin.html" class="">9. Settings, RBAC & Integrations</a>
-        </nav>
-    </aside>
-    <main>
-        
-<h1>Releases & Campaigns</h1>
-<p>Manage the lifecycle of your music catalog.</p>
+<div class="layout">
+  
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div>
+          <span class="mark">♪</span>
+          <span>LabelManager OS</span>
+        </div>
+        <small>User Manual v1.0</small>
+      </div>
 
-<h2>Release Statuses</h2>
-<p>A release moves through a logical chain: <code>Idea &rarr; A&R Selected &rarr; In Production &rarr; Mastered &rarr; Distributor Setup &rarr; Pre-Save &rarr; Scheduled &rarr; Released &rarr; Post-Campaign</code>.</p>
+      <div class="nav-section">Getting Started</div>
+      <a class="nav-item " href="index.html"><span class="icon">🏠</span> Introduction</a>
+      <a class="nav-item " href="quickstart.html"><span class="icon">⚡</span> Quick Start</a>
+      <a class="nav-item " href="roles.html"><span class="icon">🔐</span> Roles & Permissions</a>
+
+      <div class="nav-section">Core Modules</div>
+      <a class="nav-item " href="crm.html"><span class="icon">🎤</span> Artists & CRM</a>
+      <a class="nav-item " href="anr.html"><span class="icon">🎧</span> Demos & A&R</a>
+      <a class="nav-item active" href="releases.html"><span class="icon">💿</span> Releases</a>
+      <a class="nav-item " href="media.html"><span class="icon">📁</span> Media Library</a>
+      <a class="nav-item " href="events.html"><span class="icon">🎪</span> Bookings & Events</a>
+
+      <div class="nav-section">Finance</div>
+      <a class="nav-item " href="finance.html"><span class="icon">💰</span> Finance Overview</a>
+      <a class="nav-item " href="royalties.html"><span class="icon">📊</span> Royalties & Splits</a>
+
+      <div class="nav-section">Advanced</div>
+      <a class="nav-item " href="marketing.html"><span class="icon">📣</span> Marketing & Smart Links</a>
+      <a class="nav-item " href="analytics.html"><span class="icon">📈</span> Analytics</a>
+      <a class="nav-item " href="collaboration.html"><span class="icon">🤝</span> Tasks & Collaboration</a>
+      <a class="nav-item " href="portals.html"><span class="icon">👤</span> Artist & Manager Portals</a>
+      <a class="nav-item " href="integrations.html"><span class="icon">🔌</span> Integrations</a>
+
+      <div class="nav-section">Reference</div>
+      <a class="nav-item " href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      <a class="nav-item " href="faq.html"><span class="icon">❓</span> FAQ & Troubleshooting</a>
+      <a class="nav-item" href="../index.html"><span class="icon">←</span> Back to App</a>
+    </aside>
+
+  <main class="main">
+    <div class="breadcrumb"><a href="index.html">Docs</a> <span>›</span> Releases</div>
+    
+<h1>💿 Releases</h1>
+<p class="page-intro">The Releases module manages the full lifecycle of every release on your label — from initial idea through production, distribution setup, campaign and post-release analytics.</p>
+
+<h2>Release Lifecycle</h2>
+<div class="pipeline">
+  <div class="pipeline-step">💡 Idea</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step teal">🎧 A&R Selected</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">🎛 In Production</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step gold">🎚 Mastered</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step gold">📦 Distro Setup</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step teal">💾 Pre-Save</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">📅 Scheduled</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step green">🚀 Released</div><div class="pipeline-arrow">→</div>
+  <div class="pipeline-step">📣 Post-Campaign</div>
+</div>
+
+<h2>Creating a Release</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body">
+    <strong>Click + New Release</strong>
+    <p>Opens the release creation form.</p>
+  </div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body">
+    <strong>Fill in release details</strong>
+    <table>
+      <tr><th>Field</th><th>Notes</th></tr>
+      <tr><td>Title *</td><td>Release title</td></tr>
+      <tr><td>Type *</td><td>Single, EP, Album, Compilation, Remix EP</td></tr>
+      <tr><td>Artist *</td><td>Primary artist (linked from roster)</td></tr>
+      <tr><td>Catalogue Number</td><td>E.g. LBLR001 — auto-increments if left blank</td></tr>
+      <tr><td>UPC / Barcode</td><td>Provided by your distributor</td></tr>
+      <tr><td>Release Date</td><td>Triggers backwards timeline generation</td></tr>
+      <tr><td>Distributor</td><td>Which distributor handles this release</td></tr>
+      <tr><td>Territory</td><td>Worldwide or specific territories</td></tr>
+      <tr><td>Format</td><td>Digital, Vinyl, CD, Bandcamp-only</td></tr>
+      <tr><td>Status</td><td>Starting stage in the lifecycle</td></tr>
+      <tr><td>P-Line / C-Line</td><td>Copyright lines for metadata</td></tr>
+      <tr><td>Internal Notes</td><td>Private notes not shown externally</td></tr>
+    </table>
+  </div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body">
+    <strong>Select a Task Template</strong>
+    <p>After setting the release date, choose a smart template. The system generates a backwards timeline of tasks automatically.</p>
+  </div></div>
+</div>
 
 <h2>Smart Task Templates</h2>
-<p>When you create a Release, the system generates a timeline of tasks based on the release type:</p>
-<ul>
-    <li><strong>Single:</strong> Tasks for streaming pitch, artwork, and social assets.</li>
-    <li><strong>Club EP:</strong> Tasks for DJ promo pools and Beatport pitching.</li>
-    <li><strong>Vinyl:</strong> Plant booking, test press approvals, distribution logistics.</li>
-</ul>
-<p>Tasks calculate their due dates dynamically based on the target Release Date.</p>
+<p>Templates auto-generate a realistic task list backwards from your release date. Each task has a relative offset (e.g. "Artwork due: −21 days").</p>
+<table>
+  <tr><th>Template</th><th>Best for</th><th>Tasks generated</th></tr>
+  <tr><td>Streaming Single</td><td>Algorithm-focused digital single</td><td>~14 tasks: pitch, pre-save, content plan, editorial submission</td></tr>
+  <tr><td>Club EP</td><td>Dance music, DJ-focused</td><td>~18 tasks: DJ promo, Beatport setup, Juno, press kit</td></tr>
+  <tr><td>Vinyl Release</td><td>Limited vinyl with digital</td><td>~22 tasks: plant booking, test press, artwork print specs, pre-orders</td></tr>
+  <tr><td>Compilation</td><td>Multi-artist catalogue releases</td><td>~20 tasks: licensing clearances, ISRC block, contributor splits</td></tr>
+  <tr><td>Remix EP</td><td>Remix packages</td><td>~12 tasks: stem delivery, remixer contracts, artwork variations</td></tr>
+  <tr><td>Custom</td><td>Blank — add your own tasks</td><td>0 tasks, manual creation</td></tr>
+</table>
 
-    </main>
+<h2>Release Timeline View</h2>
+<p>Each release has a <strong>Timeline tab</strong> showing all tasks plotted against the release date. Tasks are colour-coded by status:</p>
+<ul>
+  <li><span class="badge badge-gray">To Do</span> — Not started</li>
+  <li><span class="badge badge-teal">In Progress</span> — Being worked on</li>
+  <li><span class="badge badge-gold">Review</span> — Awaiting approval</li>
+  <li><span class="badge badge-green">Done ✓</span> — Completed</li>
+  <li><span class="badge badge-red">Overdue</span> — Past due date, not complete</li>
+</ul>
+<p>Drag tasks to reorder them. Click a task to set assignee, priority, due date and notes. If you change the release date, all task deadlines recalculate automatically.</p>
+
+<h2>Track Management</h2>
+<p>In the release detail view, go to the <strong>Tracks</strong> tab to add individual tracks. Each track has:</p>
+<table>
+  <tr><th>Field</th><th>Notes</th></tr>
+  <tr><td>ISRC</td><td>International Standard Recording Code — one per track version</td></tr>
+  <tr><td>Title / Version</td><td>E.g. "Original Mix", "Radio Edit", "Dub Mix"</td></tr>
+  <tr><td>Duration</td><td>MM:SS</td></tr>
+  <tr><td>BPM / Key</td><td>For DJ metadata</td></tr>
+  <tr><td>Composers</td><td>Full legal names — required for publishing</td></tr>
+  <tr><td>Publishers</td><td>Publishing company or PRO affiliation</td></tr>
+  <tr><td>Credits</td><td>Producers, mixers, mastering engineers</td></tr>
+  <tr><td>Lyrics Language</td><td>ISO 639-1 code</td></tr>
+  <tr><td>Explicit</td><td>Yes / No / Clean Version</td></tr>
+  <tr><td>Linked Media Asset</td><td>Attach the master file from Media Library</td></tr>
+</table>
+
+<h2>Distributor Export</h2>
+<p>Once a release is ready for distribution, go to <strong>Integrations → Distributor Export</strong>, select the release and choose your distributor format. The system generates a complete delivery package with all track metadata, ready to upload. See the <a href="integrations.html">Integrations page</a> for full details.</p>
+
+<div class="callout callout-warn">
+  <strong>⚠️ ISRC reminder:</strong> Each track version needs its own ISRC. The Original Mix and Radio Edit of the same track are different ISRCs. Your distributor will assign ISRCs if you don't have your own IPI/ISRC registrant account.
+</div>
+
+    <div class="prev-next">
+      <a href="anr.html"><span class="dir">← Previous</span><span class="title">Demos & A&R</span></a>
+      <a href="media.html" class="next"><span class="dir">Next →</span><span class="title">Media Library</span></a>
+    </div>
+    <div class="doc-footer">
+      <span>LabelManager OS — User Manual v1.0</span>
+      <span>Built for independent labels 🖤</span>
+    </div>
+  </main>
+</div>
 </body>
 </html>
