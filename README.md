@@ -1,9 +1,9 @@
-# 🎵 LabelManager OS
+# 🎵 LabelManager
 
 > **The all-in-one operating system for independent record labels.**  
 > Manage artists, A&R pipelines, releases, royalties, bookings, media and your entire team — in one dark, fast, single-file web app.
 
-![LabelManager OS Screenshot](docs/screenshot.png)
+![LabelManager Screenshot](docs/screenshot.png)
 ![Version](https://img.shields.io/badge/version-1.0.0-gold)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
@@ -13,7 +13,7 @@
 
 ## ✨ Overview
 
-LabelManager OS is a feature-complete, **single-file progressive web app** built for independent labels, A&R managers, booking agents and music producers. No backend required — everything runs in the browser using localStorage with a clean, dark-mode UI inspired by modern SaaS tools.
+LabelManager is a feature-complete, **single-file progressive web app** built for independent labels, A&R managers, booking agents and music producers. No backend required — everything runs in the browser using localStorage with a clean, dark-mode UI inspired by modern SaaS tools.
 
 It was designed to replace the fragmented label workflow of juggling Notion, Google Sheets, Dropbox, email chains and spreadsheets — and replace them with one coherent system.
 
@@ -61,7 +61,7 @@ It was designed to replace the fragmented label workflow of juggling Notion, Goo
 
 ## 🏗️ Architecture
 
-LabelManager OS is intentionally built as a **zero-dependency, single-file app** for maximum portability and zero DevOps overhead. All data lives in `localStorage` and can be exported/imported as JSON at any time.
+LabelManager is intentionally built as a **zero-dependency, single-file app** for maximum portability and zero DevOps overhead. All data lives in `localStorage` and can be exported/imported as JSON at any time.
 
 ```
 labelmanager/
@@ -479,5 +479,5 @@ Built with:
 
 <p align="center">
   Made with 🖤 for independent labels<br>
-  <a href="https://github.com/yourusername/labelmanager-os">github.com/yourusername/labelmanager-os</a>
+  <a href="https://github.com/gemichelst/labelmanager">github.com/gemichels/labelmanager</a>
 </p>
