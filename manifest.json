@@ -1,13 +1,47 @@
 {
   "name": "LabelManager OS",
   "short_name": "LabelManager",
-  "description": "Independent Label OS — CRM, A&R, Releases, Royalties, Finance, Bookings",
-  "start_url": "./index.html",
+  "description": "Independent Label Operating System — manage artists, demos, releases, royalties and more.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0b0c0f",
+  "orientation": "portrait-primary",
+  "background_color": "#11121a",
   "theme_color": "#c9a84c",
+  "lang": "en",
+  "categories": ["music", "business", "productivity"],
   "icons": [
-    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/assets/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/icons/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "label": "LabelManager OS Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Submit Demo",
+      "short_name": "Demo",
+      "description": "Upload a demo track for A&R review",
+      "url": "/upload.html",
+      "icons": [{ "src": "/assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Documentation",
+      "short_name": "Docs",
+      "description": "Open the LabelManager documentation",
+      "url": "/docs/index.html",
+      "icons": [{ "src": "/assets/icons/icon-96.png", "sizes": "96x96" }]
+    }
   ]
 }

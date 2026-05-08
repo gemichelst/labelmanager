@@ -1,0 +1,30 @@
+# robots.txt — LabelManager OS
+# https://labelmanager.doerd.de/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /private/
+Disallow: /.git/
+
+# Sitemap
+Sitemap: https://labelmanager.doerd.de/sitemap.xml
+
+# Crawl-delay for bots
+Crawl-delay: 10
+
+# Block AI training scrapers
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
