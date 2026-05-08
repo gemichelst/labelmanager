@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Submit Your Demo · Bunte Panther</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:#0a0a0f;color:#e8e8ef;font-size:13.5px;padding:0;min-height:100vh;}
+.wrap{max-width:540px;margin:0 auto;padding:28px 18px 40px;}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,#c9a84c,#e8c97a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-name{font-size:17px;font-weight:700;letter-spacing:-.2px;}
+.logo-sub{font-size:11px;color:#5a5a72;margin-top:1px;}
+h1{font-size:20px;font-weight:700;margin-bottom:5px;letter-spacing:-.2px;}
+p.sub{font-size:13px;color:#5a5a72;margin-bottom:24px;line-height:1.6;}
+.ff{margin-bottom:13px;}
+.lbl{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#5a5a72;margin-bottom:5px;}
+.inp{width:100%;background:#16161f;border:1px solid rgba(255,255,255,.07);color:#e8e8ef;padding:9px 12px;border-radius:8px;outline:none;font-size:13px;font-family:inherit;transition:.18s ease;}
+.inp:focus{border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+select.inp{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a5a72' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
+textarea.inp{resize:vertical;min-height:72px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dz{border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:.18s;color:#5a5a72;position:relative;background:#111118;}
+.dz:hover,.dz.ov{border-color:#c9a84c;background:rgba(201,168,76,.04);color:#c9a84c;}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-ico{font-size:26px;margin-bottom:8px;}
+.dz-txt{font-size:13px;}
+.dz-sub{font-size:11px;color:#5a5a72;margin-top:4px;}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#0a0a0f;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.1px;transition:.18s;margin-top:6px;font-family:inherit;}
+.btn:hover{box-shadow:0 4px 20px rgba(201,168,76,.35);filter:brightness(1.05);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.err-b{background:rgba(192,82,78,.1);border:1px solid rgba(192,82,78,.3);border-radius:8px;padding:10px 13px;font-size:12.5px;color:#e07773;margin-bottom:12px;display:none;}
+.ok-b{display:none;text-align:center;padding:36px 20px;}
+.ok-b .ico{font-size:48px;margin-bottom:12px;}
+.ok-b h2{font-size:20px;font-weight:700;margin-bottom:8px;}
+.ok-b p{font-size:13px;color:#5a5a72;line-height:1.6;}
+.prog{height:3px;background:rgba(255,255,255,.07);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.pf{height:100%;background:linear-gradient(90deg,#c9a84c,#e8c97a);border-radius:3px;transition:width .3s ease;}
+.step{font-size:11px;color:#5a5a72;text-align:right;margin-top:3px;}
+@media(max-width:480px){.g2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-mark">♪</div>
+    <div><div class="logo-name">Bunte Panther</div><div class="logo-sub">Demo Submission</div></div>
+  </div>
+
+  <div id="formView">
+    <h1>Submit Your Demo</h1>
+    <p class="sub">We listen to every submission. If it's a fit, we'll be in touch within 4–6 weeks.</p>
+
+    <!-- Step progress -->
+    <div class="prog"><div class="pf" id="progBar" style="width:0%"></div></div>
+    <div class="step" id="progStep">Step 1 of 3 — Your info</div>
+
+    <div id="errBox" class="err-b"></div>
+
+    <!-- STEP 1 -->
+    <div id="s1">
+      <div class="g2">
+        <div class="ff"><label class="lbl">Artist / Act Name *</label><input class="inp" id="u_name" placeholder="Your stage name" oninput="upd()"></div>
+        <div class="ff"><label class="lbl">Email *</label><input class="inp" id="u_email" type="email" placeholder="you@example.com" oninput="upd()"></div>
+      </div>
+      <div class="ff"><label class="lbl">Your Location</label><input class="inp" id="u_loc" placeholder="Berlin, DE"></div>
+      <div class="ff"><label class="lbl">Instagram / Soundcloud / RA</label><input class="inp" id="u_social" placeholder="@yourhandle or https://…"></div>
+      <button class="btn" onclick="goStep(2)">Continue →</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="s2" style="display:none">
+      <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="u_title" placeholder="Name of the track" oninput="upd()"></div>
+      <div class="g2">
+        <div class="ff"><label class="lbl">Genre *</label>
+          <select class="inp" id="u_genre">
+            <option value="">Select…</option>
+            <option>Techno</option><option>House</option><option>Electro</option>
+            <option>Industrial</option><option>Ambient</option><option>Acid</option>
+            <option>Breaks</option><option>Experimental</option><option>Other</option>
+          </select>
+        </div>
+        <div class="ff"><label class="lbl">BPM (approx.)</label><input class="inp" id="u_bpm" type="number" placeholder="138"></div>
+      </div>
+      <div class="g2">
+        <div class="ff"><label class="lbl">Key</label><input class="inp" id="u_key" placeholder="A minor"></div>
+        <div class="ff"><label class="lbl">Duration</label><input class="inp" id="u_dur" placeholder="6:32"></div>
+      </div>
+      <div class="ff"><label class="lbl">Reference Artists / Tracks</label><input class="inp" id="u_refs" placeholder="Surgeon, Function, Blawan…"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn" style="background:#16161f;color:#e8e8ef;flex:0 0 80px" onclick="goStep(1)">← Back</button>
+        <button class="btn" onclick="goStep(3)" style="flex:1">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="s3" style="display:none">
+      <div class="ff">
+        <label class="lbl">Upload Audio File (MP3, WAV, AIFF, FLAC — max 50MB) *</label>
+        <div class="dz" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+          <input type="file" accept="audio/*" onchange="dzFile(this.files[0])">
+          <div class="dz-ico">🎵</div>
+          <div class="dz-txt" id="dzTxt">Drop your track here or click to browse</div>
+          <div class="dz-sub">MP3, WAV, AIFF, FLAC · max 50MB</div>
+        </div>
+      </div>
+      <div class="ff"><label class="lbl">Streaming / Preview Link (optional)</label><input class="inp" id="u_link" placeholder="https://soundcloud.com/…"></div>
+      <div class="ff"><label class="lbl">Short message to the A&R team</label><textarea class="inp" id="u_note" rows="3" placeholder="Tell us about the track, the context, or what you're looking for…"></textarea></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn" style="background:#16161f;color:#e8e8ef;flex:0 0 80px" onclick="goStep(2)">← Back</button>
+        <button class="btn" id="subBtn" onclick="submit()" style="flex:1">🚀 Submit Demo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success screen -->
+  <div class="ok-b" id="okView">
+    <div class="ico">✅</div>
+    <h2>Demo Received!</h2>
+    <p>Thanks for sending your music. We listen to everything personally.<br><br>
+    If it's a fit, we'll reach out within <strong>4–6 weeks</strong>.<br>
+    Keep creating — the right moment will come.</p>
+    <p style="margin-top:18px;font-size:12px;color:#5a5a72">— Bunte Panther Records, Berlin</p>
+  </div>
+</div>
+
+<script>
+let _file = null;
+let _step = 1;
+
+const STEPS = {
+  1:{prog:33,txt:'Step 1 of 3 — Your info'},
+  2:{prog:66,txt:'Step 2 of 3 — Track info'},
+  3:{prog:99,txt:'Step 3 of 3 — Upload & send'},
+};
+
+function goStep(n) {
+  if (n===2) {
+    const name  = document.getElementById('u_name').value.trim();
+    const email = document.getElementById('u_email').value.trim();
+    if (!name || !email) { showErr('Please fill in your artist name and email.'); return; }
+    if (!/\S+@\S+\.\S+/.test(email)) { showErr('Please enter a valid email address.'); return; }
+  }
+  if (n===3) {
+    const title = document.getElementById('u_title').value.trim();
+    const genre = document.getElementById('u_genre').value;
+    if (!title) { showErr('Please enter the track title.'); return; }
+    if (!genre) { showErr('Please select a genre.'); return; }
+  }
+  hideErr();
+  document.getElementById('s'+_step).style.display='none';
+  _step=n;
+  document.getElementById('s'+_step).style.display='block';
+  document.getElementById('progBar').style.width=STEPS[n].prog+'%';
+  document.getElementById('progStep').textContent=STEPS[n].txt;
+}
+
+function dzOver(e) { e.preventDefault(); document.getElementById('dz').classList.add('ov'); }
+function dzLeave()  { document.getElementById('dz').classList.remove('ov'); }
+function dzDrop(e)  { e.preventDefault(); dzFile(e.dataTransfer.files[0]); dzLeave(); }
+
+function dzFile(f) {
+  if (!f) return;
+  if (f.size > 50*1024*1024) { showErr('File too large. Max 50MB.'); return; }
+  _file = f;
+  document.getElementById('dz').classList.add('ov');
+  document.getElementById('dzTxt').textContent = `✓ ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`;
+}
+
+function submit() {
+  const btn = document.getElementById('subBtn');
+  if (!_file && !document.getElementById('u_link').value.trim()) {
+    showErr('Please upload a file or add a streaming link.'); return;
+  }
+  btn.disabled=true; btn.textContent='Submitting…';
+  // In production: replace with real fetch() to your API endpoint
+  // The demo data is also posted to the parent LOS app via postMessage for live testing
+  const payload = {
+    type:         'demo_submit',
+    artist_name:  document.getElementById('u_name').value,
+    email:        document.getElementById('u_email').value,
+    location:     document.getElementById('u_loc').value,
+    social:       document.getElementById('u_social').value,
+    track_title:  document.getElementById('u_title').value,
+    genre:        document.getElementById('u_genre').value,
+    bpm:          document.getElementById('u_bpm').value,
+    key:          document.getElementById('u_key').value,
+    duration:     document.getElementById('u_dur').value,
+    refs:         document.getElementById('u_refs').value,
+    link:         document.getElementById('u_link').value,
+    note:         document.getElementById('u_note').value,
+    file_name:    _file?.name||'',
+    file_url:     _file ? URL.createObjectURL(_file) : document.getElementById('u_link').value,
+  };
+  // Post message to parent frame (LOS) so demo lands directly in A&R board
+  try { window.parent.postMessage(JSON.stringify(payload), '*'); } catch(e) {}
+  setTimeout(()=>{
+    document.getElementById('progBar').style.width='100%';
+    setTimeout(()=>{
+      document.getElementById('formView').style.display='none';
+      document.getElementById('okView').style.display='block';
+    },300);
+  },900);
+}
+
+function showErr(msg) {
+  const b=document.getElementById('errBox');
+  b.style.display='block'; b.textContent=msg;
+  b.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function hideErr() { document.getElementById('errBox').style.display='none'; }
+function upd() { hideErr(); }
+
+// Listen for postMessage from parent (if embedded) — receive artist list etc.
+window.addEventListener('message', e => {
+  try {
+    const d = JSON.parse(e.data);
+    if (d.type==='artists') {
+      // Future: populate artist dropdown if on-roster artist submitting
+    }
+  } catch {}
+});
+</script>
+</body>
+</html>

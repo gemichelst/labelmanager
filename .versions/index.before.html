@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label OS - WebApp</title>
+    <!-- WaveSurfer.js & Icons -->
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --bg-dark: #080812;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Glassmorphism Utilities */
+        .glass { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 12px; }
+        .glass-panel { background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; }
+        
+        /* Layout */
+        .sidebar { width: 260px; padding: 24px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--glass-border); background: rgba(8, 8, 18, 0.8); z-index: 10; }
+        .sidebar .brand { font-size: 20px; font-weight: 600; margin-bottom: 32px; display: flex; align-items: center; gap: 12px; color: var(--text-main); }
+        .nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--text-muted); transition: all 0.2s; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background: var(--glass-bg); color: var(--accent); }
+        
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .topbar { height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); }
+        .content-area { flex: 1; padding: 32px; overflow-y: auto; padding-bottom: 120px; }
+        
+        /* Components */
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+        .btn-glass { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); }
+        .btn-glass:hover { background: rgba(255, 255, 255, 0.1); }
+        .btn-icon { padding: 8px; background: transparent; border: none; color: var(--text-main); cursor: pointer; transition: 0.2s; border-radius: 50%; }
+        .btn-icon:hover { background: rgba(255,255,255,0.1); }
+
+        select { background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: var(--text-main); padding: 8px 12px; border-radius: 8px; outline: none; cursor: pointer; }
+        select:focus { border-color: var(--accent); }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(255,255,255,0.1); }
+        .badge.accent { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+        
+        /* Views */
+        .view { display: none; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header-flex h1 { font-size: 24px; font-weight: 600; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 14px; text-transform: uppercase; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
+        
+        /* Kanban Board */
+        .kanban { display: flex; gap: 24px; overflow-x: auto; min-height: calc(100vh - 250px); }
+        .kanban-col { flex: 0 0 320px; display: flex; flex-direction: column; gap: 16px; }
+        .kanban-header { font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); }
+        .demo-card { padding: 16px; cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; gap: 12px; }
+        .demo-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
+        .demo-title { font-weight: 600; font-size: 15px; }
+        .demo-artist { font-size: 13px; color: var(--text-muted); }
+        .rating { color: #fbbf24; font-size: 14px; letter-spacing: 2px; }
+        
+        /* Timeline */
+        .timeline { position: relative; padding-left: 32px; border-left: 2px solid var(--glass-border); margin-left: 16px; margin-top: 24px; }
+        .timeline-item { position: relative; margin-bottom: 32px; }
+        .timeline-item::before { content: ''; position: absolute; left: -41px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 4px solid var(--bg-dark); }
+        .timeline-date { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+        .timeline-content { background: var(--glass-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--glass-border); }
+
+        /* Media Grid */
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; }
+        .media-card { padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .media-card:hover { background: rgba(255,255,255,0.05); }
+        .media-icon { margin-bottom: 12px; color: var(--accent); }
+
+        /* Global Player */
+        .global-player { position: fixed; bottom: 0; left: 260px; right: 0; height: 90px; background: rgba(8, 8, 18, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 32px; gap: 24px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
+        .global-player.visible { transform: translateY(0); }
+        #waveform { flex: 1; height: 40px; }
+        .player-controls { display: flex; gap: 16px; align-items: center; }
+        .player-info { width: 200px; }
+        .player-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-artist { font-size: 12px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand">
+            <i data-lucide="disc-3"></i> Label OS
+        </div>
+        <div class="nav-item active" data-target="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+        <div class="nav-item rb-admin rb-manager" data-target="crm"><i data-lucide="users"></i> Artists & Contacts</div>
+        <div class="nav-item rb-admin rb-manager rb-anr" data-target="anr"><i data-lucide="headphones"></i> Demos & A&R</div>
+        <div class="nav-item" data-target="releases"><i data-lucide="calendar-days"></i> Releases</div>
+        <div class="nav-item" data-target="media"><i data-lucide="folder-music"></i> Media Library</div>
+    </nav>
+
+    <!-- Main -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div style="color: var(--text-muted); font-size: 14px;">Welcome back, <span style="color: white; font-weight: 600;">Digital Native</span></div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <label style="font-size: 12px; color: var(--text-muted);">Active Role:</label>
+                <select id="roleSwitcher" onchange="app.switchRole(this.value)">
+                    <option value="Admin">Admin</option>
+                    <option value="Manager">Label Manager</option>
+                    <option value="AnR">A&R</option>
+                    <option value="Artist">Artist</option>
+                </select>
+                <button class="btn-icon"><i data-lucide="bell"></i></button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            
+            <!-- Dashboard -->
+            <section id="dashboard" class="view active">
+                <div class="header-flex">
+                    <h1>Dashboard</h1>
+                    <button class="btn btn-primary"><i data-lucide="plus"></i> New Task</button>
+                </div>
+                <div class="glass glass-panel" style="padding: 32px; text-align: center; margin-top: 20px;">
+                    <i data-lucide="activity" style="width: 48px; height: 48px; color: var(--accent); margin-bottom: 16px;"></i>
+                    <h2>System Operational</h2>
+                    <p style="color: var(--text-muted); margin-top: 8px;">Switch modules on the left to start managing the label.</p>
+                </div>
+            </section>
+
+            <!-- 1. CRM -->
+            <section id="crm" class="view">
+                <div class="header-flex">
+                    <h1>Artists & Contacts</h1>
+                    <button class="btn btn-primary"><i data-lucide="user-plus"></i> Add Contact</button>
+                </div>
+                <div class="glass">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name / Alias</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Tags</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crmTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 2. A&R Kanban -->
+            <section id="anr" class="view">
+                <div class="header-flex">
+                    <h1>Demos & A&R</h1>
+                    <button class="btn btn-glass" onclick="app.showSubmissionForm()"><i data-lucide="link"></i> Submission Form Link</button>
+                </div>
+                <div class="kanban" id="kanbanBoard">
+                    <!-- Columns Populated by JS -->
+                </div>
+            </section>
+
+            <!-- 3. Releases Timeline -->
+            <section id="releases" class="view">
+                <div class="header-flex">
+                    <h1>Campaign Timelines</h1>
+                    <button class="btn btn-primary"><i data-lucide="calendar-plus"></i> Draft Release</button>
+                </div>
+                <div class="glass glass-panel" style="padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2 style="font-size: 18px;">LBL042: Midnight Dub EP</h2>
+                            <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Artist: DJ Shadow • Format: Digital & Vinyl</p>
+                        </div>
+                        <span class="badge accent">Status: In Production</span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">T-8 Weeks (01.07.2026)</div>
+                            <div class="timeline-content">
+                                <strong>A&R Signoff & Contracts</strong><br>
+                                <span style="color: var(--success); font-size: 13px;">✓ All splits agreed. Contract signed.</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">T-6 Weeks (15.07.2026)</div>
+                            <div class="timeline-content">
+                                <strong>Mastering & Artwork Completion</strong><br>
+                                <span style="color: var(--warning); font-size: 13px;">Pending: Waiting for final vinyl master.</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">T-4 Weeks (29.07.2026)</div>
+                            <div class="timeline-content">
+                                <strong>Distro Setup & Pitching</strong><br>
+                                <span style="color: var(--text-muted); font-size: 13px;">Spotify Editorial Pitch & Beatport Pre-Order setup.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Media Library -->
+            <section id="media" class="view">
+                <div class="header-flex">
+                    <h1>Media Library</h1>
+                    <button class="btn btn-primary"><i data-lucide="upload"></i> Upload Asset</button>
+                </div>
+                <div class="media-grid" id="mediaGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Global Audio Player (WaveSurfer) -->
+    <div class="global-player" id="globalPlayer">
+        <button class="btn-icon" id="playPauseBtn"><i data-lucide="play" id="playIcon"></i></button>
+        <div class="player-info">
+            <div class="player-title" id="playerTitle">Select a track...</div>
+            <div class="player-artist" id="playerArtist">Label OS</div>
+        </div>
+        <div id="waveform"></div>
+        <button class="btn-icon" onclick="app.closePlayer()"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // App Data
+        const db = {
+            contacts: [
+                { id: 1, name: 'DJ Berlin', role: 'Core Artist', status: 'Active', tags: ['Techno', 'Live'] },
+                { id: 2, name: 'Groove Agency', role: 'Booking', status: 'Partner', tags: ['EU'] },
+                { id: 3, name: 'Local Radio', role: 'Promo', status: 'Active', tags: ['Radio'] }
+            ],
+            demos: [
+                { id: 1, title: 'Acid Rain (Original)', artist: 'Unknown', status: 'Neu', rating: 0, file: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg' },
+                { id: 2, title: 'Deep Chords', artist: 'Synth Kid', status: 'In Review', rating: 3, file: 'https://actions.google.com/sounds/v1/science_fiction/alien_breath.ogg' },
+                { id: 3, title: 'Mainstage Banger', artist: 'EDM Bro', status: 'Abgelehnt', rating: 1, file: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg' },
+                { id: 4, title: 'Sunday Morning', artist: 'Chill Out Co', status: 'Shortlist', rating: 5, file: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' }
+            ],
+            kanbanCols: ['Neu', 'In Review', 'Shortlist', 'Offer', 'Abgelehnt'],
+            media: [
+                { id: 1, title: 'Midnight Dub (Radio Edit)', tags: ['Master', 'WAV'], file: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
+                { id: 2, title: 'PressKit_2026.zip', tags: ['Press', 'ZIP'], type: 'archive' },
+                { id: 3, title: 'Cover_Art_V2.png', tags: ['Artwork', 'PNG'], type: 'image' }
+            ]
+        };
+
+        const app = {
+            wavesurfer: null,
+            currentRole: 'Admin',
+
+            init() {
+                this.setupNavigation();
+                this.setupWaveSurfer();
+                this.renderCRM();
+                this.renderKanban();
+                this.renderMedia();
+                this.switchRole(this.currentRole);
+            },
+
+            // 5. RBAC & Navigation
+            switchRole(role) {
+                this.currentRole = role;
+                // Hide all restricted elements first
+                document.querySelectorAll('.rb-admin, .rb-manager, .rb-anr').forEach(el => el.style.display = 'none');
+                
+                // Show based on role
+                if(role === 'Admin') document.querySelectorAll('.rb-admin').forEach(el => el.style.display = 'flex');
+                if(role === 'Manager' || role === 'Admin') document.querySelectorAll('.rb-manager').forEach(el => el.style.display = 'flex');
+                if(role === 'AnR' || role === 'Admin' || role === 'Manager') document.querySelectorAll('.rb-anr').forEach(el => el.style.display = 'flex');
+
+                // If artist is selected and they are on a hidden view, redirect to dashboard
+                if(role === 'Artist') {
+                    const activeView = document.querySelector('.view.active').id;
+                    if(['crm', 'anr'].includes(activeView)) this.navigateTo('dashboard');
+                }
+            },
+
+            setupNavigation() {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.addEventListener('click', (e) => {
+                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                        this.navigateTo(e.currentTarget.dataset.target);
+                    });
+                });
+            },
+
+            navigateTo(viewId) {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById(viewId).classList.add('active');
+            },
+
+            // 1. CRM Render
+            renderCRM() {
+                const tbody = document.getElementById('crmTableBody');
+                tbody.innerHTML = db.contacts.map(c => `
+                    <tr>
+                        <td style="font-weight: 500;">${c.name}</td>
+                        <td><span class="badge" style="background: rgba(255,255,255,0.05);">${c.role}</span></td>
+                        <td><span style="color: ${c.status==='Active'?'var(--success)':'var(--text-muted)'}">●</span> ${c.status}</td>
+                        <td>${c.tags.map(t => `<span class="badge">${t}</span>`).join(' ')}</td>
+                        <td><button class="btn-icon"><i data-lucide="edit-2" style="width:16px;"></i></button></td>
+                    </tr>
+                `).join('');
+                lucide.createIcons();
+            },
+
+            // 2. A&R Kanban
+            renderKanban() {
+                const board = document.getElementById('kanbanBoard');
+                board.innerHTML = db.kanbanCols.map(col => {
+                    const columnDemos = db.demos.filter(d => d.status === col);
+                    return `
+                        <div class="kanban-col">
+                            <div class="kanban-header">
+                                <span>${col}</span>
+                                <span class="badge">${columnDemos.length}</span>
+                            </div>
+                            ${columnDemos.map(d => `
+                                <div class="glass demo-card" onclick="app.playAudio('${d.file}', '${d.title}', '${d.artist}')">
+                                    <div style="display:flex; justify-content:space-between;">
+                                        <div class="demo-title">${d.title}</div>
+                                        <i data-lucide="play-circle" style="color:var(--accent); width:18px;"></i>
+                                    </div>
+                                    <div class="demo-artist">${d.artist}</div>
+                                    <div class="rating">${'★'.repeat(d.rating)}${'☆'.repeat(5-d.rating)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            },
+
+            // 4. Media Library & Player
+            setupWaveSurfer() {
+                this.wavesurfer = WaveSurfer.create({
+                    container: '#waveform',
+                    waveColor: '#4c1d95',
+                    progressColor: '#8b5cf6',
+                    cursorColor: '#fff',
+                    barWidth: 2,
+                    barGap: 1,
+                    barRadius: 2,
+                    height: 40,
+                    normalize: true
+                });
+
+                this.wavesurfer.on('play', () => document.getElementById('playIcon').setAttribute('data-lucide', 'pause'));
+                this.wavesurfer.on('pause', () => document.getElementById('playIcon').setAttribute('data-lucide', 'play'));
+                
+                document.getElementById('playPauseBtn').addEventListener('click', () => {
+                    this.wavesurfer.playPause();
+                    lucide.createIcons();
+                });
+            },
+
+            playAudio(url, title, artist) {
+                document.getElementById('globalPlayer').classList.add('visible');
+                document.getElementById('playerTitle').innerText = title;
+                document.getElementById('playerArtist').innerText = artist;
+                this.wavesurfer.load(url);
+                this.wavesurfer.on('ready', () => { 
+                    this.wavesurfer.play(); 
+                    lucide.createIcons();
+                });
+            },
+
+            closePlayer() {
+                this.wavesurfer.pause();
+                document.getElementById('globalPlayer').classList.remove('visible');
+            },
+
+            renderMedia() {
+                const grid = document.getElementById('mediaGrid');
+                grid.innerHTML = db.media.map(m => {
+                    const icon = m.type === 'archive' ? 'archive' : (m.type === 'image' ? 'image' : 'music');
+                    const clickAction = m.type ? '' : `onclick="app.playAudio('${m.file}', '${m.title}', 'Media Library')"`;
+                    return `
+                        <div class="glass media-card" ${clickAction}>
+                            <i data-lucide="${icon}" class="media-icon" style="width:32px; height:32px;"></i>
+                            <div style="font-weight:500; font-size:14px; margin-bottom:8px; word-break: break-all;">${m.title}</div>
+                            <div>${m.tags.map(t => `<span class="badge" style="margin:2px;">${t}</span>`).join('')}</div>
+                        </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            },
+
+            showSubmissionForm() {
+                alert("Öffnet modal oder externe Public URL für 'LabelRadar/Soundplate' style Submission Form.");
+            }
+        };
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', () => app.init());
+
+    </script>
+</body>
+</html>

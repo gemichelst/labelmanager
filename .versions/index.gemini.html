@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Label OS - The Complete Hub</title>
+  
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --bg: #080812;
+      --surface: #14141e;
+      --border: rgba(255, 255, 255, 0.08);
+      --glass: rgba(255, 255, 255, 0.03);
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+    /* Utilities */
+    .glass { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; }
+    
+    /* Sidebar */
+    .sidebar { width: 260px; padding: 24px; border-right: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 4px; overflow-y: auto; z-index: 10; }
+    .sidebar .brand { font-size: 20px; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    .nav-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin: 16px 0 8px 12px; letter-spacing: 1px; }
+    .nav-item { padding: 10px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--text-muted); transition: 0.2s; font-weight: 500; font-size: 14px; }
+    .nav-item:hover, .nav-item.active { background: var(--glass); color: var(--accent); }
+
+    /* Main Area */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .topbar { height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .content { flex: 1; padding: 32px; overflow-y: auto; padding-bottom: 120px; }
+    
+    .view { display: none; animation: fadeIn 0.3s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Elements */
+    h1 { font-size: 24px; font-weight: 600; }
+    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+    .btn-glass { background: var(--glass); color: var(--text); border: 1px solid var(--border); }
+    .btn-icon { padding: 8px; background: transparent; border: none; color: var(--text); cursor: pointer; border-radius: 50%; transition: 0.2s; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(255,255,255,0.1); }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--text-muted); font-size: 13px; text-transform: uppercase; }
+    
+    /* Layouts */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .card { background: var(--glass); padding: 24px; border-radius: 12px; border: 1px solid var(--border); }
+
+    /* Admin Overlay */
+    #adminOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(13,13,18,0.95); backdrop-filter: blur(10px); overflow-y: auto; padding: 40px; }
+    .admin-container { max-width: 900px; margin: 0 auto; }
+    select, input, textarea { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; width: 100%; margin-bottom: 12px; }
+    select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+    
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="brand"><i data-lucide="disc-3"></i> Label OS</div>
+    
+    <div class="nav-item active" data-target="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+    
+    <div class="nav-label">Core Operations</div>
+    <div class="nav-item" data-target="crm"><i data-lucide="users"></i> Artists & Contacts</div>
+    <div class="nav-item" data-target="anr"><i data-lucide="headphones"></i> Demos & A&R</div>
+    <div class="nav-item" data-target="releases"><i data-lucide="calendar-days"></i> Releases</div>
+    
+    <div class="nav-label">Business & Legal</div>
+    <div class="nav-item" data-target="contracts"><i data-lucide="file-signature"></i> Contracts</div>
+    <div class="nav-item" data-target="finance"><i data-lucide="pie-chart"></i> Royalties & Finance</div>
+    
+    <div class="nav-label">Live & Assets</div>
+    <div class="nav-item" data-target="bookings"><i data-lucide="mic-2"></i> Bookings & Events</div>
+    <div class="nav-item" data-target="media"><i data-lucide="folder-music"></i> Media Library</div>
+    
+    <div class="nav-label">Intelligence</div>
+    <div class="nav-item" data-target="research"><i data-lucide="bar-chart-2"></i> Research & Intelligence</div>
+  </nav>
+
+  <main class="main">
+    <header class="topbar">
+      <div>Welcome to the 360° Label Environment</div>
+      <div style="display: flex; gap: 16px;">
+        <button class="btn btn-primary" onclick="app.openAdmin()"><i data-lucide="database"></i> JSON Database Editor</button>
+      </div>
+    </header>
+
+    <div class="content">
+      
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="view active">
+        <div class="header-flex"><h1>Dashboard</h1></div>
+        <div class="grid-3" id="dashGrid"></div>
+      </section>
+
+      <!-- 1. CRM -->
+      <section id="crm" class="view">
+        <div class="header-flex"><h1>Label CRM</h1><button class="btn btn-glass" onclick="app.openAdmin('artists')">+ Add Artist</button></div>
+        <div class="card"><table><thead><tr><th>Name/Alias</th><th>Type</th><th>Status</th><th>Links</th></tr></thead><tbody id="crmTable"></tbody></table></div>
+      </section>
+
+      <!-- 2. A&R -->
+      <section id="anr" class="view">
+        <div class="header-flex"><h1>Demo Pipeline</h1><button class="btn btn-glass" onclick="app.openAdmin('demos')">+ Submissions</button></div>
+        <p style="color:var(--text-muted); margin-bottom: 24px;">Rating formula: Audio Quality + Artist Social Score.</p>
+        <div class="grid-3" id="anrBoard"></div>
+      </section>
+
+      <!-- 3. RELEASES -->
+      <section id="releases" class="view">
+        <div class="header-flex"><h1>Campaign Planner</h1></div>
+        <div id="releaseList"></div>
+      </section>
+
+      <!-- 4. CONTRACTS -->
+      <section id="contracts" class="view">
+        <div class="header-flex"><h1>Contract Vault</h1></div>
+        <div class="card"><table><thead><tr><th>Agreement</th><th>Artist / Parties</th><th>Status</th><th>Splits/Terms</th></tr></thead><tbody id="contractTable"></tbody></table></div>
+      </section>
+
+      <!-- 5. FINANCE -->
+      <section id="finance" class="view">
+        <div class="header-flex">
+          <h1>Royalties & Finance</h1>
+          <button class="btn btn-glass" onclick="alert('Ziehe einfach eine CSV-Datei auf die Tabelle unten!')"><i data-lucide="upload-cloud"></i> Import CSV</button>
+        </div>
+        
+        <div class="grid-3" style="margin-bottom: 24px;" id="financeSummary"></div>
+
+        <div class="grid-2">
+          <!-- DROPZONE CARD -->
+          <div class="card" style="position: relative; overflow: hidden;"
+               ondragover="app.fileDragOver(event)" 
+               ondragleave="app.fileDragLeave(event)" 
+               ondrop="app.fileDrop(event)">
+            
+            <!-- Das Drop-Overlay (standardmäßig versteckt) -->
+            <div id="dropOverlay" style="display: none; position: absolute; inset: 0; background: rgba(139, 92, 246, 0.9); z-index: 10; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+              <i data-lucide="file-spreadsheet" style="width: 48px; height: 48px; color: white;"></i>
+              <h2 style="color: white; margin-top: 16px;">Drop CSV to Import</h2>
+            </div>
+
+            <h3>Recent Payouts & Splits</h3>
+            <p style="margin-top:8px; font-size:12px; color:var(--text-muted);">Drag & Drop your Distributor CSV here.</p>
+            <table style="margin-top:16px;">
+              <thead><tr><th>Source</th><th>Total Net</th><th>Label Cut</th><th>Artist Cut</th></tr></thead>
+              <tbody id="financeTable"></tbody>
+            </table>
+          </div>
+          
+          <div class="card">
+            <h3>Revenue Breakdown</h3>
+            <div style="display:flex; justify-content:center; align-items:center; height:100%; min-height: 200px;">
+              <canvas id="financeChart" width="200" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. BOOKINGS -->
+      <section id="bookings" class="view">
+        <div class="header-flex"><h1>Event Routing</h1></div>
+        <div class="card"><table><thead><tr><th>Event</th><th>Date</th><th>Artist</th><th>Status</th></tr></thead><tbody id="bookingTable"></tbody></table></div>
+      </section>
+
+      <!-- 7. MEDIA -->
+      <section id="media" class="view">
+        <div class="header-flex"><h1>Media Manager</h1></div>
+        <div class="grid-3" id="mediaGrid"></div>
+      </section>
+
+      <!-- 8. RESEARCH -->
+      <section id="research" class="view">
+        <div class="header-flex"><h1>Intelligence Layer</h1></div>
+        <div class="card"><h3>Blog & Playlist Database</h3><p style="margin-top:12px; color:var(--text-muted);">Loaded 240 active Tech-House curators from JSON sources. A&R Scoring system is active.</p></div>
+      </section>
+
+    </div>
+  </main>
+
+
+  <!-- AUDIO PLAYER -->
+  <div class="player" id="player">
+    <button class="btn-icon" id="playBtn"><i data-lucide="play" id="playIcon"></i></button>
+    <div style="width: 200px;">
+      <div id="pTitle" style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+      <div id="pArtist" style="font-size: 12px; color: var(--text-muted);">-</div>
+    </div>
+    <div id="waveform" style="flex: 1; height: 40px;"></div>
+    <button class="btn-icon" onclick="app.closePlayer()"><i data-lucide="x"></i></button>
+  </div>
+
+  <!-- ADMIN OVERLAY -->
+  <div id="adminOverlay">
+    <div class="admin-container">
+      <div class="header-flex"><h2 style="font-size: 24px;">JSON Database Manager</h2><button class="btn-icon" onclick="app.closeAdmin()"><i data-lucide="x"></i></button></div>
+      
+      <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;" id="adminTabs">
+        <button class="btn btn-glass" onclick="app.renderAdminForm('artists')">Artists</button>
+        <button class="btn btn-glass" onclick="app.renderAdminForm('demos')">Demos</button>
+        <button class="btn btn-glass" onclick="app.renderAdminForm('releases')">Releases</button>
+        <button class="btn btn-glass" onclick="app.renderAdminForm('contracts')">Contracts</button>
+        <button class="btn btn-glass" onclick="app.renderAdminForm('events')">Events</button>
+        <button class="btn btn-glass" onclick="app.renderAdminForm('media')">Media</button>
+        <button class="btn btn-glass" onclick="app.renderAdminForm('royalties')">Royalties</button>
+      </div>
+      
+      <div class="glass" style="padding: 24px;" id="adminEditor"></div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // The relational JSON Data Model
+    const initialDB = {
+      artists: [
+        { id: 'a1', name: 'DJ Void', type: 'Core Artist', status: 'Active', links: 'Spotify, IG' },
+        { id: 'a2', name: 'Berlin Booking', type: 'Agency', status: 'Partner', links: 'Web' }
+      ],
+      demos: [
+        { id: 'd1', title: 'Berlin Nights', artist: 'Unknown', status: 'In Review', rating: 4, file: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg' },
+        { id: 'd2', title: 'Deep Tech', artist: 'Synth Kid', status: 'Neu', rating: 0, file: '' }
+      ],
+      releases: [
+        { id: 'r1', artist_id: 'a1', title: 'Void EP', status: 'Released', tasks: 'Upload Distro (Done)', date: '2026-08-01' }
+      ],
+      contracts: [
+        { id: 'c1', artist_id: 'a1', release_id: 'r1', type: 'Exclusive EP', status: 'Active', label_split: 50, artist_split: 50 }
+      ],
+      events: [
+        { id: 'e1', artist_id: 'a1', name: 'Tresor Showcase', date: '2026-06-15', status: 'Confirmed' }
+      ],
+      media: [
+        { id: 'm1', related_to: 'r1', title: 'Void_Master.wav', type: 'Audio', file: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' }
+      ],
+      royalties: [
+        { id: 'ro1', release_id: 'r1', source: 'Spotify (DistroKid)', net_amount: 1240.50 },
+        { id: 'ro2', release_id: 'r1', source: 'Beatport', net_amount: 320.00 },
+        { id: 'ro3', release_id: 'r1', source: 'Apple Music', net_amount: 850.00 }
+      ]
+    };
+
+    const app = {
+      db: JSON.parse(localStorage.getItem('labelOS_db')) || initialDB,
+      currentAdminTab: 'artists',
+
+      init() {
+        this.saveDB();
+        this.setupNav();
+        this.setupPlayer();
+        this.renderAll();
+      },
+
+      saveDB() { localStorage.setItem('labelOS_db', JSON.stringify(this.db)); },
+
+      setupNav() {
+        document.querySelectorAll('.nav-item').forEach(nav => {
+          nav.addEventListener('click', (e) => {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(e.currentTarget.dataset.target).classList.add('active');
+          });
+        });
+      },
+
+      renderAll() {
+        // Dash
+        document.getElementById('dashGrid').innerHTML = `
+          <div class="card"><h3>Artists</h3><h1 style="margin-top:12px; color:var(--accent);">${this.db.artists.length}</h1></div>
+          <div class="card"><h3>Open Demos</h3><h1 style="margin-top:12px; color:#fbbf24;">${this.db.demos.length}</h1></div>
+          <div class="card"><h3>Active Contracts</h3><h1 style="margin-top:12px;">${this.db.contracts.length}</h1></div>
+        `;
+
+        // CRM
+        document.getElementById('crmTable').innerHTML = this.db.artists.map(a => `
+          <tr><td><b>${a.name}</b></td><td><span class="badge">${a.type}</span></td><td>${a.status}</td><td>${a.links}</td></tr>
+        `).join('');
+
+        // A&R (mit Drag & Drop)
+        // Wir nutzen 5 Spalten wie in deiner ursprünglichen Anforderung
+        const columns = ['Neu', 'In Review', 'Shortlist', 'Offer', 'Abgelehnt'];
+        document.getElementById('anrBoard').innerHTML = columns.map(col => {
+          const items = this.db.demos.filter(d => d.status === col);
+          return `
+            <div class="card" 
+                 ondragover="app.dragOver(event)" 
+                 ondragleave="app.dragLeave(event)" 
+                 ondrop="app.drop(event, '${col}')"
+                 style="min-height: 250px; transition: background 0.2s;">
+              <h3 style="margin-bottom:12px; color:var(--text-muted); border-bottom:1px solid var(--border); padding-bottom:8px;">
+                ${col} (${items.length})
+              </h3>
+              ${items.map(i => `
+                <div draggable="true" 
+                     ondragstart="app.dragStart(event, '${i.id}')"
+                     onclick="app.play('${i.file || ''}', '${i.title}', '${i.artist}')"
+                     style="background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; margin-bottom:8px; cursor:grab; border:1px solid transparent; transition:0.2s;"
+                     onmouseover="this.style.borderColor='rgba(255,255,255,0.2)'"
+                     onmouseout="this.style.borderColor='transparent'">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${i.title}</b>
+                    <i data-lucide="play-circle" style="color:var(--accent); width:16px;"></i>
+                  </div>
+                  <span style="font-size:12px; color:var(--text-muted);">${i.artist}</span><br>
+                  <span style="color:#fbbf24;">${'★'.repeat(i.rating || 0)}${'☆'.repeat(5-(i.rating || 0))}</span>
+                </div>
+              `).join('')}
+            </div>`;
+        }).join('');
+
+
+
+        // Releases
+        document.getElementById('releaseList').innerHTML = this.db.releases.map(r => {
+          const artist = this.db.artists.find(a => a.id === r.artist_id)?.name || 'Unknown';
+          return `<div class="card" style="margin-bottom: 16px;">
+            <h3>${r.title} <span style="font-size:14px; color:var(--text-muted);">by ${artist}</span></h3>
+            <p style="margin-top:8px;">Status: <span class="badge accent">${r.status}</span> | Date: ${r.date}</p>
+            <p style="margin-top:8px; font-size:13px; color:var(--text-muted);">Timeline Tasks: ${r.tasks}</p>
+          </div>`;
+        }).join('');
+
+        // Contracts
+        document.getElementById('contractTable').innerHTML = this.db.contracts.map(c => {
+          const artist = this.db.artists.find(a => a.id === c.artist_id)?.name || 'Unknown';
+          return `<tr><td><b>${c.type}</b></td><td>${artist}</td><td><span class="badge">${c.status}</span></td><td>${c.splits}</td></tr>`;
+        }).join('');
+
+        // Events
+        document.getElementById('bookingTable').innerHTML = this.db.events.map(e => {
+          const artist = this.db.artists.find(a => a.id === e.artist_id)?.name || 'Unknown';
+          return `<tr><td><b>${e.name}</b></td><td>${e.date}</td><td>${artist}</td><td><span class="badge">${e.status}</span></td></tr>`;
+        }).join('');
+
+        // Finance & Royalties Calculations
+        let totalRevenue = 0;
+        let totalLabel = 0;
+        let totalArtist = 0;
+
+        document.getElementById('financeTable').innerHTML = this.db.royalties.map(ro => {
+          totalRevenue += parseFloat(ro.net_amount);
+          
+          // Finde den Vertrag für dieses Release, um die Splits zu berechnen
+          const contract = this.db.contracts.find(c => c.release_id === ro.release_id);
+          const labelPercent = contract ? parseFloat(contract.label_split) : 100;
+          const artistPercent = contract ? parseFloat(contract.artist_split) : 0;
+          
+          // Beträge berechnen
+          const labelCut = (parseFloat(ro.net_amount) * (labelPercent / 100));
+          const artistCut = (parseFloat(ro.net_amount) * (artistPercent / 100));
+          
+          totalLabel += labelCut;
+          totalArtist += artistCut;
+
+          return `<tr>
+            <td><b>${ro.source}</b></td>
+            <td>€ ${parseFloat(ro.net_amount).toFixed(2)}</td>
+            <td style="color:var(--accent);">€ ${labelCut.toFixed(2)}</td>
+            <td style="color:var(--text-muted);">€ ${artistCut.toFixed(2)}</td>
+          </tr>`;
+        }).join('');
+
+        // Finance Summary Cards rendern
+        document.getElementById('financeSummary').innerHTML = `
+          <div class="card" style="border-left: 4px solid #fff;">
+            <h3>Total Net Revenue</h3>
+            <h1 style="margin-top:12px;">€ ${totalRevenue.toFixed(2)}</h1>
+          </div>
+          <div class="card" style="border-left: 4px solid var(--accent);">
+            <h3>Label Share</h3>
+            <h1 style="margin-top:12px; color:var(--accent);">€ ${totalLabel.toFixed(2)}</h1>
+          </div>
+          <div class="card" style="border-left: 4px solid var(--text-muted);">
+            <h3>Artist Share (Payouts)</h3>
+            <h1 style="margin-top:12px; color:var(--text-muted);">€ ${totalArtist.toFixed(2)}</h1>
+          </div>
+        `;
+
+        // Vanilla JS Doughnut Chart zeichnen
+        const canvas = document.getElementById('financeChart');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height); // Reset
+          
+          if(totalRevenue > 0) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 70;
+            
+            // Artist Anteil (Grau)
+            const artistAngle = (totalArtist / totalRevenue) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, -0.5 * Math.PI, artistAngle - 0.5 * Math.PI);
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = '#334155'; // var(--text-muted) in Hex
+            ctx.stroke();
+
+            // Label Anteil (Lila/Accent)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, artistAngle - 0.5 * Math.PI, 1.5 * Math.PI);
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = '#8b5cf6'; // var(--accent) in Hex
+            ctx.stroke();
+          }
+        }
+
+        lucide.createIcons();
+      },
+
+      // --- Drag & Drop für Kanban ---
+      dragStart(e, demoId) {
+        // Speichert die ID des gezogenen Elements
+        e.dataTransfer.setData('text/plain', demoId);
+        // Macht das Element beim Ziehen leicht transparent
+        setTimeout(() => e.target.style.opacity = '0.5', 0);
+      },
+
+      dragOver(e) {
+        e.preventDefault(); // Erlaubt das Ablegen
+        // Visuelles Feedback für die Spalte
+        const col = e.target.closest('.card');
+        if(col) col.style.background = 'rgba(139, 92, 246, 0.1)'; // Sanftes Violett
+      },
+
+      dragLeave(e) {
+        // Visuelles Feedback zurücksetzen
+        const col = e.target.closest('.card');
+        if(col) col.style.background = 'var(--glass)';
+      },
+
+      drop(e, newStatus) {
+        e.preventDefault();
+        const demoId = e.dataTransfer.getData('text/plain');
+        
+        // Demo im Array suchen und Status updaten
+        const demoIndex = this.db.demos.findIndex(d => d.id === demoId);
+        if (demoIndex > -1 && this.db.demos[demoIndex].status !== newStatus) {
+          this.db.demos[demoIndex].status = newStatus;
+          this.saveDB(); // Speichert direkt in den localStorage
+        }
+        
+        // Board neu zeichnen, um die Änderung sichtbar zu machen
+        this.renderAll(); 
+      },
+
+      // --- Drag & Drop für CSV File Import ---
+      fileDragOver(e) {
+        e.preventDefault(); // Zwingend nötig, um den Drop zuzulassen
+        document.getElementById('dropOverlay').style.display = 'flex';
+      },
+
+      fileDragLeave(e) {
+        e.preventDefault();
+        document.getElementById('dropOverlay').style.display = 'none';
+      },
+
+      fileDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropOverlay').style.display = 'none';
+
+        const files = e.dataTransfer.files;
+        if (files.length === 0) return;
+
+        const file = files[0];
+        if (!file.name.endsWith('.csv')) {
+          alert('Bitte lade eine gültige .csv Datei hoch.');
+          return;
+        }
+
+        // HTML5 FileReader liest die Datei lokal aus (kein Server Upload nötig!)
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const csvText = event.target.result;
+          const rows = csvText.split('\n').map(r => r.trim()).filter(r => r.length > 0);
+          
+          let importedCount = 0;
+          
+          // Schleife startet bei 1, um den CSV-Header (Zeile 0) zu überspringen
+          for (let i = 1; i < rows.length; i++) {
+            // Wir erwarten das Format: Source, Release_ID, Amount
+            // Z.B.: "Spotify", "r1", "450.50"
+            const cols = rows[i].split(',').map(c => c.replace(/"/g, '').trim());
+            
+            if (cols.length >= 3) {
+              this.db.royalties.push({
+                id: 'ro_' + Date.now() + '_' + i,
+                source: cols[0] + ' (CSV)',
+                release_id: cols[1],
+                net_amount: parseFloat(cols[2]) || 0
+              });
+              importedCount++;
+            }
+          }
+
+          if (importedCount > 0) {
+            this.saveDB();
+            this.renderAll(); // Aktualisiert sofort Tabelle und Diagramm
+            alert(`Erfolg! ${importedCount} Royalties aus "${file.name}" importiert.`);
+          } else {
+            alert('Die CSV-Datei war leer oder das Format hat nicht gestimmt (Erwartet: Source, ReleaseID, Amount).');
+          }
+        };
+        
+        reader.readAsText(file);
+      },
+
+      // --- Admin JSON Editor ---
+      openAdmin(tab = 'artists') {
+        document.getElementById('adminOverlay').style.display = 'block';
+        this.renderAdminForm(tab);
+      },
+      closeAdmin() { document.getElementById('adminOverlay').style.display = 'none'; },
+
+      renderAdminForm(tab) {
+        this.currentAdminTab = tab;
+        const data = this.db[tab];
+        if(!data) return;
+
+        // Auto-detect JSON keys from the first object to build the form
+        const keys = data.length > 0 ? Object.keys(data[0]) : ['id', 'name']; 
+
+        let html = `<div class="header-flex"><h3>Editing JSON: ${tab.toUpperCase()}</h3><button class="btn btn-primary" onclick="app.addAdminItem()">+ Add Record</button></div>`;
+
+        data.forEach((item, index) => {
+          html += `<div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:8px; margin-bottom:16px; border:1px solid var(--border);">`;
+          keys.forEach(k => {
+            if(k === 'id') html += `<input type="hidden" value="${item[k]}">`;
+            else html += `<label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">${k}</label>
+                          <input type="text" value="${item[k] || ''}" onchange="app.updateAdminItem(${index}, '${k}', this.value)">`;
+          });
+          html += `<button class="btn btn-glass" style="color:#ef4444; border-color:rgba(239,68,68,0.3);" onclick="app.deleteAdminItem(${index})">Delete Record</button></div>`;
+        });
+
+        html += `<button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="app.saveAdmin()">Write to DB & Sync</button>`;
+        document.getElementById('adminEditor').innerHTML = html;
+      },
+
+      updateAdminItem(index, field, value) { this.db[this.currentAdminTab][index][field] = value; },
+      
+      addAdminItem() {
+        const keys = Object.keys(this.db[this.currentAdminTab][0] || {id:''});
+        let newItem = { id: Date.now().toString() };
+        keys.forEach(k => { if(k !== 'id') newItem[k] = ''; });
+        this.db[this.currentAdminTab].push(newItem);
+        this.renderAdminForm(this.currentAdminTab);
+      },
+
+      deleteAdminItem(index) {
+        this.db[this.currentAdminTab].splice(index, 1);
+        this.renderAdminForm(this.currentAdminTab);
+      },
+
+      saveAdmin() {
+        this.saveDB();
+        this.renderAll();
+        this.closeAdmin();
+      },
+
+      // --- Player Logic ---
+      setupPlayer() {
+        if (!window.WaveSurfer) return;
+        this.ws = WaveSurfer.create({ 
+          container: '#waveform', 
+          waveColor: '#2d2d3a', 
+          progressColor: '#8b5cf6', 
+          cursorColor: '#fff', 
+          barWidth: 2, 
+          height: 40 
+        });
+        
+        this.ws.on('play', () => document.getElementById('playIcon').setAttribute('data-lucide', 'pause'));
+        this.ws.on('pause', () => document.getElementById('playIcon').setAttribute('data-lucide', 'play'));
+        
+        document.getElementById('playBtn').onclick = () => { 
+          this.ws.playPause(); 
+          lucide.createIcons(); 
+        };
+      },
+
+      play(url, title, artist) {
+        if(!url) {
+            alert("Keine Audio-URL in der Datenbank hinterlegt!");
+            return;
+        }
+        document.getElementById('player').classList.add('visible');
+        document.getElementById('pTitle').innerText = title;
+        document.getElementById('pArtist').innerText = artist;
+        
+        this.ws.load(url);
+        this.ws.on('ready', () => { 
+          this.ws.play(); 
+          lucide.createIcons(); 
+        });
+      },
+
+      closePlayer() { 
+        if(this.ws) this.ws.pause(); 
+        document.getElementById('player').classList.remove('visible'); 
+      }
+
+    };
+
+    document.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>

@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Label OS · Bunte Panther</title>
+<script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+/* ── TOKENS ─────────────────────────────────────────────────────────── */
+:root {
+  --bg:      #0a0a0f;
+  --s1:      #111118;     /* sidebar */
+  --s2:      #16161f;     /* card */
+  --s3:      #1c1c28;     /* input bg */
+  --b1:      rgba(255,255,255,.07);
+  --b2:      rgba(255,255,255,.13);
+  --gold:    #c9a84c;      /* primary accent — warm gold */
+  --gold2:   #e8c97a;      /* lighter gold hover */
+  --goldg:   linear-gradient(135deg,#c9a84c,#e8c97a);
+  --teal:    #4a9fa8;      /* secondary */
+  --ok:      #3d9970;
+  --warn:    #c9a84c;
+  --err:     #c0524e;
+  --text:    #e8e8ef;
+  --muted:   #5a5a72;
+  --r:       10px;
+  --tr:      .18s ease;
+  --shadow:  0 2px 20px rgba(0,0,0,.45);
+}
+
+/* ── RESET ──────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.55;overflow:hidden;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,select,textarea{font-family:inherit;}
+a{color:inherit;text-decoration:none;}
+ul{list-style:none;}
+img{display:block;max-width:100%;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────────── */
+#app{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sb{width:216px;min-width:216px;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;padding:18px 10px 14px;overflow-y:auto;transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:50;}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:2px 8px 20px;border-bottom:1px solid var(--b1);margin-bottom:12px;}
+.sb-logo{width:28px;height:28px;background:var(--goldg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;box-shadow:0 0 16px rgba(201,168,76,.25);}
+.sb-name{font-family:'DM Serif Display',serif;font-size:15px;letter-spacing:.2px;color:var(--text);}
+.sb-group{font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:14px 10px 5px;}
+.nav{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:var(--tr);position:relative;white-space:nowrap;}
+.nav:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.nav.on{background:rgba(201,168,76,.1);color:var(--gold);}
+.nav .pill{margin-left:auto;background:var(--gold);color:#0a0a0f;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:20px;}
+.sb-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--b1);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:54px;min-height:54px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:12px;}
+.topbar-title{font-size:14px;font-weight:600;letter-spacing:-.1px;}
+.topbar-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.content{flex:1;overflow-y:auto;padding:22px;padding-bottom:90px;}
+
+/* HAMBURGER */
+.hbg{display:none;width:34px;height:34px;align-items:center;justify-content:center;background:none;border:1px solid var(--b1);border-radius:7px;color:var(--muted);}
+#sbOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;}
+
+/* ── VIEWS ───────────────────────────────────────────────────────────── */
+.view{display:none;}
+.view.on{display:block;animation:fu .2s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── COMPONENTS ─────────────────────────────────────────────────────── */
+/* Card */
+.card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px;}
+.ct{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:13px;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;transition:var(--tr);cursor:pointer;white-space:nowrap;}
+.btn-p{background:var(--goldg);color:#0a0a0f;box-shadow:0 2px 12px rgba(201,168,76,.2);}
+.btn-p:hover{box-shadow:0 4px 20px rgba(201,168,76,.4);filter:brightness(1.07);}
+.btn-g{background:var(--s3);border:1px solid var(--b1);color:var(--text);}
+.btn-g:hover{background:rgba(255,255,255,.06);border-color:var(--b2);}
+.btn-d{background:rgba(192,82,78,.1);border:1px solid rgba(192,82,78,.25);color:#e07773;}
+.btn-ic{padding:5px;border-radius:6px;display:inline-flex;color:var(--muted);transition:var(--tr);}
+.btn-ic:hover{background:rgba(255,255,255,.06);color:var(--text);}
+
+/* Badges */
+.bd{display:inline-flex;align-items:center;padding:2.5px 7px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.b-n{background:rgba(255,255,255,.06);color:var(--muted);}
+.b-g{background:rgba(201,168,76,.12);color:#d4b060;border:1px solid rgba(201,168,76,.22);}
+.b-t{background:rgba(74,159,168,.12);color:#6dbcc5;border:1px solid rgba(74,159,168,.22);}
+.b-ok{background:rgba(61,153,112,.12);color:#5dba90;border:1px solid rgba(61,153,112,.22);}
+.b-w{background:rgba(201,168,76,.1);color:#d4b060;}
+.b-e{background:rgba(192,82,78,.1);color:#e07773;border:1px solid rgba(192,82,78,.2);}
+
+/* Forms */
+.ff{margin-bottom:14px;}
+.lbl{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px;}
+.inp{width:100%;background:var(--s3);border:1px solid var(--b1);color:var(--text);padding:8px 11px;border-radius:7px;transition:var(--tr);outline:none;font-size:13px;appearance:none;}
+.inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+select.inp{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a5a72' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
+textarea.inp{resize:vertical;min-height:68px;}
+
+/* Artist select with search — custom dropdown */
+.art-sel{position:relative;}
+.art-sel-inp{width:100%;background:var(--s3);border:1px solid var(--b1);color:var(--text);padding:8px 30px 8px 11px;border-radius:7px;transition:var(--tr);outline:none;font-size:13px;cursor:pointer;}
+.art-sel-inp:focus,.art-sel-inp.open{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+.art-sel-arrow{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.art-sel-drop{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--s2);border:1px solid var(--b2);border-radius:8px;z-index:200;max-height:220px;overflow-y:auto;box-shadow:var(--shadow);}
+.art-sel-drop.open{display:block;}
+.art-sel-search{padding:8px 10px;border-bottom:1px solid var(--b1);}
+.art-sel-search input{width:100%;background:var(--s3);border:1px solid var(--b1);color:var(--text);padding:5px 8px;border-radius:5px;outline:none;font-size:12px;}
+.art-opt{padding:8px 12px;cursor:pointer;font-size:13px;transition:var(--tr);}
+.art-opt:hover{background:rgba(201,168,76,.08);color:var(--gold);}
+.art-opt.sel{background:rgba(201,168,76,.12);color:var(--gold);}
+.art-opt-none{padding:10px 12px;font-size:12px;color:var(--muted);text-align:center;}
+
+/* Grid layouts */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.flex{display:flex;align-items:center;}
+.flex-1{flex:1;}
+.gap2{gap:8px;}
+.gap3{gap:12px;}
+.mb4{margin-bottom:16px;}
+.mb6{margin-bottom:22px;}
+.mt3{margin-top:12px;}
+
+/* Table */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:9px 13px;border-bottom:1px solid var(--b1);text-align:left;white-space:nowrap;}
+td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.012);}
+
+/* Stats */
+.stat{padding:18px;}
+.sl{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;}
+.sv{font-size:24px;font-weight:700;margin:6px 0 2px;letter-spacing:-.5px;}
+.ss{font-size:11.5px;color:var(--muted);}
+
+/* Kanban */
+.kanban{display:flex;gap:12px;overflow-x:auto;min-height:460px;padding-bottom:8px;}
+.kc{flex:0 0 220px;display:flex;flex-direction:column;}
+.kch{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;margin-bottom:8px;border-radius:7px;font-size:11.5px;font-weight:700;letter-spacing:.2px;}
+.kcb{flex:1;display:flex;flex-direction:column;gap:7px;min-height:80px;border-radius:7px;transition:var(--tr);}
+.kcb.dov{background:rgba(201,168,76,.06);outline:2px dashed rgba(201,168,76,.3);}
+.kcard{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:11px;cursor:grab;transition:var(--tr);}
+.kcard:hover{border-color:var(--b2);transform:translateY(-1px);box-shadow:0 6px 22px rgba(0,0,0,.35);}
+.kcard.dg{opacity:.3;}
+
+/* Progress */
+.pb{height:3px;background:var(--b1);border-radius:3px;overflow:hidden;}
+.pf{height:100%;background:var(--goldg);border-radius:3px;transition:width .4s ease;}
+
+/* Task item */
+.ti{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.ti:last-child{border-bottom:none;}
+.ti input[type=checkbox]{accent-color:var(--gold);width:14px;height:14px;flex-shrink:0;cursor:pointer;}
+.ti label{font-size:13px;cursor:pointer;transition:var(--tr);}
+.ti.done label{text-decoration:line-through;color:var(--muted);}
+
+/* Activity log */
+.li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.li:last-child{border-bottom:none;}
+.ld{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.lt{font-size:11px;color:var(--muted);white-space:nowrap;margin-left:auto;}
+
+/* Player */
+.player{position:fixed;bottom:0;left:216px;right:0;z-index:100;height:64px;background:rgba(10,10,15,.95);backdrop-filter:blur(24px);border-top:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;gap:14px;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.player.vis{transform:translateY(0);}
+.p-inf{min-width:130px;}
+.p-tt{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:125px;}
+.p-sb{font-size:10.5px;color:var(--muted);}
+
+/* Lightbox */
+#lightbox{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.9);backdrop-filter:blur(8px);align-items:center;justify-content:center;cursor:zoom-out;}
+#lightbox.open{display:flex;}
+#lightbox img{max-width:90vw;max-height:88vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+
+/* Modal */
+.mbb{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:14px;}
+.mbb.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:22px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;animation:fu .2s ease;}
+.modal-lg{max-width:640px;}
+.mt{font-size:16px;font-weight:700;margin-bottom:18px;letter-spacing:-.1px;}
+
+/* Upload zone */
+.dz{border:2px dashed var(--b1);border-radius:var(--r);padding:26px;text-align:center;cursor:pointer;transition:var(--tr);color:var(--muted);position:relative;}
+.dz:hover,.dz.ov{border-color:var(--gold);background:rgba(201,168,76,.04);color:var(--gold);}
+.dz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+
+/* Expiry alert */
+.eal{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:9px 13px;font-size:12.5px;color:#d4b060;display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+
+/* Search global */
+#gs{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);padding:70px 16px 16px;}
+#gs.open{display:block;}
+.gs-box{max-width:580px;margin:0 auto;}
+.gs-inp{width:100%;font-size:15px;padding:13px 16px;background:var(--s1);border:1px solid var(--gold);border-radius:10px;color:var(--text);outline:none;}
+.gs-res{background:var(--s1);border:1px solid var(--b1);border-radius:10px;margin-top:7px;overflow:hidden;max-height:60vh;overflow-y:auto;}
+.gs-it{padding:11px 15px;cursor:pointer;border-bottom:1px solid var(--b1);transition:var(--tr);}
+.gs-it:hover{background:rgba(201,168,76,.07);}
+.gs-it:last-child{border-bottom:none;}
+
+/* Toast */
+#toast{position:fixed;bottom:76px;right:18px;z-index:999;display:flex;flex-direction:column;gap:6px;}
+.tos{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px 14px;font-size:12.5px;font-weight:500;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;animation:si .22s ease;}
+.tos.ok{border-color:rgba(61,153,112,.35);}
+.tos.er{border-color:rgba(192,82,78,.35);}
+@keyframes si{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+
+/* RBAC chip */
+#role{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--b1);background:var(--s2);color:var(--muted);transition:var(--tr);}
+#role:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Admin overlay */
+#adm{display:none;position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.97);backdrop-filter:blur(10px);overflow-y:auto;padding:26px;}
+.adm-w{max-width:800px;margin:0 auto;}
+.adm-tb{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px;}
+.adm-t{padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;background:var(--s2);border:1px solid var(--b1);color:var(--muted);cursor:pointer;transition:var(--tr);}
+.adm-t.on,.adm-t:hover{background:rgba(201,168,76,.12);color:var(--gold);border-color:rgba(201,168,76,.25);}
+.adm-r{background:rgba(0,0,0,.3);border:1px solid var(--b1);border-radius:8px;padding:13px;margin-bottom:9px;}
+
+/* File preview in media grid */
+.media-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;transition:var(--tr);}
+.media-card:hover{border-color:var(--b2);transform:translateY(-1px);box-shadow:var(--shadow);}
+.media-thumb{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:var(--s3);cursor:pointer;overflow:hidden;}
+.media-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease;}
+.media-thumb img:hover{transform:scale(1.04);}
+.media-thumb .play-ico{width:38px;height:38px;border-radius:50%;background:var(--goldg);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);}
+.media-thumb .play-ico:hover{transform:scale(1.1);box-shadow:0 0 20px rgba(201,168,76,.4);}
+.media-info{padding:11px 12px;}
+
+/* ── EMBED BANNER ────────────────────────────────────────────────────── */
+.embed-hint{background:rgba(74,159,168,.08);border:1px solid rgba(74,159,168,.2);border-radius:8px;padding:9px 13px;font-size:12px;color:#6dbcc5;display:flex;align-items:center;gap:8px;}
+.embed-hint code{background:rgba(74,159,168,.12);padding:2px 6px;border-radius:4px;font-size:11px;}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+@media(max-width:1100px){
+  .g4{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:860px){
+  .g3{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:640px){
+  .sb{position:fixed;top:0;left:0;height:100vh;transform:translateX(-100%);width:220px;}
+  .sb.open{transform:translateX(0);}
+  #sbOverlay.open{display:block;}
+  .player{left:0;}
+  .hbg{display:flex;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .kanban{flex-direction:column;}
+  .kc{flex:none;width:100%;}
+  .content{padding:14px;padding-bottom:80px;}
+  .topbar{padding:0 12px;}
+  .modal{padding:16px;}
+  th{padding:7px 9px;}
+  td{padding:9px;}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+<!-- ─── SIDEBAR ────────────────────────────────────────────────── -->
+<nav class="sb" id="sb">
+  <div class="sb-brand">
+    <div class="sb-logo">♪</div>
+    <div class="sb-name">Label OS</div>
+  </div>
+
+  <div class="nav on" data-view="dash"><i data-lucide="layout-dashboard" style="width:14px"></i> Dashboard</div>
+
+  <div class="sb-group">Core</div>
+  <div class="nav" data-view="crm"><i data-lucide="users" style="width:14px"></i> Artists & CRM</div>
+  <div class="nav" data-view="anr"><i data-lucide="headphones" style="width:14px"></i> Demos & A&R <span class="pill" id="navAnr" style="display:none">0</span></div>
+  <div class="nav" data-view="releases"><i data-lucide="calendar-days" style="width:14px"></i> Releases</div>
+
+  <div class="sb-group">Business</div>
+  <div class="nav" data-view="contracts"><i data-lucide="file-signature" style="width:14px"></i> Contracts <span class="pill" id="navExp" style="display:none;background:var(--err);color:#fff">!</span></div>
+  <div class="nav" data-view="finance"><i data-lucide="bar-chart-2" style="width:14px"></i> Finance</div>
+  <div class="nav" data-view="bookings"><i data-lucide="mic-2" style="width:14px"></i> Bookings</div>
+
+  <div class="sb-group">Assets</div>
+  <div class="nav" data-view="media"><i data-lucide="folder-music" style="width:14px"></i> Media</div>
+
+  <div class="sb-group">System</div>
+  <div class="nav" data-view="research"><i data-lucide="telescope" style="width:14px"></i> Research</div>
+  <div class="nav" data-view="users"><i data-lucide="shield-check" style="width:14px"></i> Users & Roles</div>
+  <div class="nav" data-view="actlog"><i data-lucide="scroll-text" style="width:14px"></i> Activity Log</div>
+
+  <div class="sb-foot">
+    <div class="nav" onclick="LOS.openAdm()"><i data-lucide="database" style="width:14px"></i> DB Editor</div>
+  </div>
+</nav>
+<div id="sbOverlay" onclick="LOS.closeSb()"></div>
+
+<!-- ─── MAIN ──────────────────────────────────────────────────── -->
+<div class="main">
+  <header class="topbar">
+    <button class="hbg" onclick="LOS.openSb()"><i data-lucide="menu" style="width:16px"></i></button>
+    <div class="topbar-title" id="tbTitle">Dashboard</div>
+    <div class="topbar-r">
+      <button class="btn btn-g" style="font-size:12px;gap:5px;" onclick="LOS.openSearch()">
+        <i data-lucide="search" style="width:12px"></i> Search
+        <kbd style="font-size:10px;opacity:.45;margin-left:3px">⌘K</kbd>
+      </button>
+      <div id="role" onclick="LOS.cycleRole()"></div>
+      <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
+        <i data-lucide="upload" style="width:13px"></i> Submit Demo
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <section id="view-dash" class="view on">
+      <div class="g4 mb6" id="dStats"></div>
+      <div class="g3 mb4">
+        <div class="card"><div class="ct">New Demos</div><div id="dDemos"></div></div>
+        <div class="card"><div class="ct">Active Releases</div><div id="dRels"></div></div>
+        <div class="card"><div class="ct">Confirmed Gigs</div><div id="dGigs"></div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ct">Open Tasks</div><div id="dTasks"></div></div>
+        <div class="card"><div class="ct">Finance Snapshot</div><div id="dFin"></div></div>
+      </div>
+    </section>
+
+    <!-- CRM -->
+    <section id="view-crm" class="view">
+      <div class="flex gap2 mb6">
+        <input class="inp flex-1" id="crmQ" placeholder="Search artists & contacts…" oninput="LOS.renderCRM()">
+        <select class="inp" style="width:150px" id="crmTy" onchange="LOS.renderCRM()">
+          <option value="">All Types</option>
+          <option>Core Artist</option><option>Development</option><option>Legacy</option>
+          <option>Manager</option><option>Booker</option><option>PR Agency</option>
+          <option>Distributor</option><option>Blog</option><option>Radio</option>
+        </select>
+        <button class="btn btn-p" onclick="LOS.openModal('add-artist')" id="btn-add-art">
+          <i data-lucide="user-plus" style="width:13px"></i> Add
+        </button>
+      </div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Name / Email</th><th>Type</th><th>Status</th><th>Territory</th><th>Genres</th><th>Releases</th><th></th></tr></thead>
+          <tbody id="crmTbl"></tbody>
+        </table>
+      </div>
+      <div id="artDrawer" style="display:none;margin-top:14px" class="card"></div>
+    </section>
+
+    <!-- A&R -->
+    <section id="view-anr" class="view">
+      <div class="flex gap2 mb6" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:160px" id="anrQ" placeholder="Search demos…" oninput="LOS.renderANR()">
+        <select class="inp" style="width:120px" id="anrG" onchange="LOS.renderANR()">
+          <option value="">All Genres</option>
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+        <label class="btn btn-g" style="font-size:12px;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="wlOnly" onchange="LOS.renderANR()" style="accent-color:var(--gold)"> Watchlist
+        </label>
+        <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
+          <i data-lucide="plus" style="width:13px"></i> Add Demo
+        </button>
+      </div>
+      <div class="kanban" id="anrBoard"></div>
+    </section>
+
+    <!-- RELEASES -->
+    <section id="view-releases" class="view">
+      <div class="flex gap2 mb6" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:160px" id="relQ" placeholder="Search releases…" oninput="LOS.renderReleases()">
+        <select class="inp" style="width:120px" id="relTy" onchange="LOS.renderReleases()">
+          <option value="">All Types</option>
+          <option>Single</option><option>EP</option><option>Album</option><option>Compilation</option>
+        </select>
+        <button class="btn btn-p" onclick="LOS.openModal('add-release')">
+          <i data-lucide="plus" style="width:13px"></i> New Release
+        </button>
+      </div>
+      <div id="relList"></div>
+    </section>
+
+    <!-- CONTRACTS -->
+    <section id="view-contracts" class="view">
+      <div id="conAlerts"></div>
+      <div class="flex gap2 mb6">
+        <input class="inp flex-1" placeholder="Search contracts…" id="conQ" oninput="LOS.renderContracts()">
+        <button class="btn btn-p" onclick="LOS.openModal('add-contract')">
+          <i data-lucide="plus" style="width:13px"></i> New Contract
+        </button>
+      </div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Type</th><th>Artist</th><th>Status</th><th>Splits</th><th>Advance</th><th>Territory</th><th>Expires</th><th></th></tr></thead>
+          <tbody id="conTbl"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FINANCE -->
+    <section id="view-finance" class="view">
+      <div class="g4 mb6" id="finStats"></div>
+      <div class="g2 mb4">
+        <div class="card" id="finDrop" style="position:relative;overflow:hidden"
+             ondragover="LOS.fDragOver(event)" ondragleave="LOS.fDragLeave(event)" ondrop="LOS.fDrop(event)">
+          <div id="finOvl" style="display:none;position:absolute;inset:0;background:rgba(201,168,76,.85);backdrop-filter:blur(4px);z-index:5;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+            <i data-lucide="file-spreadsheet" style="width:32px;height:32px;color:#0a0a0f"></i>
+            <span style="color:#0a0a0f;font-weight:700">Drop CSV to Import</span>
+          </div>
+          <div class="ct flex gap2">Royalty Statements <span style="margin-left:auto;font-size:10px">drag .csv here</span></div>
+          <div class="tw"><table>
+            <thead><tr><th>Source</th><th>Release</th><th>Net</th><th>Label</th><th>Artist</th><th>Recouped</th></tr></thead>
+            <tbody id="finTbl"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="ct">Split Breakdown</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px;">
+            <canvas id="finChart" width="160" height="160"></canvas>
+            <div id="finLeg" style="display:flex;gap:14px;font-size:11.5px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex gap2 mb4">
+          <div class="ct" style="margin-bottom:0">Expenses & Recoup</div>
+          <button class="btn btn-g" style="margin-left:auto;font-size:12px" onclick="LOS.openModal('add-expense')">
+            <i data-lucide="plus" style="width:12px"></i> Add Expense
+          </button>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>Description</th><th>Release</th><th>Artist</th><th>Amount</th><th>Recouped</th><th>Status</th><th></th></tr></thead>
+          <tbody id="expTbl"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- BOOKINGS -->
+    <section id="view-bookings" class="view">
+      <div class="flex gap2 mb6" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:140px" placeholder="Search events…" id="bokQ" oninput="LOS.renderBookings()">
+        <select class="inp" style="width:140px" id="bokS" onchange="LOS.renderBookings()">
+          <option value="">All Statuses</option>
+          <option>Inquiry</option><option>Option</option><option>Confirmed</option><option>Settled</option><option>Cancelled</option>
+        </select>
+        <button class="btn btn-p" onclick="LOS.openModal('add-event')">
+          <i data-lucide="plus" style="width:13px"></i> New Event
+        </button>
+      </div>
+      <div class="g2 mb4">
+        <div class="card tw">
+          <table>
+            <thead><tr><th>Event</th><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th><th></th></tr></thead>
+            <tbody id="bokTbl"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="ct">Booking Pipeline</div>
+          <div id="bokPipe"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEDIA -->
+    <section id="view-media" class="view">
+      <div class="flex gap2 mb4" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:140px" id="medQ" placeholder="Search media…" oninput="LOS.renderMedia()">
+        <select class="inp" style="width:130px" id="medTy" onchange="LOS.renderMedia()">
+          <option value="">All Types</option>
+          <option>Master</option><option>Demo</option><option>Artwork</option>
+          <option>Press Photo</option><option>Video</option><option>STEMS</option>
+        </select>
+        <button class="btn btn-g" onclick="LOS.openModal('add-media')">
+          <i data-lucide="plus" style="width:13px"></i> Add Asset
+        </button>
+      </div>
+      <!-- Embed hint -->
+      <div class="embed-hint mb4">
+        <i data-lucide="code-2" style="width:14px;flex-shrink:0"></i>
+        Embeddable Demo Uploader:
+        <code>&lt;iframe src="upload.html" width="100%" height="520" frameborder="0"&gt;&lt;/iframe&gt;</code>
+        <button class="btn btn-g" style="font-size:11px;padding:4px 9px;margin-left:auto;flex-shrink:0" onclick="LOS.openUploader()">Preview</button>
+      </div>
+      <div class="g4" id="medGrid"></div>
+    </section>
+
+    <!-- RESEARCH -->
+    <section id="view-research" class="view">
+      <div class="g3 mb6">
+        <div class="card"><div class="ct">A&R Pipeline Funnel</div><canvas id="anrChart" width="280" height="180"></canvas></div>
+        <div class="card"><div class="ct">Genre Breakdown</div><canvas id="genChart" width="280" height="180"></canvas></div>
+        <div class="card"><div class="ct">Pipeline Velocity</div><div id="pipeVel" style="margin-top:8px"></div></div>
+      </div>
+      <div class="card">
+        <div class="ct">Curator & Blog Database</div>
+        <div id="curDB" class="tw"></div>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section id="view-users" class="view">
+      <div class="flex gap2 mb6">
+        <h2 style="font-size:14px;font-weight:700">Users & Role Management</h2>
+        <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('add-user')">
+          <i data-lucide="plus" style="width:13px"></i> Add User
+        </button>
+      </div>
+      <div class="card mb4"><div class="ct">RBAC Permission Matrix</div><div id="rbacMx" class="tw"></div></div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th><th></th></tr></thead>
+          <tbody id="usrTbl"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LOG -->
+    <section id="view-actlog" class="view">
+      <div class="flex gap2 mb6">
+        <input class="inp flex-1" id="logQ" placeholder="Filter activity log…" oninput="LOS.renderLog()">
+        <button class="btn btn-d" onclick="LOS.clearLog()"><i data-lucide="trash-2" style="width:13px"></i> Clear</button>
+      </div>
+      <div class="card"><div id="logList"></div></div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ─── AUDIO PLAYER ─────────────────────────────────────────────── -->
+<div class="player" id="player">
+  <button id="playBtn" style="width:32px;height:32px;border-radius:50%;background:var(--goldg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <i data-lucide="play" id="playIco" style="width:14px;color:#0a0a0f;margin-left:1px"></i>
+  </button>
+  <div class="p-inf">
+    <div class="p-tt" id="pTt">—</div>
+    <div class="p-sb" id="pSb">—</div>
+  </div>
+  <div id="waveform" style="flex:1;height:34px;min-width:0;"></div>
+  <div id="pTime" style="font-size:11.5px;color:var(--muted);min-width:74px;text-align:right">0:00 / 0:00</div>
+  <button class="btn-ic" onclick="LOS.closePlayer()"><i data-lucide="x" style="width:14px"></i></button>
+</div>
+
+<!-- ─── LIGHTBOX ──────────────────────────────────────────────────── -->
+<div id="lightbox" onclick="this.classList.remove('open')">
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- ─── GLOBAL SEARCH ─────────────────────────────────────────────── -->
+<div id="gs">
+  <div class="gs-box">
+    <input class="gs-inp" id="gsInp" placeholder="Search artists, demos, releases, media…" oninput="LOS.gsSearch()">
+    <div class="gs-res" id="gsRes"></div>
+    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Esc to close</div>
+  </div>
+</div>
+
+<!-- ─── TOASTS ────────────────────────────────────────────────────── -->
+<div id="toast"></div>
+
+<!-- ─── UPLOADER MODAL (Embed Preview) ───────────────────────────── -->
+<div class="mbb" id="modal-uploader">
+  <div class="modal modal-lg">
+    <div class="mt flex gap2">
+      Demo Submission
+      <button class="btn-ic" style="margin-left:auto" onclick="LOS.closeModal('uploader')"><i data-lucide="x" style="width:14px"></i></button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:18px;margin-top:-10px">
+      This form can be embedded on the Bunte Panther website via <code style="background:var(--s3);padding:1px 5px;border-radius:4px;font-size:11px">&lt;iframe src="upload.html"&gt;</code>
+    </p>
+    <div class="ff"><label class="lbl">Your Artist Name *</label><input class="inp" id="upN" placeholder="Stage name or act name"></div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Email *</label><input class="inp" id="upE" type="email"></div>
+      <div class="ff"><label class="lbl">Genre</label>
+        <select class="inp" id="upG">
+          <option value="">Select genre…</option>
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">BPM</label><input class="inp" id="upBpm" type="number" placeholder="138"></div>
+      <div class="ff"><label class="lbl">Key</label><input class="inp" id="upKey" placeholder="A minor"></div>
+    </div>
+    <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="upT" placeholder="Name of the track"></div>
+    <div class="ff"><label class="lbl">Reference Artists / Tracks</label><input class="inp" id="upRef" placeholder="e.g. Surgeon, Blawan, Function"></div>
+    <div class="ff"><label class="lbl">Soundcloud / Streaming URL</label><input class="inp" id="upUrl" placeholder="https://soundcloud.com/…"></div>
+    <div class="ff">
+      <label class="lbl">Upload Audio File (MP3 / WAV / AIFF / FLAC · max 50MB)</label>
+      <div class="dz" id="upDz">
+        <input type="file" accept="audio/*" onchange="LOS.upFile(this)">
+        <i data-lucide="upload-cloud" style="width:24px;margin:0 auto 8px;display:block"></i>
+        <div id="upDzTxt">Drop file here or click to browse</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">MP3, WAV, AIFF, FLAC — max 50 MB</div>
+      </div>
+    </div>
+    <div class="ff"><label class="lbl">Short Note to the Label</label><textarea class="inp" id="upNotes" rows="3" placeholder="Tell us about the track, context, mood…"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('uploader')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.submitUpload()">
+        <i data-lucide="send" style="width:13px"></i> Submit Demo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODALS ────────────────────────────────────────────────────── -->
+
+<!-- Add Artist -->
+<div class="mbb" id="modal-add-artist">
+  <div class="modal">
+    <div class="mt">Add Artist / Contact</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Name *</label><input class="inp" id="maN"></div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="maT">
+          <option>Core Artist</option><option>Development</option><option>Legacy</option>
+          <option>Manager</option><option>Booker</option><option>PR Agency</option>
+          <option>Distributor</option><option>Blog</option><option>Radio</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="maS"><option>Active</option><option>Inactive</option><option>Partner</option></select>
+      </div>
+      <div class="ff"><label class="lbl">Territory</label><input class="inp" id="maTe" placeholder="DE, EU, WW"></div>
+      <div class="ff"><label class="lbl">Email</label><input class="inp" id="maE" type="email"></div>
+      <div class="ff"><label class="lbl">Phone</label><input class="inp" id="maPh"></div>
+    </div>
+    <div class="ff"><label class="lbl">Genres / Tags</label><input class="inp" id="maG" placeholder="Techno, Electro…"></div>
+    <div class="ff"><label class="lbl">Spotify / RA / Instagram / Beatport URLs</label><input class="inp" id="maL" placeholder="https://…, https://…"></div>
+    <div class="ff"><label class="lbl">Notes / Bio</label><textarea class="inp" id="maNt"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-artist')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveArtist()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Demo -->
+<div class="mbb" id="modal-add-demo">
+  <div class="modal">
+    <div class="mt">Add Demo</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="mdT"></div>
+      <div class="ff">
+        <label class="lbl">Artist (from roster)</label>
+        <div class="art-sel" id="asel-demo"></div>
+      </div>
+      <div class="ff"><label class="lbl">Genre</label>
+        <select class="inp" id="mdG">
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">BPM</label><input class="inp" id="mdB" type="number" placeholder="138"></div>
+      <div class="ff"><label class="lbl">Submitter Email</label><input class="inp" id="mdE" type="email"></div>
+      <div class="ff"><label class="lbl">Rating (0–5)</label><input class="inp" id="mdR" type="number" min="0" max="5" value="0"></div>
+    </div>
+    <div class="ff"><label class="lbl">Audio URL</label><input class="inp" id="mdF" placeholder="https://soundcloud.com/…"></div>
+    <div class="ff"><label class="lbl">Notes</label><textarea class="inp" id="mdN"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-demo')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveDemo()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Release -->
+<div class="mbb" id="modal-add-release">
+  <div class="modal">
+    <div class="mt">New Release</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Title *</label><input class="inp" id="mrT"></div>
+      <div class="ff">
+        <label class="lbl">Artist *</label>
+        <div class="art-sel" id="asel-release"></div>
+      </div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="mrTy">
+          <option>Single</option><option>EP</option><option>Album</option><option>Compilation</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Catalogue #</label><input class="inp" id="mrC" placeholder="BP-001"></div>
+      <div class="ff"><label class="lbl">Release Date</label><input class="inp" id="mrD" type="date"></div>
+      <div class="ff"><label class="lbl">Distributor</label>
+        <select class="inp" id="mrDist">
+          <option>DistroKid</option><option>Believe</option><option>Amuse</option>
+          <option>CD Baby</option><option>Awal</option><option>Self</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="ff"><label class="lbl">Initial Status</label>
+      <select class="inp" id="mrS">
+        <option>Idea</option><option>A&R Selected</option><option>In Production</option>
+        <option>Mastered</option><option>Distro Setup</option><option>Pre-Save</option>
+        <option>Released</option><option>Post-Campaign</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-release')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveRelease()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Contract -->
+<div class="mbb" id="modal-add-contract">
+  <div class="modal">
+    <div class="mt">New Contract</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Type *</label>
+        <select class="inp" id="mcTy">
+          <option>Exclusive EP</option><option>Single Deal</option><option>Album Deal</option>
+          <option>Remix</option><option>License In</option><option>License Out</option>
+          <option>Publishing</option><option>360°</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="lbl">Artist *</label>
+        <div class="art-sel" id="asel-contract"></div>
+      </div>
+      <div class="ff">
+        <label class="lbl">Release (optional)</label>
+        <div id="rsel-contract"></div>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="mcS">
+          <option>Draft</option><option>In Negotiation</option><option>Active</option><option>Expired</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Territory</label><input class="inp" id="mcTe" placeholder="WW"></div>
+      <div class="ff"><label class="lbl">Label Split %</label><input class="inp" id="mcL" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Artist Split %</label><input class="inp" id="mcAr" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Advance (€)</label><input class="inp" id="mcAdv" type="number" value="0"></div>
+      <div class="ff"><label class="lbl">Expires</label><input class="inp" id="mcExp" type="date"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-contract')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveContract()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Event -->
+<div class="mbb" id="modal-add-event">
+  <div class="modal">
+    <div class="mt">New Booking / Event</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Event Name *</label><input class="inp" id="meN"></div>
+      <div class="ff">
+        <label class="lbl">Artist *</label>
+        <div class="art-sel" id="asel-event"></div>
+      </div>
+      <div class="ff"><label class="lbl">Date</label><input class="inp" id="meD" type="date"></div>
+      <div class="ff"><label class="lbl">Venue</label><input class="inp" id="meV"></div>
+      <div class="ff"><label class="lbl">Promoter / Contact</label>
+        <div id="csel-event"></div>
+      </div>
+      <div class="ff"><label class="lbl">Deal Type</label>
+        <select class="inp" id="meDT"><option>Fee</option><option>Door-Deal</option><option>Hybrid</option></select>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="meS">
+          <option>Inquiry</option><option>Option</option><option>Confirmed</option><option>Settled</option><option>Cancelled</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Fee (€)</label><input class="inp" id="meF" type="number" value="0"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-event')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveEvent()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Expense -->
+<div class="mbb" id="modal-add-expense">
+  <div class="modal">
+    <div class="mt">Add Expense</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Description *</label><input class="inp" id="mxD"></div>
+      <div class="ff"><label class="lbl">Category</label>
+        <select class="inp" id="mxC">
+          <option>Mastering</option><option>Artwork</option><option>Video</option>
+          <option>PR</option><option>Ads</option><option>Pressing</option><option>Tour</option><option>Other</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Amount (€)</label><input class="inp" id="mxA" type="number" value="0"></div>
+      <div class="ff">
+        <label class="lbl">Artist</label>
+        <div class="art-sel" id="asel-expense"></div>
+      </div>
+    </div>
+    <div class="ff">
+      <label class="lbl">Release</label>
+      <div id="rsel-expense"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-expense')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveExpense()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Media -->
+<div class="mbb" id="modal-add-media">
+  <div class="modal">
+    <div class="mt">Add Media Asset</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Title *</label><input class="inp" id="mmT"></div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="mmTy">
+          <option>Master</option><option>Demo</option><option>Artwork</option>
+          <option>Press Photo</option><option>Video</option><option>STEMS</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="lbl">Artist</label>
+        <div class="art-sel" id="asel-media"></div>
+      </div>
+      <div class="ff">
+        <label class="lbl">Release</label>
+        <div id="rsel-media"></div>
+      </div>
+      <div class="ff"><label class="lbl">Version</label><input class="inp" id="mmV" placeholder="Club, Radio, Vinyl…"></div>
+      <div class="ff"><label class="lbl">Tags</label><input class="inp" id="mmTg" placeholder="24bit, WAV, 3000×3000…"></div>
+    </div>
+    <div class="ff">
+      <label class="lbl">File URL (audio / image)</label>
+      <input class="inp" id="mmF" placeholder="https://…">
+    </div>
+    <div class="ff">
+      <label class="lbl">Or Upload File (audio/image · max 50MB)</label>
+      <div class="dz">
+        <input type="file" accept="audio/*,image/*" onchange="LOS.mmFileUpload(this)">
+        <i data-lucide="upload-cloud" style="width:22px;margin:0 auto 6px;display:block"></i>
+        <div id="mmDzTxt">Drop file here or click to browse</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-media')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveMedia()">Add Asset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User -->
+<div class="mbb" id="modal-add-user">
+  <div class="modal">
+    <div class="mt">Add User</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Name *</label><input class="inp" id="muN"></div>
+      <div class="ff"><label class="lbl">Email *</label><input class="inp" id="muE" type="email"></div>
+      <div class="ff"><label class="lbl">Role</label>
+        <select class="inp" id="muR">
+          <option value="admin">Admin</option><option value="label_manager">Label Manager</option>
+          <option value="ar">A&R</option><option value="artist">Artist</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="lbl">Linked Artist</label>
+        <div class="art-sel" id="asel-user"></div>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="muS"><option>Active</option><option>Inactive</option></select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-user')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- DB ADMIN OVERLAY -->
+<div id="adm">
+  <div class="adm-w">
+    <div class="flex gap2 mb6">
+      <h2 style="font-size:17px;font-weight:700">JSON Database Editor</h2>
+      <button class="btn btn-g" style="margin-left:auto" onclick="LOS.closeAdm()">
+        <i data-lucide="x" style="width:13px"></i> Close
+      </button>
+    </div>
+    <div class="adm-tb" id="admTbs"></div>
+    <div id="admEd"></div>
+  </div>
+</div>
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+// CONSTANTS
+// ────────────────────────────────────────────────────────────────────────────
+const TASK_TPL = {
+  Single:['Artwork erstellen (3000×3000)','Mastering abschließen','DistroKid Upload','ISRC + UPC beantragen','Spotify Editorial Pitch','Pre-Save Link','Social Media Countdown','DJ Promo Links','Blog Outreach (5)','Post-Release Analytics'],
+  EP:['Tracklist finalisieren','Artwork + Label Copy','Mastering aller Tracks','Katalognummer','DistroKid/Believe Upload','ISRC alle Tracks','Beatport Exclusive (4W)','Spotify Pitch','Pre-Save Kampagne','DJ Promo CSV','PR Outreach (10 Blogs)','Instagram Reel','Post-Release Check'],
+  Album:['A&R Tracklist finalisieren','Mixing finalisieren','Mastering (Digital + Vinyl)','Artwork (Front/Back/Inlay)','Label Copy + Credits','Vinylpressung','Distributor Setup (WW)','ISRC alle Tracks','Pitchtext DE/EN','Spotify Pitch','Apple Music Pitch','Pre-Save 4 Wochen vorher','Pressearbeit 6 Wochen','Video Produktion','Bandcamp Early Access','Post-Campaign Auswertung'],
+  Compilation:['Artist Submissions','Verträge alle Artists','Tracklist + Running Order','Mastering + Artwork','Katalognummer','Upload','Blog + Radio Outreach','Promo Links']
+};
+
+const ROLES = {
+  admin:         {label:'Admin',         col:'#c9a84c', mods:['dash','crm','anr','releases','contracts','finance','bookings','media','research','users','actlog'], write:['*']},
+  label_manager: {label:'Label Manager', col:'#4a9fa8', mods:['dash','crm','anr','releases','contracts','finance','bookings','media','research','actlog'],         write:['crm','anr','releases','contracts','bookings','media']},
+  ar:            {label:'A&R',           col:'#7c6fa8', mods:['dash','crm','anr','releases','media','research'],                                                     write:['anr','media']},
+  artist:        {label:'Artist',        col:'#3d9970', mods:['dash','anr','releases','media'],                                                                      write:[]},
+};
+
+const RBAC_MX = {
+  'CRM':       {admin:true, label_manager:true,  ar:'read',   artist:false},
+  'Demos/A&R': {admin:true, label_manager:true,  ar:true,     artist:'own'},
+  'Releases':  {admin:true, label_manager:true,  ar:'read',   artist:'own'},
+  'Contracts': {admin:true, label_manager:true,  ar:false,    artist:false},
+  'Finance':   {admin:true, label_manager:true,  ar:false,    artist:false},
+  'Bookings':  {admin:true, label_manager:true,  ar:false,    artist:'own'},
+  'Media':     {admin:true, label_manager:true,  ar:true,     artist:'own'},
+  'Users':     {admin:true, label_manager:false, ar:false,    artist:false},
+  'Log':       {admin:true, label_manager:true,  ar:false,    artist:false},
+};
+
+const ANR_COLS = [
+  {key:'Neu',       label:'New',       col:'#5a5a72'},
+  {key:'In Review', label:'In Review', col:'#4a9fa8'},
+  {key:'Shortlist', label:'Shortlist', col:'#c9a84c'},
+  {key:'Gespräch',  label:'In Talk',   col:'#7c6fa8'},
+  {key:'Offer',     label:'Offer',     col:'#c9a84c'},
+  {key:'Signed',    label:'Signed ✓',  col:'#3d9970'},
+  {key:'Abgelehnt', label:'Pass',      col:'#c0524e'},
+];
+
+const REL_ST = ['Idea','A&R Selected','In Production','Mastered','Distro Setup','Pre-Save','Released','Post-Campaign'];
+
+const STATUS_CLS = {
+  Active:'b-ok',Confirmed:'b-ok',Released:'b-ok',Signed:'b-ok',
+  'In Review':'b-t','In Production':'b-t','In Talk':'b-t','In Negotiation':'b-t',
+  Shortlist:'b-g',Option:'b-g',Offer:'b-g',Mastered:'b-g','A&R Selected':'b-g',
+  Neu:'b-n',Draft:'b-n',Idea:'b-n',Inactive:'b-n',
+  Abgelehnt:'b-e',Expired:'b-e',Cancelled:'b-e',
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// SEED DATA
+// ────────────────────────────────────────────────────────────────────────────
+const SEED = {
+  artists:[
+    {id:'a1',name:'DJ Void',type:'Core Artist',status:'Active',territory:'DE, EU',genres:'Techno, Industrial',email:'void@mail.com',phone:'+49 151 11223344',links:'https://ra.co/djvoid, @void_dj',notes:'Resident at Tresor. 3 EPs on roster.'},
+    {id:'a2',name:'Synth Kid',type:'Development',status:'Active',territory:'DE',genres:'Electro, Acid',email:'synthkid@web.de',phone:'',links:'@synthkid_de',notes:'First submission 2026-03. Very promising.'},
+    {id:'a3',name:'Groove Agency Berlin',type:'Booker',status:'Partner',territory:'EU',genres:'',email:'book@grooveagency.de',phone:'+49 30 123456',links:'https://grooveagency.de',notes:'Handles DJ Void EU bookings.'}
+  ],
+  demos:[
+    {id:'d1',title:'Berlin Nights',artist_id:'',artist_name:'Unknown Submitter',genre:'Techno',bpm:138,email:'sub@x.de',status:'Neu',rating:0,watchlist:false,file:'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',notes:'Interesting main motif.',submitted:'2026-05-01'},
+    {id:'d2',title:'Deep Chords',artist_id:'a2',artist_name:'Synth Kid',genre:'Electro',bpm:125,email:'synthkid@web.de',status:'In Review',rating:4,watchlist:true,file:'https://actions.google.com/sounds/v1/science_fiction/alien_breath.ogg',notes:'Strong Drexciya reference.',submitted:'2026-04-28'},
+    {id:'d3',title:'Acid Rain',artist_id:'a1',artist_name:'DJ Void',genre:'Acid',bpm:140,email:'void@mail.com',status:'Shortlist',rating:5,watchlist:false,file:'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',notes:'Potential label release.',submitted:'2026-04-15'}
+  ],
+  releases:[
+    {id:'r1',title:'Void EP',artist_id:'a1',type:'EP',cat:'BP-001',status:'Released',date:'2026-03-01',distributor:'DistroKid',territory:'WW',tasks:TASK_TPL.EP.map((t,i)=>({id:'t'+i,text:t,done:true}))},
+    {id:'r2',title:'Deep Transmission',artist_id:'a2',type:'Single',cat:'BP-002',status:'In Production',date:'2026-07-15',distributor:'Believe',territory:'WW',tasks:TASK_TPL.Single.map((t,i)=>({id:'s'+i,text:t,done:i<2}))}
+  ],
+  contracts:[
+    {id:'c1',type:'Exclusive EP',artist_id:'a1',release_id:'r1',status:'Active',territory:'WW',label_split:50,artist_split:50,advance:0,expires:'2027-03-01'},
+    {id:'c2',type:'Single Deal',artist_id:'a2',release_id:'r2',status:'In Negotiation',territory:'WW',label_split:60,artist_split:40,advance:200,expires:'2026-06-01'}
+  ],
+  events:[
+    {id:'e1',name:'Tresor Night',artist_id:'a1',date:'2026-06-14',venue:'Tresor, Berlin',promoter_id:'',promoter_name:'Tresor GmbH',deal_type:'Fee',status:'Confirmed',fee:800},
+    {id:'e2',name:'Fusion Festival',artist_id:'a1',date:'2026-08-22',venue:'Fusion, Lärz',promoter_id:'',promoter_name:'Kulturkosmos',deal_type:'Fee',status:'Option',fee:1200}
+  ],
+  media:[
+    {id:'m1',related_to:'r1',title:'Void EP – Club Master',type:'Master',artist_id:'a1',version:'Club',file:'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',tags:'WAV, 24bit, 44.1kHz',is_image:false},
+    {id:'m2',related_to:'r1',title:'Void EP – Artwork',type:'Artwork',artist_id:'a1',version:'',file:'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=400&q=80',tags:'3000×3000, RGB, JPG',is_image:true},
+    {id:'m3',related_to:'r2',title:'Deep Transmission – Press Photo',type:'Press Photo',artist_id:'a2',version:'',file:'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80',tags:'1200×800, JPG',is_image:true}
+  ],
+  royalties:[
+    {id:'ro1',release_id:'r1',source:'Spotify (DistroKid)',net_amount:1240.50},
+    {id:'ro2',release_id:'r1',source:'Beatport',net_amount:320.00},
+    {id:'ro3',release_id:'r1',source:'Apple Music',net_amount:850.00}
+  ],
+  expenses:[
+    {id:'x1',description:'Mastering Void EP',category:'Mastering',amount:250,artist_id:'a1',release_id:'r1',recouped:250},
+    {id:'x2',description:'PR Campaign Void EP',category:'PR',amount:500,artist_id:'a1',release_id:'r1',recouped:320}
+  ],
+  curators:[
+    {id:'cu1',name:'RA Reviews',type:'Blog',genre:'Techno',contact:'reviews@ra.co',submits:'ra.co/submit'},
+    {id:'cu2',name:'Acid Test Podcast',type:'Podcast',genre:'Techno, Acid',contact:'',submits:'acidtest.com'},
+    {id:'cu3',name:'Groove Magazine',type:'Print/Web',genre:'Electronic',contact:'redaktion@groove.de',submits:''}
+  ],
+  users:[
+    {id:'u1',name:'Max Mustermann',email:'admin@bunterpanther.de',role:'admin',artist_id:'',status:'Active',last_active:'2026-05-03'},
+    {id:'u2',name:'Lena A&R',email:'ar@bunterpanther.de',role:'ar',artist_id:'',status:'Active',last_active:'2026-05-02'},
+    {id:'u3',name:'DJ Void (Artist Portal)',email:'void@mail.com',role:'artist',artist_id:'a1',status:'Active',last_active:'2026-04-28'}
+  ],
+  activity_log:[
+    {id:'l1',ts:'2026-05-03T00:30:00',user:'Max',action:'Demo "Acid Rain" moved to Shortlist',module:'A&R'},
+    {id:'l2',ts:'2026-05-02T18:12:00',user:'Lena',action:'Contract "Single Deal" created for Synth Kid',module:'Contracts'},
+    {id:'l3',ts:'2026-05-02T14:05:00',user:'Max',action:'Release "Deep Transmission" → In Production',module:'Releases'}
+  ]
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ────────────────────────────────────────────────────────────────────────────
+const uid   = () => '_'+Math.random().toString(36).slice(2,9);
+const esc   = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtE  = v => v ? `€ ${parseFloat(v).toFixed(2)}` : '—';
+const fmtT  = ts => new Date(ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const badge = s => `<span class="bd ${STATUS_CLS[s]||'b-n'}">${esc(s)||'—'}</span>`;
+
+function loadDB() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('los_v3')||'{}');
+    const db  = {};
+    Object.keys(SEED).forEach(k => { db[k] = Array.isArray(raw[k]) ? raw[k] : JSON.parse(JSON.stringify(SEED[k])); });
+    return db;
+  } catch { return JSON.parse(JSON.stringify(SEED)); }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ARTIST-SELECT WIDGET
+// A reusable searchable dropdown bound to db.artists
+// ────────────────────────────────────────────────────────────────────────────
+const ArtSel = {
+  _state: {},
+
+  build(containerId, opts={}) {
+    // opts: {placeholder, allowEmpty, emptyLabel, filter, value, onChange}
+    const id    = containerId;
+    const state = this._state[id] = { value: opts.value||'', open: false, q: '' };
+    const el    = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    el.innerHTML = `
+      <div class="art-sel">
+        <div class="art-sel-inp" id="asi-${id}" tabindex="0" onclick="ArtSel.toggle('${id}')" onkeydown="ArtSel.kd(event,'${id}')">
+          <span id="asl-${id}">${opts.allowEmpty?(opts.emptyLabel||'— None —'):'Select artist…'}</span>
+        </div>
+        <i data-lucide="chevron-down" class="art-sel-arrow" style="width:13px"></i>
+        <div class="art-sel-drop" id="asd-${id}">
+          <div class="art-sel-search"><input type="text" id="asq-${id}" placeholder="Search…" oninput="ArtSel.filter('${id}',this.value)" onclick="event.stopPropagation()"></div>
+          <div id="aso-${id}"></div>
+        </div>
+      </div>`;
+    this._opts[id] = opts;
+    this.renderOpts(id, '');
+    if (opts.value) this.setValue(id, opts.value, true);
+    lucide.createIcons();
+  },
+
+  _opts: {},
+
+  renderOpts(id, q) {
+    const opts  = this._opts[id]||{};
+    const list  = (LOS.db.artists||[]).filter(a => {
+      if (opts.filter && !opts.filter(a)) return false;
+      return !q || a.name.toLowerCase().includes(q.toLowerCase());
+    });
+    const container = document.getElementById('aso-'+id);
+    if (!container) return;
+    let html = '';
+    if (opts.allowEmpty) {
+      html += `<div class="art-opt" data-id="" onclick="ArtSel.select('${id}','','${esc(opts.emptyLabel||'— None —')}')">
+        ${esc(opts.emptyLabel||'— None —')}
+      </div>`;
+    }
+    if (!list.length && q) {
+      html += `<div class="art-opt-none">No artists found</div>`;
+    } else {
+      list.forEach(a => {
+        const sel = this._state[id]?.value === a.id ? ' sel' : '';
+        html += `<div class="art-opt${sel}" data-id="${a.id}" onclick="ArtSel.select('${id}','${a.id}','${esc(a.name)}')">
+          ${esc(a.name)} <span style="color:var(--muted);font-size:11px;margin-left:6px">${esc(a.type)}</span>
+        </div>`;
+      });
+    }
+    container.innerHTML = html;
+  },
+
+  filter(id, q) { this._state[id].q = q; this.renderOpts(id, q); },
+
+  toggle(id) {
+    const drop = document.getElementById('asd-'+id);
+    const inp  = document.getElementById('asi-'+id);
+    if (!drop) return;
+    this._state[id].open = !this._state[id].open;
+    drop.classList.toggle('open', this._state[id].open);
+    inp.classList.toggle('open', this._state[id].open);
+    if (this._state[id].open) {
+      setTimeout(() => document.getElementById('asq-'+id)?.focus(), 50);
+    }
+  },
+
+  close(id) {
+    const drop = document.getElementById('asd-'+id);
+    const inp  = document.getElementById('asi-'+id);
+    if (drop) { drop.classList.remove('open'); inp.classList.remove('open'); }
+    if (this._state[id]) this._state[id].open = false;
+  },
+
+  select(id, value, label) {
+    this._state[id] = {...(this._state[id]||{}), value, open: false };
+    const lbl = document.getElementById('asl-'+id);
+    if (lbl) { lbl.textContent = label; lbl.style.color = value ? 'var(--text)' : 'var(--muted)'; }
+    this.close(id);
+    const onChange = this._opts[id]?.onChange;
+    if (onChange) onChange(value, label);
+  },
+
+  setValue(id, value, silent) {
+    const a = (LOS?.db?.artists||[]).find(x => x.id === value);
+    const label = a ? a.name : (this._opts[id]?.emptyLabel || '— None —');
+    if (this._state[id]) this._state[id].value = value;
+    const lbl = document.getElementById('asl-'+id);
+    if (lbl) { lbl.textContent = label; lbl.style.color = value ? 'var(--text)' : 'var(--muted)'; }
+    if (!silent && this._opts[id]?.onChange) this._opts[id].onChange(value, label);
+  },
+
+  getValue(id) { return this._state[id]?.value || ''; },
+
+  kd(e, id) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggle(id); }
+    if (e.key === 'Escape') this.close(id);
+  }
+};
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  Object.keys(ArtSel._state).forEach(id => {
+    if (ArtSel._state[id].open) {
+      const el = document.getElementById('asd-'+id);
+      if (el && !el.closest('.art-sel')?.contains(e.target)) ArtSel.close(id);
+    }
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// RELEASE SELECT HELPER (simpler, no search needed usually)
+// ────────────────────────────────────────────────────────────────────────────
+function buildRelSel(containerId, selectedId='', allowEmpty=true) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const releases = LOS.db.releases||[];
+  let html = `<select class="inp" id="${containerId}-sel">`;
+  if (allowEmpty) html += `<option value="">— No release —</option>`;
+  releases.forEach(r => {
+    const art = (LOS.db.artists||[]).find(a => a.id === r.artist_id);
+    html += `<option value="${r.id}" ${r.id===selectedId?'selected':''}>${esc(r.title)}${art?' ('+esc(art.name)+')':''}</option>`;
+  });
+  html += `</select>`;
+  el.innerHTML = html;
+}
+
+function buildContactSel(containerId, selectedId='') {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const contacts = (LOS.db.artists||[]).filter(a => ['Manager','Booker','PR Agency','Distributor','Blog','Radio'].includes(a.type));
+  let html = `<select class="inp" id="${containerId}-sel"><option value="">— None —</option>`;
+  contacts.forEach(c => {
+    html += `<option value="${c.id}" ${c.id===selectedId?'selected':''}>${esc(c.name)} (${esc(c.type)})</option>`;
+  });
+  html += '</select>';
+  el.innerHTML = html;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// MAIN APP
+// ────────────────────────────────────────────────────────────────────────────
+const LOS = {
+  db:    loadDB(),
+  ws:    null,
+  dragId:null,
+  role:  'admin',
+  _upFile: null,
+  _mmFile: null,
+
+  init() {
+    this.save();
+    this.setupNav();
+    this.setupPlayer();
+    this.setupKeys();
+    this.updateRoleChip();
+    this.renderAll();
+    lucide.createIcons();
+  },
+
+  save() { localStorage.setItem('los_v3', JSON.stringify(this.db)); },
+
+  log(action, module='System') {
+    const u = this.db.users?.find(u => u.role === this.role);
+    this.db.activity_log.unshift({id:uid(), ts:new Date().toISOString(), user:u?.name||'Unknown', action, module});
+    if (this.db.activity_log.length > 300) this.db.activity_log = this.db.activity_log.slice(0,300);
+    this.save();
+  },
+
+  toast(msg, type='ok') {
+    const t = document.createElement('div');
+    t.className = `tos ${type==='ok'?'ok':'er'}`;
+    t.innerHTML = `<i data-lucide="${type==='ok'?'check-circle':'alert-circle'}" style="width:13px;color:${type==='ok'?'var(--ok)':'var(--err)'}"></i> ${msg}`;
+    document.getElementById('toast').appendChild(t);
+    lucide.createIcons();
+    setTimeout(() => t.remove(), 3200);
+  },
+
+  // ── SIDEBAR MOBILE ────────────────────────────────────────────────────
+  openSb()  { document.getElementById('sb').classList.add('open'); document.getElementById('sbOverlay').classList.add('open'); },
+  closeSb() { document.getElementById('sb').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('open'); },
+
+  // ── RBAC ──────────────────────────────────────────────────────────────
+  cycleRole() {
+    const keys = Object.keys(ROLES);
+    this.role = keys[(keys.indexOf(this.role)+1) % keys.length];
+    this.updateRoleChip();
+    this.applyRBAC();
+    this.toast(`Role: ${ROLES[this.role].label}`);
+  },
+  updateRoleChip() {
+    const r = ROLES[this.role];
+    document.getElementById('role').innerHTML = `<i data-lucide="shield" style="width:11px;color:${r.col}"></i> ${r.label}`;
+    lucide.createIcons();
+  },
+  applyRBAC() {
+    const allowed = ROLES[this.role].mods;
+    document.querySelectorAll('.nav[data-view]').forEach(el => {
+      el.style.display = allowed.includes(el.dataset.view) ? 'flex' : 'none';
+    });
+    document.getElementById('btn-add-art').style.display =
+      (ROLES[this.role].write.includes('*') || ROLES[this.role].write.includes('crm')) ? 'inline-flex' : 'none';
+  },
+
+  // ── NAV ───────────────────────────────────────────────────────────────
+  setupNav() {
+    const names = {dash:'Dashboard',crm:'Artists & CRM',anr:'Demos & A&R',releases:'Releases',contracts:'Contract Vault',finance:'Finance & Royalties',bookings:'Bookings & Events',media:'Media Library',research:'Research',users:'Users & Roles',actlog:'Activity Log'};
+    document.querySelectorAll('.nav[data-view]').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.nav').forEach(n => n.classList.remove('on'));
+        el.classList.add('on');
+        document.querySelectorAll('.view').forEach(s => s.classList.remove('on'));
+        document.getElementById('view-'+el.dataset.view)?.classList.add('on');
+        document.getElementById('tbTitle').textContent = names[el.dataset.view]||el.dataset.view;
+        this.closeSb();
+        if (el.dataset.view === 'research') setTimeout(() => this.renderResearch(), 50);
+        if (el.dataset.view === 'anr')      this.buildModalSelects();
+        lucide.createIcons();
+      });
+    });
+    this.applyRBAC();
+  },
+
+  setupKeys() {
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); this.openSearch(); }
+      if (e.key === 'Escape') {
+        this.closeSearch();
+        this.closeAdm();
+        document.querySelectorAll('.mbb.open').forEach(m => m.classList.remove('open'));
+      }
+    });
+  },
+
+  // ── BUILD MODAL SELECTS ───────────────────────────────────────────────
+  buildModalSelects() {
+    const modalSelects = [
+      {id:'asel-demo',     opts:{allowEmpty:true, emptyLabel:'— External Artist —'}},
+      {id:'asel-release',  opts:{allowEmpty:false}},
+      {id:'asel-contract', opts:{allowEmpty:false, filter:a=>['Core Artist','Development','Legacy'].includes(a.type)||a.type?.includes('Artist')}},
+      {id:'asel-event',    opts:{allowEmpty:false, filter:a=>['Core Artist','Development','Legacy'].includes(a.type)||a.type?.includes('Artist')}},
+      {id:'asel-expense',  opts:{allowEmpty:true, emptyLabel:'— No Artist —'}},
+      {id:'asel-media',    opts:{allowEmpty:true, emptyLabel:'— No Artist —'}},
+      {id:'asel-user',     opts:{allowEmpty:true, emptyLabel:'— Not linked —', filter:a=>['Core Artist','Development','Legacy'].includes(a.type)}},
+    ];
+    modalSelects.forEach(({id, opts}) => {
+      if (document.getElementById(id)) ArtSel.build(id, opts);
+    });
+    // Release selects
+    if (document.getElementById('rsel-contract')) buildRelSel('rsel-contract', '', true);
+    if (document.getElementById('rsel-expense'))  buildRelSel('rsel-expense',  '', true);
+    if (document.getElementById('rsel-media'))    buildRelSel('rsel-media',    '', true);
+    if (document.getElementById('csel-event'))    buildContactSel('csel-event', '');
+    lucide.createIcons();
+  },
+
+  // ── RENDER ALL ────────────────────────────────────────────────────────
+  renderAll() {
+    this.renderDash();
+    this.renderCRM();
+    this.renderANR();
+    this.renderReleases();
+    this.renderContracts();
+    this.renderFinance();
+    this.renderExpenses();
+    this.renderBookings();
+    this.renderMedia();
+    this.renderUsers();
+    this.renderLog();
+    // Nav badges
+    const newD = this.db.demos.filter(d=>d.status==='Neu').length;
+    document.getElementById('navAnr').textContent = newD;
+    document.getElementById('navAnr').style.display = newD ? 'inline' : 'none';
+    const expC = this.db.contracts.filter(c=>c.expires && new Date(c.expires)<new Date(Date.now()+30*86400000)).length;
+    document.getElementById('navExp').style.display = expC ? 'inline' : 'none';
+    lucide.createIcons();
+  },
+
+  // ── DASHBOARD ─────────────────────────────────────────────────────────
+  renderDash() {
+    const tR = this.db.royalties.reduce((a,r)=>a+parseFloat(r.net_amount||0),0);
+    const newD = this.db.demos.filter(d=>d.status==='Neu').length;
+    document.getElementById('dStats').innerHTML = [
+      {l:'Artists',     v:this.db.artists.filter(a=>['Core Artist','Development','Legacy'].includes(a.type)).length, col:'var(--gold)',  ic:'user-circle'},
+      {l:'New Demos',   v:newD,                                                                                       col:'var(--warn)', ic:'inbox'},
+      {l:'Releases',    v:this.db.releases.filter(r=>r.status!=='Released').length,                                  col:'var(--teal)', ic:'disc-3'},
+      {l:'Net Revenue', v:`€${tR.toFixed(0)}`,                                                                       col:'var(--ok)',   ic:'trending-up'},
+    ].map(s=>`<div class="card stat"><div class="sl flex gap2" style="gap:6px"><i data-lucide="${s.ic}" style="width:12px"></i>${s.l}</div><div class="sv" style="color:${s.col}">${s.v}</div></div>`).join('');
+
+    const demoHtml = this.db.demos.filter(d=>d.status==='Neu').slice(0,5).map(d=>{
+      const art = this.db.artists.find(a=>a.id===d.artist_id);
+      return `<div class="flex gap2 mb4" style="cursor:pointer;padding:6px 0;border-bottom:1px solid var(--b1)" onclick="LOS.play('${esc(d.file)}','${esc(d.title)}','${esc(d.artist_name||d.title)}')">
+        <i data-lucide="music" style="width:13px;color:var(--gold);flex-shrink:0;margin-top:2px"></i>
+        <div class="flex-1" style="min-width:0"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.title)}</div>
+              <div style="font-size:11px;color:var(--muted)">${esc(art?.name||d.artist_name||'External')} · ${esc(d.genre)}</div></div>
+        <span style="font-size:10px;color:var(--muted);white-space:nowrap">${d.submitted||''}</span>
+      </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:12px;padding:8px 0">No new demos</div>';
+    document.getElementById('dDemos').innerHTML = demoHtml;
+
+    document.getElementById('dRels').innerHTML = this.db.releases.filter(r=>r.status!=='Released').slice(0,5).map(r=>{
+      const art = this.db.artists.find(a=>a.id===r.artist_id);
+      return `<div class="flex gap2 mb4" style="padding:6px 0;border-bottom:1px solid var(--b1)">
+        <i data-lucide="disc-3" style="width:13px;color:var(--teal);flex-shrink:0;margin-top:2px"></i>
+        <div class="flex-1"><div style="font-weight:600;font-size:13px">${esc(r.title)}</div>
+        <div style="font-size:11px;color:var(--muted)">${esc(art?.name||'—')} · ${esc(r.type)}</div></div>
+        ${badge(r.status)}
+      </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:12px;padding:8px 0">No active releases</div>';
+
+    document.getElementById('dGigs').innerHTML = this.db.events.filter(e=>e.status==='Confirmed').slice(0,5).map(e=>{
+      const art = this.db.artists.find(a=>a.id===e.artist_id);
+      return `<div class="flex gap2 mb4" style="padding:6px 0;border-bottom:1px solid var(--b1)">
+        <i data-lucide="mic-2" style="width:13px;color:var(--ok);flex-shrink:0;margin-top:2px"></i>
+        <div class="flex-1"><div style="font-weight:600;font-size:13px">${esc(e.name)}</div>
+        <div style="font-size:11px;color:var(--muted)">${esc(art?.name||'—')} · ${esc(e.date||'TBA')}</div></div>
+        <span style="font-weight:600;font-size:13px;color:var(--ok)">${fmtE(e.fee)}</span>
+      </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:12px;padding:8px 0">No confirmed gigs</div>';
+
+    const allTasks = this.db.releases.flatMap(r=>(r.tasks||[]).filter(t=>!t.done).map(t=>({...t,release:r.title})));
+    document.getElementById('dTasks').innerHTML = allTasks.slice(0,6).map(t=>`
+      <div class="flex gap2 mb4" style="padding:5px 0;border-bottom:1px solid var(--b1)">
+        <i data-lucide="circle-dot" style="width:12px;color:var(--gold);flex-shrink:0;margin-top:2px"></i>
+        <div class="flex-1"><div style="font-size:12.5px">${esc(t.text)}</div>
+        <div style="font-size:11px;color:var(--muted)">${esc(t.release)}</div></div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:12px;padding:8px 0">All tasks done ✓</div>';
+
+    const tRoy = this.db.royalties.reduce((a,r)=>a+parseFloat(r.net_amount||0),0);
+    const tExp = this.db.expenses.reduce((a,e)=>a+parseFloat(e.amount||0),0);
+    document.getElementById('dFin').innerHTML = `
+      <div class="flex gap2 mb4" style="padding:7px 0;border-bottom:1px solid var(--b1)"><span style="color:var(--muted)">Total Royalties</span><span style="margin-left:auto;font-weight:700;color:var(--ok)">${fmtE(tRoy)}</span></div>
+      <div class="flex gap2 mb4" style="padding:7px 0;border-bottom:1px solid var(--b1)"><span style="color:var(--muted)">Total Expenses</span><span style="margin-left:auto;font-weight:700;color:var(--err)">${fmtE(tExp)}</span></div>
+      <div class="flex gap2" style="padding:7px 0"><span style="font-weight:600">Net Balance</span><span style="margin-left:auto;font-weight:700;font-size:16px;color:var(--gold)">${fmtE(tRoy-tExp)}</span></div>`;
+    lucide.createIcons();
+  },
+
+  // ── CRM ───────────────────────────────────────────────────────────────
+  renderCRM() {
+    const q  = document.getElementById('crmQ')?.value.toLowerCase()||'';
+    const ty = document.getElementById('crmTy')?.value||'';
+    const TYPE_COL = {
+      'Core Artist':'var(--gold)','Development':'var(--teal)','Legacy':'var(--muted)',
+      'Manager':'#9b7fc8','Booker':'#c87f9b','PR Agency':'#7fc8b8',
+      'Distributor':'#c8a07f','Blog':'#7f9bc8','Radio':'#a8c87f',
+    };
+    const list = this.db.artists.filter(a=>{
+      const qm = !q || a.name.toLowerCase().includes(q) || (a.email||'').toLowerCase().includes(q) || (a.genres||'').toLowerCase().includes(q);
+      const tm = !ty || a.type===ty;
+      return qm && tm;
+    });
+    document.getElementById('crmTbl').innerHTML = list.map(a=>{
+      const relCount = this.db.releases.filter(r=>r.artist_id===a.id).length;
+      return `<tr>
+        <td>
+          <div style="font-weight:600">${esc(a.name)}</div>
+          <div style="font-size:11px;color:var(--muted)">${esc(a.email)||'—'}</div>
+        </td>
+        <td><span class="bd b-n" style="color:${TYPE_COL[a.type]||'var(--muted)'};border-color:${TYPE_COL[a.type]||'transparent'}20">${esc(a.type)}</span></td>
+        <td>${badge(a.status)}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(a.territory)||'—'}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(a.genres)||'—'}</td>
+        <td style="font-size:12px">${relCount||0}</td>
+        <td>
+          <div class="flex gap2">
+            <button class="btn-ic" onclick="LOS.openArtistDrawer('${a.id}')" title="View Details"><i data-lucide="eye" style="width:13px"></i></button>
+            <button class="btn-ic" onclick="LOS.deleteItem('artists','${a.id}')" title="Delete"><i data-lucide="trash-2" style="width:13px"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No entries found</td></tr>`;
+    lucide.createIcons();
+  },
+
+  openArtistDrawer(id) {
+    const a = this.db.artists.find(x=>x.id===id);
+    if (!a) return;
+    const rels   = this.db.releases.filter(r=>r.artist_id===id);
+    const demos  = this.db.demos.filter(d=>d.artist_id===id);
+    const cts    = this.db.contracts.filter(c=>c.artist_id===id);
+    const events = this.db.events.filter(e=>e.artist_id===id);
+    const drawer = document.getElementById('artDrawer');
+    drawer.style.display = 'block';
+    drawer.innerHTML = `
+      <div class="flex gap3 mb4" style="flex-wrap:wrap">
+        <div>
+          <div style="font-size:18px;font-weight:700">${esc(a.name)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">${esc(a.type)} · ${esc(a.territory)||'—'}</div>
+          ${a.genres?`<div style="font-size:12px;color:var(--gold);margin-top:4px">${esc(a.genres)}</div>`:''}
+        </div>
+        <button class="btn-ic" style="margin-left:auto" onclick="document.getElementById('artDrawer').style.display='none'">
+          <i data-lucide="x" style="width:15px"></i>
+        </button>
+      </div>
+      ${a.notes?`<div style="font-size:13px;color:var(--muted);margin-bottom:14px;padding:10px;background:var(--s3);border-radius:8px">${esc(a.notes)}</div>`:''}
+      ${a.email||a.phone?`<div class="flex gap3 mb4" style="font-size:12px;color:var(--muted);flex-wrap:wrap">
+        ${a.email?`<span><i data-lucide="mail" style="width:12px;vertical-align:middle"></i> ${esc(a.email)}</span>`:''}
+        ${a.phone?`<span><i data-lucide="phone" style="width:12px;vertical-align:middle"></i> ${esc(a.phone)}</span>`:''}
+      </div>`:''}
+      ${a.links?`<div style="font-size:12px;color:var(--teal);margin-bottom:14px">${esc(a.links)}</div>`:''}
+      <div class="g4" style="gap:10px;margin-bottom:14px">
+        ${[['Releases',rels.length,'disc-3'],['Demos',demos.length,'headphones'],['Contracts',cts.length,'file-signature'],['Gigs',events.length,'mic-2']].map(([l,v,ic])=>`
+          <div style="background:var(--s3);border-radius:8px;padding:10px;text-align:center">
+            <i data-lucide="${ic}" style="width:14px;color:var(--gold)"></i>
+            <div style="font-size:20px;font-weight:700;margin:4px 0">${v}</div>
+            <div style="font-size:10.5px;color:var(--muted)">${l}</div>
+          </div>`).join('')}
+      </div>
+      ${rels.length?`<div class="ct">Releases</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${rels.map(r=>`<span class="bd b-n">${esc(r.title)} <span style="color:var(--muted)">${esc(r.type)}</span></span>`).join('')}</div>`:''}
+      ${events.length?`<div class="ct">Bookings</div><div style="display:flex;flex-wrap:wrap;gap:6px">${events.map(e=>`<span class="bd ${STATUS_CLS[e.status]||'b-n'}">${esc(e.name)} — ${esc(e.date||'TBA')}</span>`).join('')}</div>`:''}`;
+    lucide.createIcons();
+  },
+
+  saveArtist() {
+    const n = document.getElementById('maN')?.value.trim();
+    if (!n) return this.toast('Name required','err');
+    const a = {
+      id:uid(), name:n,
+      type:   document.getElementById('maT')?.value,
+      status: document.getElementById('maS')?.value,
+      territory: document.getElementById('maTe')?.value,
+      email:  document.getElementById('maE')?.value,
+      phone:  document.getElementById('maPh')?.value,
+      genres: document.getElementById('maG')?.value,
+      links:  document.getElementById('maL')?.value,
+      notes:  document.getElementById('maNt')?.value,
+    };
+    this.db.artists.push(a);
+    this.save();
+    this.closeModal('add-artist');
+    this.renderAll();
+    this.log(`Artist/Contact "${n}" created`,'CRM');
+    this.toast(`${n} added`);
+    // Rebuild all artist selects in open modals
+    this.buildModalSelects();
+  },
+
+  // ── A&R ───────────────────────────────────────────────────────────────
+  renderANR() {
+    const q   = document.getElementById('anrQ')?.value.toLowerCase()||'';
+    const g   = document.getElementById('anrG')?.value||'';
+    const wl  = document.getElementById('wlOnly')?.checked||false;
+    const filtered = this.db.demos.filter(d=>{
+      const qm = !q || d.title.toLowerCase().includes(q) || (d.artist_name||'').toLowerCase().includes(q);
+      const gm = !g || d.genre===g;
+      const wm = !wl || d.watchlist;
+      return qm && gm && wm;
+    });
+    document.getElementById('anrBoard').innerHTML = ANR_COLS.map(col=>{
+      const cards = filtered.filter(d=>d.status===col.key);
+      return `<div class="kc">
+        <div class="kch" style="background:${col.col}18;color:${col.col}">
+          <span>${col.label}</span>
+          <span class="bd" style="background:${col.col}22;color:${col.col};border:none">${cards.length}</span>
+        </div>
+        <div class="kcb" id="kcb-${col.key}"
+             ondragover="event.preventDefault();this.classList.add('dov')"
+             ondragleave="this.classList.remove('dov')"
+             ondrop="LOS.dropDemo(event,'${col.key}')">
+          ${cards.map(d=>this._demoCard(d,col.col)).join('')}
+        </div>
+      </div>`;
+    }).join('');
+    }).join('');
+    lucide.createIcons();
+  },
+
+  _demoCard(d, col) {
+    const stars = [1,2,3,4,5].map(n =>
+      `<span style="color:${n<=(d.rating||0)?'var(--gold)':'var(--b2)'};cursor:pointer"
+             onclick="LOS.rateDemo('${d.id}',${n})">★</span>`
+    ).join('');
+
+    const art = this.db.artists.find(a => a.id === d.artist_id);
+    return `<div class="kcard" draggable="true"
+         ondragstart="LOS.dragStart(event,'${d.id}')"
+         ondragend="document.querySelectorAll('.kcb').forEach(b=>b.classList.remove('dov'))">
+      <div class="flex gap2 mb4">
+        <div style="font-weight:600;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.title)}</div>
+        <button class="btn-ic" style="padding:2px" onclick="LOS.toggleWatchlist('${d.id}')">
+          <i data-lucide="${d.watchlist?'bookmark-check':'bookmark'}"
+             style="width:12px;color:${d.watchlist?'var(--gold)':'var(--muted)'}"></i>
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:7px">
+        ${esc(art?.name||d.artist_name||'External')}
+        ${d.genre?` · <span style="color:${col}">${esc(d.genre)}</span>`:''}
+        ${d.bpm?` · <span>${d.bpm} BPM</span>`:''}
+      </div>
+      <div class="flex gap2" style="font-size:14px;letter-spacing:1px;margin-bottom:8px">${stars}</div>
+      ${d.file?`<button class="btn btn-g"
+          style="width:100%;font-size:11.5px;padding:5px;gap:5px;margin-bottom:6px"
+          onclick="LOS.play('${esc(d.file)}','${esc(d.title)}','${esc(d.artist_name||'')}')">
+        <i data-lucide="play-circle" style="width:12px;color:var(--gold)"></i> Play Preview
+      </button>`:''}
+      <select class="inp"
+          style="font-size:11.5px;padding:4px 26px 4px 7px;background:var(--s3)"
+          onchange="LOS.moveDemoStatus('${d.id}',this.value)">
+        ${ANR_COLS.map(c=>`<option value="${c.key}" ${c.key===d.status?'selected':''}>${c.label}</option>`).join('')}
+      </select>
+    </div>`;
+  },
+
+  dragStart(e, id) { this.dragId=id; e.dataTransfer.setData('text/plain',id); },
+  dropDemo(e, status) {
+    e.preventDefault();
+    document.querySelectorAll('.kcb').forEach(b=>b.classList.remove('dov'));
+    if (!this.dragId) return;
+    this.moveDemoStatus(this.dragId, status);
+    this.dragId=null;
+  },
+  moveDemoStatus(id, status) {
+    const d = this.db.demos.find(x=>x.id===id);
+    if (!d) return;
+    d.status = status;
+    this.save(); this.renderANR(); this.renderDash();
+    this.log(`Demo "${d.title}" → ${status}`,'A&R');
+    const newD = this.db.demos.filter(x=>x.status==='Neu').length;
+    document.getElementById('navAnr').textContent=newD;
+    document.getElementById('navAnr').style.display=newD?'inline':'none';
+  },
+  rateDemo(id, r) {
+    const d = this.db.demos.find(x=>x.id===id);
+    if (d) { d.rating=r; this.save(); this.renderANR(); this.log(`Demo "${d.title}" rated ${r}★`,'A&R'); }
+  },
+  toggleWatchlist(id) {
+    const d = this.db.demos.find(x=>x.id===id);
+    if (d) { d.watchlist=!d.watchlist; this.save(); this.renderANR(); this.toast(d.watchlist?'Added to watchlist':'Removed from watchlist'); }
+  },
+  saveDemo() {
+    const t = document.getElementById('mdT')?.value.trim();
+    if (!t) return this.toast('Track title required','err');
+    const artId = ArtSel.getValue('asel-demo');
+    const art   = this.db.artists.find(a=>a.id===artId);
+    const d = {
+      id: uid(), title: t,
+      artist_id:   artId,
+      artist_name: art?.name || document.getElementById('mdE')?.value.split('@')[0]||'External',
+      genre:    document.getElementById('mdG')?.value,
+      bpm:      document.getElementById('mdB')?.value,
+      email:    document.getElementById('mdE')?.value,
+      rating:   parseInt(document.getElementById('mdR')?.value)||0,
+      file:     document.getElementById('mdF')?.value,
+      notes:    document.getElementById('mdN')?.value,
+      status:  'Neu', watchlist: false,
+      submitted: new Date().toISOString().slice(0,10),
+    };
+    this.db.demos.push(d);
+    this.save(); this.closeModal('add-demo'); this.renderAll();
+    this.log(`Demo "${t}" submitted`,'A&R'); this.toast('Demo added');
+  },
+
+  // ── RELEASES ──────────────────────────────────────────────────────────
+  renderReleases() {
+    const q  = document.getElementById('relQ')?.value.toLowerCase()||'';
+    const ty = document.getElementById('relTy')?.value||'';
+    const list = this.db.releases.filter(r=>{
+      const qm = !q || r.title.toLowerCase().includes(q);
+      const tm = !ty || r.type===ty;
+      return qm && tm;
+    });
+    document.getElementById('relList').innerHTML = list.map(r=>{
+      const art   = this.db.artists.find(a=>a.id===r.artist_id);
+      const tasks = r.tasks||[];
+      const done  = tasks.filter(t=>t.done).length;
+      const pct   = tasks.length ? Math.round(done/tasks.length*100) : 0;
+      const stIdx = REL_ST.indexOf(r.status);
+      return `<div class="card mb4">
+        <div class="flex gap3 mb4" style="flex-wrap:wrap">
+          <div>
+            <div style="font-size:15px;font-weight:700">${esc(r.title)}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">
+              ${esc(art?.name||'—')} · ${esc(r.type)} · ${esc(r.cat||'—')} · ${esc(r.distributor||'—')}
+              ${r.date?` · <span style="color:var(--gold)">${r.date}</span>`:''}
+            </div>
+          </div>
+          <div class="flex gap2" style="margin-left:auto;align-items:flex-start;flex-wrap:wrap">
+            ${badge(r.status)}
+            <select class="inp" style="width:160px;font-size:11.5px;padding:4px 26px 4px 7px" onchange="LOS.setRelStatus('${r.id}',this.value)">
+              ${REL_ST.map(s=>`<option ${s===r.status?'selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn-ic" onclick="LOS.deleteItem('releases','${r.id}')"><i data-lucide="trash-2" style="width:13px"></i></button>
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div class="flex gap2 mb4" style="align-items:center;gap:10px">
+          <div class="pb flex-1"><div class="pf" style="width:${pct}%"></div></div>
+          <span style="font-size:11px;color:var(--muted);white-space:nowrap">${done}/${tasks.length} tasks</span>
+        </div>
+        <!-- Release timeline stepper -->
+        <div style="display:flex;gap:0;overflow-x:auto;margin-bottom:14px;padding-bottom:4px">
+          ${REL_ST.map((s,i)=>{
+            const active  = i===stIdx;
+            const done_st = i<stIdx;
+            return `<div style="display:flex;flex-direction:column;align-items:center;min-width:80px;flex:1">
+              <div style="width:22px;height:22px;border-radius:50%;background:${done_st?'var(--ok)':active?'var(--gold)':'var(--s3)'};border:2px solid ${active?'var(--gold)':done_st?'var(--ok)':'var(--b1)'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${done_st||active?'#0a0a0f':'var(--muted)'}">
+                ${done_st?'✓':i+1}
+              </div>
+              <div style="font-size:9.5px;color:${active?'var(--gold)':done_st?'var(--ok)':'var(--muted)'};margin-top:4px;text-align:center;line-height:1.3">${s}</div>
+              ${i<REL_ST.length-1?`<div style="position:absolute;display:none"></div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+        <!-- Tasks -->
+        <div class="ct">Tasks (${done}/${tasks.length} done)</div>
+        <div>${tasks.map(t=>`
+          <div class="ti ${t.done?'done':''}">
+            <input type="checkbox" id="tk-${t.id}" ${t.done?'checked':''} onchange="LOS.toggleTask('${r.id}','${t.id}',this.checked)">
+            <label for="tk-${t.id}">${esc(t.text)}</label>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('') || '<div class="card" style="text-align:center;color:var(--muted);padding:32px">No releases yet</div>';
+    lucide.createIcons();
+  },
+
+  setRelStatus(id, status) {
+    const r = this.db.releases.find(x=>x.id===id);
+    if (r) { r.status=status; this.save(); this.renderReleases(); this.renderDash(); this.log(`Release "${r.title}" → ${status}`,'Releases'); }
+  },
+
+  toggleTask(relId, taskId, done) {
+    const r = this.db.releases.find(x=>x.id===relId);
+    if (!r) return;
+    const t = r.tasks?.find(x=>x.id===taskId);
+    if (t) { t.done=done; this.save(); this.renderReleases(); this.log(`Task "${t.text}" ${done?'completed':'reopened'}`,'Releases'); }
+  },
+
+  saveRelease() {
+    const t = document.getElementById('mrT')?.value.trim();
+    if (!t) return this.toast('Title required','err');
+    const artId = ArtSel.getValue('asel-release');
+    if (!artId) return this.toast('Please select an artist','err');
+    const ty = document.getElementById('mrTy')?.value||'Single';
+    const r = {
+      id:uid(), title:t, artist_id:artId, type:ty,
+      cat:   document.getElementById('mrC')?.value,
+      date:  document.getElementById('mrD')?.value,
+      distributor: document.getElementById('mrDist')?.value,
+      status: document.getElementById('mrS')?.value||'Idea',
+      territory:'WW',
+      tasks: (TASK_TPL[ty]||TASK_TPL.Single).map((tx,i)=>({id:uid(),text:tx,done:false})),
+    };
+    this.db.releases.push(r);
+    this.save(); this.closeModal('add-release'); this.renderAll();
+    this.log(`Release "${t}" created`,'Releases'); this.toast(`Release "${t}" created`);
+    buildRelSel('rsel-contract','',true);
+    buildRelSel('rsel-expense','',true);
+    buildRelSel('rsel-media','',true);
+  },
+
+  // ── CONTRACTS ─────────────────────────────────────────────────────────
+  renderContracts() {
+    const q    = document.getElementById('conQ')?.value.toLowerCase()||'';
+    const now  = Date.now();
+    const warn30 = this.db.contracts.filter(c=>c.expires&&new Date(c.expires)<new Date(now+30*86400000)&&c.status==='Active');
+    document.getElementById('conAlerts').innerHTML = warn30.map(c=>{
+      const art=this.db.artists.find(a=>a.id===c.artist_id);
+      return `<div class="eal"><i data-lucide="alert-triangle" style="width:14px;flex-shrink:0"></i> Contract for <strong>${art?.name||'?'}</strong> expires ${c.expires}</div>`;
+    }).join('');
+
+    const list = this.db.contracts.filter(c=>{
+      const art=this.db.artists.find(a=>a.id===c.artist_id);
+      return !q||(art?.name||'').toLowerCase().includes(q)||(c.type||'').toLowerCase().includes(q);
+    });
+    document.getElementById('conTbl').innerHTML = list.map(c=>{
+      const art = this.db.artists.find(a=>a.id===c.artist_id);
+      const rel = this.db.releases.find(r=>r.id===c.release_id);
+      const expC= c.expires&&new Date(c.expires)<new Date(now+30*86400000)?'color:var(--warn);font-weight:600':'color:var(--muted)';
+      return `<tr>
+        <td><div style="font-weight:600">${esc(c.type)}</div>${rel?`<div style="font-size:11px;color:var(--teal)">${esc(rel.title)}</div>`:''}</td>
+        <td style="font-weight:500">${esc(art?.name||'—')}</td>
+        <td>${badge(c.status)}</td>
+        <td style="font-size:12px">${c.label_split||50}% / ${c.artist_split||50}%</td>
+        <td style="font-weight:600;color:var(--ok)">${c.advance?fmtE(c.advance):'—'}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(c.territory)||'—'}</td>
+        <td style="font-size:12px;${expC}">${c.expires||'—'}</td>
+        <td><button class="btn-ic" onclick="LOS.deleteItem('contracts','${c.id}')"><i data-lucide="trash-2" style="width:13px"></i></button></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No contracts</td></tr>`;
+    lucide.createIcons();
+  },
+
+  saveContract() {
+    const artId = ArtSel.getValue('asel-contract');
+    if (!artId) return this.toast('Artist required','err');
+    const relSel = document.getElementById('rsel-contract-sel');
+    const c = {
+      id:uid(),
+      type:       document.getElementById('mcTy')?.value,
+      artist_id:  artId,
+      release_id: relSel?.value||'',
+      status:     document.getElementById('mcS')?.value,
+      territory:  document.getElementById('mcTe')?.value,
+      label_split:parseFloat(document.getElementById('mcL')?.value)||50,
+      artist_split:parseFloat(document.getElementById('mcAr')?.value)||50,
+      advance:    parseFloat(document.getElementById('mcAdv')?.value)||0,
+      expires:    document.getElementById('mcExp')?.value,
+    };
+    this.db.contracts.push(c);
+    const art=this.db.artists.find(a=>a.id===artId);
+    this.save(); this.closeModal('add-contract'); this.renderAll();
+    this.log(`Contract "${c.type}" for ${art?.name} created`,'Contracts'); this.toast('Contract saved');
+  },
+
+  // ── FINANCE ───────────────────────────────────────────────────────────
+  renderFinance() {
+    const tRoy  = this.db.royalties.reduce((a,r)=>a+parseFloat(r.net_amount||0),0);
+    const tExp  = this.db.expenses.reduce((a,e)=>a+parseFloat(e.amount||0),0);
+    const tRec  = this.db.expenses.reduce((a,e)=>a+parseFloat(e.recouped||0),0);
+    document.getElementById('finStats').innerHTML = [
+      {l:'Gross Royalties', v:fmtE(tRoy),     col:'var(--ok)',  ic:'trending-up'},
+      {l:'Total Expenses',  v:fmtE(tExp),      col:'var(--err)', ic:'trending-down'},
+      {l:'Net Balance',     v:fmtE(tRoy-tExp), col:'var(--gold)',ic:'wallet'},
+      {l:'Recouped',        v:fmtE(tRec),      col:'var(--teal)',ic:'refresh-cw'},
+    ].map(s=>`<div class="card stat"><div class="sl flex gap2" style="gap:6px"><i data-lucide="${s.ic}" style="width:12px"></i>${s.l}</div><div class="sv" style="color:${s.col}">${s.v}</div></div>`).join('');
+
+    document.getElementById('finTbl').innerHTML = this.db.royalties.map(ro=>{
+      const rel  = this.db.releases.find(r=>r.id===ro.release_id);
+      const art  = this.db.artists.find(a=>a.id===rel?.artist_id);
+      const net  = parseFloat(ro.net_amount||0);
+      const lbl  = net*0.5; const art_s = net*0.5;
+      return `<tr>
+        <td style="font-size:12px">${esc(ro.source)}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(rel?.title||'—')}</td>
+        <td style="font-weight:600;color:var(--ok)">${fmtE(net)}</td>
+        <td style="font-size:12px">${fmtE(lbl)}</td>
+        <td style="font-size:12px">${esc(art?.name||'—')} ${fmtE(art_s)}</td>
+        <td><span class="bd b-ok" style="font-size:10px">✓</span></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:18px">No royalties — drag CSV to import</td></tr>`;
+
+    this._drawDonut('finChart', tRoy*0.5, tRoy*0.5);
+    document.getElementById('finLeg').innerHTML=`
+      <span style="color:var(--gold);font-size:12px">▬ Label: ${fmtE(tRoy*0.5)}</span>
+      <span style="color:var(--muted);font-size:12px">▬ Artists: ${fmtE(tRoy*0.5)}</span>`;
+    lucide.createIcons();
+  },
+
+  _drawDonut(id,a,b) {
+    const c=document.getElementById(id); if(!c) return;
+    const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+    const total=a+b; if(!total) return;
+    const cx=c.width/2,cy=c.height/2,r=64,lw=18;
+    const draw=(from,to,color)=>{ ctx.beginPath(); ctx.arc(cx,cy,r,from,to); ctx.lineWidth=lw; ctx.strokeStyle=color; ctx.lineCap='butt'; ctx.stroke(); };
+    const aAngle=(a/total)*2*Math.PI;
+    draw(-Math.PI/2,-Math.PI/2+aAngle,'#c9a84c');
+    draw(-Math.PI/2+aAngle,1.5*Math.PI,'#2a2a3a');
+    ctx.fillStyle='#e8e8ef'; ctx.font='bold 13px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(fmtE(a+b),cx,cy-2);
+    ctx.font='10px Inter'; ctx.fillStyle='#5a5a72';
+    ctx.fillText('total',cx,cy+13);
+  },
+
+  renderExpenses() {
+    document.getElementById('expTbl').innerHTML = this.db.expenses.map(x=>{
+      const art = this.db.artists.find(a=>a.id===x.artist_id);
+      const rel = this.db.releases.find(r=>r.id===x.release_id);
+      const pct = x.amount ? Math.round((parseFloat(x.recouped||0)/parseFloat(x.amount))*100) : 0;
+      const over= pct>=100;
+      return `<tr>
+        <td><div style="font-weight:600">${esc(x.description)}</div><div style="font-size:11px;color:var(--muted)">${esc(x.category)}</div></td>
+        <td style="font-size:12px;color:var(--muted)">${esc(rel?.title||'—')}</td>
+        <td style="font-size:12px">${esc(art?.name||'—')}</td>
+        <td style="font-weight:600">${fmtE(x.amount)}</td>
+        <td>${fmtE(x.recouped)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="pb" style="width:64px"><div class="pf" style="width:${Math.min(pct,100)}%;background:${over?'var(--ok)':'var(--warn)'}"></div></div>
+            <span class="bd ${over?'b-ok':'b-w'}" style="font-size:10px">${over?'✓ Recouped':pct+'%'}</span>
+          </div>
+        </td>
+        <td><button class="btn-ic" onclick="LOS.deleteItem('expenses','${x.id}')"><i data-lucide="trash-2" style="width:13px"></i></button></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No expenses</td></tr>`;
+    lucide.createIcons();
+  },
+
+  saveExpense() {
+    const d = document.getElementById('mxD')?.value.trim();
+    if (!d) return this.toast('Description required','err');
+    const relSel = document.getElementById('rsel-expense-sel');
+    const x = {
+      id:uid(), description:d,
+      category: document.getElementById('mxC')?.value,
+      amount:   parseFloat(document.getElementById('mxA')?.value)||0,
+      artist_id:ArtSel.getValue('asel-expense'),
+      release_id:relSel?.value||'',
+      recouped: 0,
+    };
+    this.db.expenses.push(x);
+    this.save(); this.closeModal('add-expense'); this.renderAll();
+    this.log(`Expense "${d}" added`,'Finance'); this.toast('Expense added');
+  },
+
+  // CSV Import
+  fDragOver(e) { e.preventDefault(); const o=document.getElementById('finOvl'); o.style.display='flex'; lucide.createIcons(); },
+  fDragLeave()  { document.getElementById('finOvl').style.display='none'; },
+  fDrop(e) {
+    e.preventDefault(); document.getElementById('finOvl').style.display='none';
+    const f=e.dataTransfer.files[0];
+    if (!f||!f.name.endsWith('.csv')) return this.toast('Drop a valid .csv file','err');
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const rows=ev.target.result.split('\n').slice(1);
+      let count=0;
+      rows.forEach(row=>{
+        const c=row.split(',').map(x=>x.replace(/"/g,'').trim());
+        if (c.length>=3&&c[2]) { this.db.royalties.push({id:uid(),source:c[0]+' (CSV)',release_id:c[1]||'',net_amount:parseFloat(c[2])||0}); count++; }
+      });
+      if (count) { this.save(); this.renderFinance(); this.log(`${count} royalty rows imported via CSV`,'Finance'); this.toast(`${count} rows imported`); }
+      else this.toast('CSV empty or wrong format (Source,ReleaseID,Amount)','err');
+    };
+    reader.readAsText(f);
+  },
+
+  // ── BOOKINGS ──────────────────────────────────────────────────────────
+  renderBookings() {
+    const q  = document.getElementById('bokQ')?.value.toLowerCase()||'';
+    const sf = document.getElementById('bokS')?.value||'';
+    const list = this.db.events.filter(e=>{
+      const art=this.db.artists.find(a=>a.id===e.artist_id);
+      const qm = !q||(e.name||'').toLowerCase().includes(q)||(art?.name||'').toLowerCase().includes(q);
+      const sm = !sf||e.status===sf;
+      return qm && sm;
+    });
+    document.getElementById('bokTbl').innerHTML = list.map(e=>{
+      const art=this.db.artists.find(a=>a.id===e.artist_id);
+      return `<tr>
+        <td><div style="font-weight:600">${esc(e.name)}</div><div style="font-size:11px;color:var(--muted)">${esc(e.promoter_name||'—')} · ${esc(e.deal_type)}</div></td>
+        <td style="font-size:12px;white-space:nowrap">${e.date||'TBA'}</td>
+        <td style="font-weight:500">${esc(art?.name||'—')}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(e.venue||'—')}</td>
+        <td>${badge(e.status)}</td>
+        <td style="font-weight:600;color:var(--ok)">${fmtE(e.fee)}</td>
+        <td>
+          <div class="flex gap2">
+            <select class="inp" style="width:112px;font-size:11px;padding:3px 22px 3px 6px" onchange="LOS.setEventStatus('${e.id}',this.value)">
+              ${['Inquiry','Option','Confirmed','Settled','Cancelled'].map(s=>`<option ${s===e.status?'selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn-ic" onclick="LOS.deleteItem('events','${e.id}')"><i data-lucide="trash-2" style="width:13px"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No events</td></tr>`;
+
+    const PIPE=[['Inquiry','var(--muted)'],['Option','var(--warn)'],['Confirmed','var(--ok)'],['Settled','var(--gold)']];
+    const tSettled=this.db.events.filter(e=>e.status==='Settled').reduce((a,e)=>a+parseFloat(e.fee||0),0);
+    const tConf=this.db.events.filter(e=>e.status==='Confirmed').reduce((a,e)=>a+parseFloat(e.fee||0),0);
+    document.getElementById('bokPipe').innerHTML = PIPE.map(([s,col])=>{
+      const cnt=this.db.events.filter(e=>e.status===s).length;
+      const fee=this.db.events.filter(e=>e.status===s).reduce((a,e)=>a+parseFloat(e.fee||0),0);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b1)">
+        <span style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;display:inline-block"></span>
+        <span style="font-size:13px;font-weight:500;flex:1">${s}</span>
+        <span class="bd b-n">${cnt}</span>
+        <span style="font-size:13px;font-weight:600;color:${col}">${fee?fmtE(fee):'—'}</span>
+      </div>`;
+    }).join('') + `<div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.07);border-radius:8px;font-size:12px">
+      <div class="flex" style="justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted)">Confirmed pipeline</span><span style="font-weight:700;color:var(--ok)">${fmtE(tConf)}</span></div>
+      <div class="flex" style="justify-content:space-between"><span style="color:var(--muted)">Total settled</span><span style="font-weight:700;color:var(--gold)">${fmtE(tSettled)}</span></div>
+    </div>`;
+    lucide.createIcons();
+  },
+
+  setEventStatus(id, status) {
+    const e=this.db.events.find(x=>x.id===id);
+    if (e) { e.status=status; this.save(); this.renderBookings(); this.renderDash(); this.log(`Event "${e.name}" → ${status}`,'Bookings'); }
+  },
+
+  saveEvent() {
+    const n=document.getElementById('meN')?.value.trim();
+    if (!n) return this.toast('Event name required','err');
+    const artId=ArtSel.getValue('asel-event');
+    if (!artId) return this.toast('Artist required','err');
+    const cSel=document.getElementById('csel-event-sel');
+    const pId=cSel?.value||'';
+    const pContact=this.db.artists.find(a=>a.id===pId);
+    const e={
+      id:uid(), name:n, artist_id:artId,
+      date:      document.getElementById('meD')?.value,
+      venue:     document.getElementById('meV')?.value,
+      promoter_id:  pId,
+      promoter_name:pContact?.name||document.getElementById('meV')?.value,
+      deal_type: document.getElementById('meDT')?.value,
+      status:    document.getElementById('meS')?.value,
+      fee:       parseFloat(document.getElementById('meF')?.value)||0,
+    };
+    this.db.events.push(e);
+    this.save(); this.closeModal('add-event'); this.renderAll();
+    this.log(`Event "${n}" created`,'Bookings'); this.toast('Event saved');
+  },
+
+  // ── MEDIA ─────────────────────────────────────────────────────────────
+  renderMedia() {
+    const q  = document.getElementById('medQ')?.value.toLowerCase()||'';
+    const ty = document.getElementById('medTy')?.value||'';
+    const list = this.db.media.filter(m=>{
+      const qm = !q||m.title.toLowerCase().includes(q)||(m.tags||'').toLowerCase().includes(q);
+      const tm = !ty||m.type===ty;
+      return qm && tm;
+    });
+    const TYPE_ICO = {Master:'music',Demo:'headphones',Artwork:'image','Press Photo':'camera',Video:'film',STEMS:'layers'};
+    const TYPE_COL = {Master:'var(--gold)',Demo:'var(--teal)',Artwork:'var(--warn)',Video:'var(--err)',STEMS:'var(--ok)','Press Photo':'#9b7fc8'};
+    document.getElementById('medGrid').innerHTML = list.map(m=>{
+      const art = this.db.artists.find(a=>a.id===m.artist_id);
+      const rel = this.db.releases.find(r=>r.id===m.related_to);
+      const isImg = m.is_image || /\.(jpg|jpeg|png|gif|webp|avif|svg)(\?|$)/i.test(m.file||'');
+      return `<div class="media-card">
+        <div class="media-thumb" onclick="${isImg?`LOS.openLightbox('${esc(m.file)}')`:m.file?`LOS.play('${esc(m.file)}','${esc(m.title)}','${esc(art?.name||'—')}')`:''}">
+          ${isImg
+            ? `<img src="${esc(m.file)}" alt="${esc(m.title)}" loading="lazy">`
+            : m.file
+              ? `<div class="play-ico"><i data-lucide="play" style="width:16px;color:#0a0a0f;margin-left:2px"></i></div>`
+              : `<i data-lucide="${TYPE_ICO[m.type]||'file'}" style="width:28px;color:${TYPE_COL[m.type]||'var(--muted)'}"></i>`
+          }
+        </div>
+        <div class="media-info">
+          <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.title)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(art?.name||'—')}${m.version?' · '+esc(m.version):''}</div>
+          ${rel?`<div style="font-size:10.5px;color:var(--teal);margin-top:2px">${esc(rel.title)}</div>`:''}
+          <div class="flex gap2" style="margin-top:7px;flex-wrap:wrap">
+            <span class="bd b-n" style="font-size:10px;color:${TYPE_COL[m.type]||'var(--muted)'}">${esc(m.type)}</span>
+            ${m.tags?`<span style="font-size:10px;color:var(--muted)">${esc(m.tags)}</span>`:''}
+          </div>
+          <div class="flex gap2" style="margin-top:8px">
+            ${m.file&&!isImg?`<button class="btn btn-g" style="font-size:11px;padding:4px 8px;gap:4px;flex:1" onclick="LOS.play('${esc(m.file)}','${esc(m.title)}','${esc(art?.name||'')}')"><i data-lucide="play" style="width:11px;color:var(--gold)"></i> Play</button>`:''}
+            ${isImg?`<button class="btn btn-g" style="font-size:11px;padding:4px 8px;gap:4px;flex:1" onclick="LOS.openLightbox('${esc(m.file)}')"><i data-lucide="zoom-in" style="width:11px"></i> View</button>`:''}
+            <button class="btn-ic" onclick="LOS.deleteItem('media','${m.id}')"><i data-lucide="trash-2" style="width:13px"></i></button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') || '<div style="grid-column:span 4;text-align:center;color:var(--muted);padding:44px">No media assets</div>';
+    lucide.createIcons();
+  },
+
+  openLightbox(url) {
+    document.getElementById('lbImg').src = url;
+    document.getElementById('lightbox').classList.add('open');
+  },
+
+  mmFileUpload(inp) {
+    const f = inp.files[0];
+    if (!f) return;
+    this._mmFile = f;
+    const isImg = f.type.startsWith('image/');
+    const url   = URL.createObjectURL(f);
+    document.getElementById('mmDzTxt').textContent = `✓ ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`;
+    document.getElementById('mmF').value = url;
+    if (isImg) {
+      const prev = document.createElement('img');
+      prev.src=url; prev.style.cssText='max-height:80px;border-radius:6px;margin:8px auto 0;display:block';
+      document.getElementById('mmDzTxt').after(prev);
+    }
+  },
+
+  saveMedia() {
+    const t=document.getElementById('mmT')?.value.trim();
+    if (!t) return this.toast('Title required','err');
+    const relSel=document.getElementById('rsel-media-sel');
+    const f=document.getElementById('mmF')?.value;
+    const ty=document.getElementById('mmTy')?.value;
+    const isImg = ty==='Artwork'||ty==='Press Photo'||ty==='Video';
+    const m={
+      id:uid(), title:t, type:ty,
+      artist_id: ArtSel.getValue('asel-media'),
+      related_to: relSel?.value||'',
+      version:   document.getElementById('mmV')?.value,
+      tags:      document.getElementById('mmTg')?.value,
+      file:      f,
+      is_image:  isImg||/\.(jpg|jpeg|png|gif|webp|avif|svg)(\?|$)/i.test(f||''),
+    };
+    this.db.media.push(m);
+    this.save(); this.closeModal('add-media'); this.renderMedia();
+    this.log(`Media "${t}" added`,'Media'); this.toast('Asset added');
+  },
+
+  // ── RESEARCH ──────────────────────────────────────────────────────────
+  renderResearch() {
+    const totals = {};
+    ANR_COLS.forEach(c=>{ totals[c.key]=this.db.demos.filter(d=>d.status===c.key).length; });
+    document.getElementById('pipeVel').innerHTML = ANR_COLS.map(c=>{
+      const pct = this.db.demos.length ? Math.round(totals[c.key]/this.db.demos.length*100) : 0;
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:11px">
+        <span style="font-size:11px;width:62px;color:var(--muted);flex-shrink:0">${c.label}</span>
+        <div class="pb flex-1"><div class="pf" style="width:${pct}%;background:${c.col}"></div></div>
+        <span style="font-size:11px;color:var(--muted);width:18px;text-align:right">${totals[c.key]}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('curDB').innerHTML=`<table>
+      <thead><tr><th>Name</th><th>Type</th><th>Genre</th><th>Contact</th><th>Submit</th></tr></thead>
+      <tbody>${this.db.curators.map(c=>`
+        <tr><td style="font-weight:600">${esc(c.name)}</td><td>${badge(c.type)}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(c.genre)}</td>
+        <td><a href="mailto:${esc(c.contact)}" style="color:var(--teal);font-size:12px">${esc(c.contact)||'—'}</a></td>
+        <td><a href="${esc(c.submits)}" target="_blank" style="color:var(--gold);font-size:12px">${esc(c.submits)||'—'}</a></td>
+      </tr>`).join('')}
+      </tbody></table>`;
+
+    this._drawBar('anrChart', ANR_COLS.map(c=>c.label), ANR_COLS.map(c=>totals[c.key]), ANR_COLS.map(c=>c.col));
+    const genres={};
+    this.db.demos.forEach(d=>{ genres[d.genre||'Other']=(genres[d.genre||'Other']||0)+1; });
+    this._drawPie('genChart', Object.keys(genres), Object.values(genres));
+    lucide.createIcons();
+  },
+
+  _drawBar(id,labels,values,colors) {
+    const c=document.getElementById(id); if(!c) return;
+    const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+    const max=Math.max(...values,1);
+    const bw=(c.width-32)/labels.length;
+    values.forEach((v,i)=>{
+      const h=v/max*(c.height-32);
+      const x=16+i*bw+bw*.15, y=c.height-20-h;
+      ctx.fillStyle=colors[i]||'#c9a84c';
+      ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x,y,bw*.7,h,3); else ctx.rect(x,y,bw*.7,h); ctx.fill();
+      ctx.fillStyle='#5a5a72'; ctx.font='9px Inter'; ctx.textAlign='center';
+      ctx.fillText(labels[i].slice(0,6),x+bw*.35,c.height-6);
+      if(v){ ctx.fillStyle='#e8e8ef'; ctx.fillText(v,x+bw*.35,y-4); }
+    });
+  },
+
+  _drawPie(id,labels,values) {
+    const c=document.getElementById(id); if(!c) return;
+    const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+    const total=values.reduce((a,v)=>a+v,0); if(!total) return;
+    const colors=['#c9a84c','#4a9fa8','#7c6fa8','#3d9970','#c0524e','#ec4899'];
+    let start=-Math.PI/2;
+    const cx=c.width/2, cy=c.height/2, r=72;
+    values.forEach((v,i)=>{
+      const angle=(v/total)*2*Math.PI;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+angle);
+      ctx.closePath(); ctx.fillStyle=colors[i%colors.length]; ctx.fill();
+      start+=angle;
+    });
+    ctx.beginPath(); ctx.arc(cx,cy,r*.45,0,2*Math.PI);
+    ctx.fillStyle='var(--s2)'; ctx.fill();
+    start=-Math.PI/2;
+    values.forEach((v,i)=>{
+      const angle=(v/total)*2*Math.PI;
+      const mid=start+angle/2;
+      if(v/total>.08){
+        const lx=cx+Math.cos(mid)*r*.7, ly=cy+Math.sin(mid)*r*.7;
+        ctx.fillStyle='#fff'; ctx.font='bold 10px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(labels[i].slice(0,5),lx,ly);
+      }
+      start+=angle;
+    });
+  },
+
+  // ── USERS ─────────────────────────────────────────────────────────────
+  renderUsers() {
+    const pLbl={true:'✅ Full',read:'👁 Read',own:'👤 Own',false:'—'};
+    document.getElementById('rbacMx').innerHTML=`<table>
+      <thead><tr><th>Module</th><th>Admin</th><th>Label Manager</th><th>A&R</th><th>Artist</th></tr></thead>
+      <tbody>${Object.entries(RBAC_MX).map(([mod,p])=>`
+        <tr><td style="font-weight:600">${mod}</td>
+          ${['admin','label_manager','ar','artist'].map(r=>`
+            <td style="font-size:12px;color:${p[r]===true?'var(--ok)':p[r]==='read'?'var(--teal)':p[r]==='own'?'var(--warn)':'var(--muted)'}">
+              ${pLbl[String(p[r])]||p[r]}</td>`).join('')}
+        </tr>`).join('')}
+      </tbody></table>`;
+
+    const RC={'admin':'var(--gold)','label_manager':'var(--warn)','ar':'var(--teal)','artist':'var(--ok)'};
+    document.getElementById('usrTbl').innerHTML=this.db.users.map(u=>{
+      const art=this.db.artists.find(a=>a.id===u.artist_id);
+      return `<tr>
+        <td style="font-weight:600">${esc(u.name)}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(u.email)}</td>
+        <td><span class="bd b-n" style="color:${RC[u.role]||'var(--muted)'}">${u.role?.replace('_',' ')}</span></td>
+        <td>${badge(u.status)}</td>
+        <td style="font-size:12px;color:var(--muted)">${u.last_active||'—'}${art?` · <span style="color:var(--gold)">${esc(art.name)}</span>`:''}</td>
+        <td><button class="btn-ic" onclick="LOS.deleteItem('users','${u.id}')"><i data-lucide="trash-2" style="width:13px"></i></button></td>
+      </tr>`;
+    }).join('');
+    lucide.createIcons();
+  },
+
+  saveUser() {
+    const n=document.getElementById('muN')?.value.trim();
+    const e=document.getElementById('muE')?.value.trim();
+    if (!n||!e) return this.toast('Name and email required','err');
+    const u={
+      id:uid(), name:n, email:e,
+      role:      document.getElementById('muR')?.value,
+      artist_id: ArtSel.getValue('asel-user'),
+      status:    document.getElementById('muS')?.value,
+      last_active: new Date().toISOString().slice(0,10),
+    };
+    this.db.users.push(u);
+    this.save(); this.closeModal('add-user'); this.renderUsers();
+    this.log(`User "${n}" created`,'System'); this.toast('User added');
+  },
+
+  // ── ACTIVITY LOG ──────────────────────────────────────────────────────
+  renderLog() {
+    const q=document.getElementById('logQ')?.value.toLowerCase()||'';
+    const MC={'A&R':'var(--gold)','Releases':'var(--teal)','Finance':'var(--ok)','Contracts':'var(--warn)','Bookings':'var(--err)','CRM':'#9b7fc8','System':'var(--muted)','Media':'#c87f9b'};
+    const list=this.db.activity_log.filter(l=>!q||(l.action+l.user+l.module).toLowerCase().includes(q));
+    document.getElementById('logList').innerHTML = list.length
+      ? list.map(l=>`<div class="li">
+          <div class="ld" style="background:${MC[l.module]||'var(--muted)'}"></div>
+          <div class="flex-1">
+            <div style="font-size:13px">${esc(l.action)}</div>
+            <div style="display:flex;gap:9px;margin-top:3px">
+              <span style="font-size:11px;color:var(--muted)">${esc(l.user||'?')}</span>
+              <span class="bd b-n" style="font-size:10px">${esc(l.module)}</span>
+            </div>
+          </div>
+          <div class="lt">${fmtT(l.ts)}</div>
+        </div>`).join('')
+      : '<div style="color:var(--muted);font-size:13px;text-align:center;padding:28px">No activity logged yet.</div>';
+  },
+
+  clearLog() {
+    if (!confirm('Clear all activity logs?')) return;
+    this.db.activity_log=[]; this.save(); this.renderLog(); this.toast('Log cleared');
+  },
+
+  // ── GLOBAL SEARCH ─────────────────────────────────────────────────────
+  openSearch()  { document.getElementById('gs').classList.add('open'); setTimeout(()=>document.getElementById('gsInp').focus(),60); },
+  closeSearch() { document.getElementById('gs').classList.remove('open'); document.getElementById('gsInp').value=''; document.getElementById('gsRes').innerHTML=''; },
+
+  gsSearch() {
+    const q=document.getElementById('gsInp').value.toLowerCase().trim();
+    if (!q) { document.getElementById('gsRes').innerHTML=''; return; }
+    const results=[];
+    this.db.artists.forEach(a=>{ if(a.name.toLowerCase().includes(q)) results.push({label:a.name,sub:a.type,view:'crm',ic:'user-circle'}); });
+    this.db.demos.forEach(d=>{   if(d.title.toLowerCase().includes(q)) results.push({label:d.title,sub:d.genre+' · '+d.status,view:'anr',ic:'headphones'}); });
+    this.db.releases.forEach(r=>{ if(r.title.toLowerCase().includes(q)) results.push({label:r.title,sub:r.type+' · '+r.status,view:'releases',ic:'disc-3'}); });
+    this.db.media.forEach(m=>{   if(m.title.toLowerCase().includes(q)) results.push({label:m.title,sub:m.type,view:'media',ic:'folder-music'}); });
+    document.getElementById('gsRes').innerHTML = results.length
+      ? results.slice(0,10).map(r=>`<div class="gs-it" onclick="LOS.gsGo('${r.view}')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <i data-lucide="${r.ic}" style="width:14px;color:var(--gold);flex-shrink:0"></i>
+            <div><div style="font-weight:600;font-size:13px">${esc(r.label)}</div><div style="font-size:11px;color:var(--muted)">${esc(r.sub)}</div></div>
+          </div>
+        </div>`).join('')
+      : '<div style="padding:16px;text-align:center;font-size:13px;color:var(--muted)">No results found</div>';
+    lucide.createIcons();
+  },
+
+  gsGo(view) {
+    this.closeSearch();
+    document.querySelector(`.nav[data-view="${view}"]`)?.click();
+  },
+
+  // ── PLAYER ────────────────────────────────────────────────────────────
+  setupPlayer() {
+    document.getElementById('playBtn').addEventListener('click', ()=>{
+      if (this.ws) this.ws.playPause();
+    });
+  },
+
+  play(url, title, artist) {
+    if (!url) return this.toast('No audio file available','err');
+    document.getElementById('pTt').textContent = title||'—';
+    document.getElementById('pSb').textContent = artist||'—';
+    document.getElementById('player').classList.add('vis');
+    if (this.ws) { this.ws.destroy(); this.ws=null; }
+    this.ws = WaveSurfer.create({
+      container: '#waveform',
+      waveColor:    '#2a2a3a',
+      progressColor:'#c9a84c',
+      cursorColor:  '#e8c97a',
+      height: 34, barWidth: 2, barRadius: 2,
+      normalize: true, backend: 'WebAudio',
+    });
+    this.ws.load(url);
+    this.ws.on('ready', ()=>{
+      this.ws.play();
+      this._updatePlayBtn(true);
+    });
+    this.ws.on('play',  ()=>this._updatePlayBtn(true));
+    this.ws.on('pause', ()=>this._updatePlayBtn(false));
+    this.ws.on('finish',()=>this._updatePlayBtn(false));
+    this.ws.on('audioprocess', ()=>{
+      const cur=this.ws.getCurrentTime(), dur=this.ws.getDuration();
+      document.getElementById('pTime').textContent=`${this._fmt(cur)} / ${this._fmt(dur)}`;
+    });
+  },
+
+  _updatePlayBtn(playing) {
+    document.getElementById('playIco').setAttribute('data-lucide', playing?'pause':'play');
+    lucide.createIcons();
+  },
+
+  _fmt(s) { const m=Math.floor(s/60); return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`; },
+
+  closePlayer() {
+    this.ws?.destroy(); this.ws=null;
+    document.getElementById('player').classList.remove('vis');
+  },
+
+  // ── MODALS ────────────────────────────────────────────────────────────
+  openModal(name) {
+    document.getElementById(`modal-${name}`)?.classList.add('open');
+    this.buildModalSelects();
+    lucide.createIcons();
+  },
+  closeModal(name) { document.getElementById(`modal-${name}`)?.classList.remove('open'); },
+
+  openUploader() { this.openModal('uploader'); },
+
+  // ── UPLOAD SUBMIT ─────────────────────────────────────────────────────
+  upFile(inp) {
+    const f=inp.files[0]; if(!f) return;
+    this._upFile=f;
+    document.getElementById('upDzTxt').textContent=`✓ ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`;
+    document.getElementById('upDz').classList.add('ov');
+  },
+
+  submitUpload() {
+    const n=document.getElementById('upN')?.value.trim();
+    const e=document.getElementById('upE')?.value.trim();
+    const t=document.getElementById('upT')?.value.trim();
+    if (!n||!e||!t) return this.toast('Name, email and title required','err');
+    const url = this._upFile ? URL.createObjectURL(this._upFile) : document.getElementById('upUrl')?.value;
+    const d={
+      id:uid(), title:t, artist_id:'', artist_name:n,
+      genre:  document.getElementById('upG')?.value,
+      bpm:    document.getElementById('upBpm')?.value,
+      key:    document.getElementById('upKey')?.value,
+      email:  e,
+      file:   url||'',
+      notes:  (document.getElementById('upRef')?.value?'Refs: '+document.getElementById('upRef')?.value+'\n':'')+
+              (document.getElementById('upNotes')?.value||''),
+      status:'Neu', rating:0, watchlist:false,
+      submitted: new Date().toISOString().slice(0,10),
+    };
+    // Also add to media library
+    if (url) {
+      this.db.media.push({id:uid(),title:t+' (Demo)',type:'Demo',artist_id:'',version:'',file:url,tags:'Submitted via form',is_image:false});
+    }
+    this.db.demos.push(d);
+    this.save(); this.closeModal('uploader'); this.renderAll();
+    this.log(`Demo submitted via Uploader: "${t}" by ${n}`,'A&R');
+    this.toast(`Demo "${t}" submitted — lands in A&R Neu column & Media Library`);
+    this._upFile=null;
+  },
+
+  // ── DELETE ITEM ───────────────────────────────────────────────────────
+  deleteItem(collection, id) {
+    if (!confirm('Delete this item?')) return;
+    const name = this.db[collection]?.find(x=>x.id===id)?.name||this.db[collection]?.find(x=>x.id===id)?.title||id;
+    this.db[collection] = this.db[collection].filter(x=>x.id!==id);
+    this.save(); this.renderAll();
+    this.log(`Deleted ${collection} item "${name}"`,'System');
+    this.toast('Deleted');
+    this.buildModalSelects();
+  },
+
+  // ── DB ADMIN ──────────────────────────────────────────────────────────
+  openAdm() {
+    const tables = Object.keys(this.db);
+    document.getElementById('admTbs').innerHTML = tables.map((t,i)=>`
+      <div class="adm-t ${i===0?'on':''}" onclick="LOS.admShow('${t}',this)">${t} (${this.db[t].length})</div>`).join('');
+    this.admShow(tables[0], document.querySelector('.adm-t'));
+    document.getElementById('adm').style.display='block';
+    lucide.createIcons();
+  },
+
+  closeAdm() { document.getElementById('adm').style.display='none'; },
+
+  admShow(tbl, el) {
+    document.querySelectorAll('.adm-t').forEach(t=>t.classList.remove('on'));
+    el?.classList.add('on');
+    const data = JSON.stringify(this.db[tbl], null, 2);
+    document.getElementById('admEd').innerHTML=`
+      <div class="adm-r">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-weight:700;font-size:13px">${tbl} <span style="color:var(--muted)">(${this.db[tbl].length} rows)</span></span>
+          <button class="btn btn-p" style="font-size:12px" onclick="LOS.admSave('${tbl}')">
+            <i data-lucide="save" style="width:12px"></i> Save
+          </button>
+        </div>
+        <textarea class="inp" id="admTA" style="min-height:420px;font-family:monospace;font-size:12px;line-height:1.6">${esc(data)}</textarea>
+      </div>`;
+    lucide.createIcons();
+  },
+
+  admSave(tbl) {
+    try {
+      const parsed=JSON.parse(document.getElementById('admTA').value);
+      if (!Array.isArray(parsed)) return this.toast('Must be a JSON array','err');
+      this.db[tbl]=parsed; this.save(); this.renderAll();
+      this.toast(`${tbl} saved (${parsed.length} rows)`);
+      this.log(`DB Admin: ${tbl} updated`,'System');
+    } catch(e) { this.toast('Invalid JSON: '+e.message,'err'); }
+  },
+};
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{ LOS.init(); });
+</script>
+</body>
+</html>

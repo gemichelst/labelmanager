@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Label OS · Bunte Panther</title>
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    /* ── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --bg:          #080812;
+      --surface:     #0f0f1a;
+      --card:        rgba(255,255,255,0.03);
+      --border:      rgba(255,255,255,0.08);
+      --accent:      #8b5cf6;
+      --accent2:     #06b6d4;
+      --success:     #22c55e;
+      --warn:        #f59e0b;
+      --danger:      #ef4444;
+      --text:        #f1f5f9;
+      --muted:       #64748b;
+      --r:           12px;
+      --trans:       0.2s ease;
+    }
+
+    /* ── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
+           display: flex; height: 100vh; overflow: hidden; font-size: 14px; line-height: 1.5; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    /* ── SCROLLBAR ──────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── SIDEBAR ────────────────────────────────────────────────── */
+    .sidebar {
+      width: 240px; min-width: 240px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 20px 12px;
+      overflow-y: auto;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      padding: 4px 12px 20px;
+      font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .brand-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-group-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted);
+      padding: 16px 12px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px;
+      color: var(--muted); font-weight: 500;
+      cursor: pointer; transition: var(--trans);
+      position: relative;
+    }
+    .nav-item:hover { background: var(--card); color: var(--text); }
+    .nav-item.active { background: rgba(139,92,246,0.12); color: var(--accent); }
+    .nav-item .badge-count {
+      margin-left: auto;
+      background: var(--accent); color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 20px;
+    }
+    .sidebar-footer {
+      margin-top: auto; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── MAIN ───────────────────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar {
+      height: 60px; min-height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 28px; gap: 16px;
+    }
+    .topbar-title { font-size: 16px; font-weight: 600; }
+    .topbar-sub { font-size: 12px; color: var(--muted); }
+    .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .content { flex: 1; overflow-y: auto; padding: 28px; padding-bottom: 110px; }
+
+    /* ── VIEWS ──────────────────────────────────────────────────── */
+    .view { display: none; }
+    .view.active { display: block; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── COMPONENTS ─────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+    }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 500; transition: var(--trans); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #7c3aed; box-shadow: 0 0 20px rgba(139,92,246,0.35); }
+    .btn-ghost { background: var(--card); border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.06); }
+    .btn-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+    .btn-icon { background: none; border: none; color: var(--muted); padding: 6px; border-radius: 6px; display: inline-flex; transition: var(--trans); }
+    .btn-icon:hover { background: var(--card); color: var(--text); }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-default { background: rgba(255,255,255,0.06); color: var(--muted); }
+    .badge-accent { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+    .badge-success { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .badge-warn { background: rgba(245,158,11,0.12); color: #fcd34d; border: 1px solid rgba(245,158,11,0.2); }
+    .badge-danger { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .badge-cyan { background: rgba(6,182,212,0.12); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+
+    /* Forms */
+    .form-field { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 5px; }
+    .input {
+      width: 100%; background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border); color: var(--text);
+      padding: 9px 12px; border-radius: 8px;
+      transition: var(--trans); outline: none;
+    }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+    select.input { cursor: pointer; }
+    textarea.input { resize: vertical; min-height: 80px; }
+
+    /* Grid layouts */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .flex { display: flex; align-items: center; }
+    .flex-1 { flex: 1; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mb-6 { margin-bottom: 24px; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.015); }
+
+    /* Stats */
+    .stat-card { padding: 20px; }
+    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+    .stat-value { font-size: 28px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.5px; }
+    .stat-sub { font-size: 12px; color: var(--muted); }
+
+    /* Kanban */
+    .kanban { display: flex; gap: 16px; overflow-x: auto; min-height: 500px; padding-bottom: 8px; }
+    .k-col { flex: 0 0 240px; display: flex; flex-direction: column; }
+    .k-col-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; margin-bottom: 10px;
+      border-radius: 8px; font-size: 12px; font-weight: 600;
+    }
+    .k-col-body { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .k-col-body.drag-over { background: rgba(139,92,246,0.07); border-radius: 8px; outline: 2px dashed rgba(139,92,246,0.4); }
+    .k-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; cursor: grab; transition: var(--trans);
+      animation: fadeUp 0.2s ease;
+    }
+    .k-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .k-card.dragging { opacity: 0.4; }
+    .k-card-title { font-weight: 600; margin-bottom: 4px; }
+    .k-card-sub { font-size: 12px; color: var(--muted); }
+    .stars { color: var(--warn); font-size: 12px; letter-spacing: 1px; }
+
+    /* Timeline */
+    .timeline { padding-left: 28px; position: relative; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 6px; bottom: 0; width: 2px; background: var(--border); }
+    .tl-item { position: relative; padding: 0 0 20px; }
+    .tl-item::before { content: ''; position: absolute; left: -23px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+    .tl-item.done::before { background: var(--success); }
+    .tl-item.pending::before { background: var(--muted); }
+    .tl-date { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+    .tl-text { font-size: 13px; }
+
+    /* Player */
+    .player {
+      position: fixed; bottom: 0; left: 240px; right: 0; z-index: 100;
+      height: 76px;
+      background: rgba(8,8,18,0.9); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 24px; gap: 20px;
+      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .player.visible { transform: translateY(0); }
+    .player-info { min-width: 160px; }
+    .player-title { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+    .player-sub { font-size: 11px; color: var(--muted); }
+    #waveform { flex: 1; height: 40px; }
+
+    /* Modal */
+    .modal-bg {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      width: 100%; max-width: 520px; max-height: 90vh;
+      overflow-y: auto; animation: fadeUp 0.2s ease;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+    /* Admin Overlay */
+    #adminOverlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(4,4,12,0.96); backdrop-filter: blur(12px);
+      overflow-y: auto; padding: 32px;
+    }
+    .admin-wrap { max-width: 860px; margin: 0 auto; }
+    .admin-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+    .admin-tab { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; background: var(--card); border: 1px solid var(--border); color: var(--muted); cursor: pointer; transition: var(--trans); }
+    .admin-tab.active, .admin-tab:hover { background: rgba(139,92,246,0.15); color: var(--accent); border-color: rgba(139,92,246,0.3); }
+    .admin-record { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* CSV Drop Zone */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: var(--r);
+      padding: 32px; text-align: center; transition: var(--trans);
+      cursor: pointer; color: var(--muted);
+      position: relative;
+    }
+    .drop-zone.over { border-color: var(--accent); background: rgba(139,92,246,0.06); color: var(--accent); }
+    .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    /* Progress bar */
+    .progress-bar { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.4s ease; }
+
+    /* Toast */
+    #toastContainer { position: fixed; bottom: 90px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      animation: slideIn 0.3s ease;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.success { border-color: rgba(34,197,94,0.3); }
+    .toast.error   { border-color: rgba(239,68,68,0.3); }
+    @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+    /* Responsive */
+    @media (max-width: 1024px) { .g4 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .player { left: 0; }
+      .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ──────────────────────────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">♪</div>
+    Label OS
+  </div>
+
+  <div class="nav-item active" data-view="dashboard">
+    <i data-lucide="layout-dashboard" style="width:16px;"></i> Dashboard
+  </div>
+
+  <div class="nav-group-label">Core</div>
+  <div class="nav-item" data-view="crm">
+    <i data-lucide="users" style="width:16px;"></i> Artists & CRM
+  </div>
+  <div class="nav-item" data-view="anr">
+    <i data-lucide="headphones" style="width:16px;"></i> Demos & A&R
+    <span class="badge-count" id="navBadgeAnr">0</span>
+  </div>
+  <div class="nav-item" data-view="releases">
+    <i data-lucide="calendar-days" style="width:16px;"></i> Releases
+  </div>
+
+  <div class="nav-group-label">Business</div>
+  <div class="nav-item" data-view="contracts">
+    <i data-lucide="file-signature" style="width:16px;"></i> Contracts
+  </div>
+  <div class="nav-item" data-view="finance">
+    <i data-lucide="pie-chart" style="width:16px;"></i> Finance & Royalties
+  </div>
+
+  <div class="nav-group-label">Live & Assets</div>
+  <div class="nav-item" data-view="bookings">
+    <i data-lucide="mic-2" style="width:16px;"></i> Bookings & Events
+  </div>
+  <div class="nav-item" data-view="media">
+    <i data-lucide="folder-music" style="width:16px;"></i> Media Library
+  </div>
+
+  <div class="nav-group-label">Intelligence</div>
+  <div class="nav-item" data-view="research">
+    <i data-lucide="bar-chart-2" style="width:16px;"></i> Research
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="nav-item" onclick="LOS.openAdmin()">
+      <i data-lucide="database" style="width:16px;"></i> DB Editor
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ──────────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-sub" id="topbarSub">Bunte Panther Label OS</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="LOS.openModal('add-artist')"><i data-lucide="plus" style="width:14px;"></i> Add Artist</button>
+      <button class="btn btn-primary" onclick="LOS.openModal('add-demo')"><i data-lucide="upload" style="width:14px;"></i> Submit Demo</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ──────────────────────────────────────────────── -->
+    <section id="view-dashboard" class="view active">
+      <div class="g4 mb-6" id="dashStats"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">New Demos</div>
+          <div id="dashDemos"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Upcoming Releases</div>
+          <div id="dashReleases"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CRM ───────────────────────────────────────────────────── -->
+    <section id="view-crm" class="view">
+      <div class="flex gap-2 mb-6">
+        <input class="input flex-1" id="crmSearch" placeholder="Search artists & contacts…" oninput="LOS.renderCRM()">
+        <select class="input" style="width:160px;" id="crmTypeFilter" onchange="LOS.renderCRM()">
+          <option value="">All Types</option>
+          <option>Core Artist</option><option>Development</option><option>Legacy</option>
+          <option>Manager</option><option>Booker</option><option>PR Agency</option>
+          <option>Distributor</option><option>Blog</option><option>Radio</option>
+        </select>
+        <button class="btn btn-primary" onclick="LOS.openModal('add-artist')"><i data-lucide="user-plus" style="width:14px;"></i> Add</button>
+      </div>
+      <div class="card table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Territory</th><th>Links</th><th>Actions</th></tr></thead>
+          <tbody id="crmTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── A&R ───────────────────────────────────────────────────── -->
+    <section id="view-anr" class="view">
+      <div class="flex gap-2 mb-6">
+        <input class="input flex-1" id="anrSearch" placeholder="Search demos…" oninput="LOS.renderANR()">
+        <select class="input" style="width:140px;" id="anrGenreFilter" onchange="LOS.renderANR()">
+          <option value="">All Genres</option>
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="LOS.openModal('add-demo')"><i data-lucide="plus" style="width:14px;"></i> Add Demo</button>
+      </div>
+      <div class="kanban" id="anrBoard"></div>
+    </section>
+
+    <!-- ── RELEASES ───────────────────────────────────────────────── -->
+    <section id="view-releases" class="view">
+      <div class="flex gap-2 mb-6">
+        <input class="input flex-1" placeholder="Search releases…" id="relSearch" oninput="LOS.renderReleases()">
+        <button class="btn btn-primary" onclick="LOS.openModal('add-release')"><i data-lucide="plus" style="width:14px;"></i> New Release</button>
+      </div>
+      <div id="releasesList"></div>
+    </section>
+
+    <!-- ── CONTRACTS ──────────────────────────────────────────────── -->
+    <section id="view-contracts" class="view">
+      <div class="flex gap-2 mb-6">
+        <input class="input flex-1" placeholder="Search contracts…">
+        <button class="btn btn-primary" onclick="LOS.openModal('add-contract')"><i data-lucide="plus" style="width:14px;"></i> New Contract</button>
+      </div>
+      <div class="card table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Artist</th><th>Status</th><th>Territory</th><th>Splits</th><th>Expires</th></tr></thead>
+          <tbody id="contractTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── FINANCE ────────────────────────────────────────────────── -->
+    <section id="view-finance" class="view">
+      <div class="g4 mb-6" id="finStats"></div>
+      <div class="g2">
+        <div class="card" id="finDropZone" style="position:relative; overflow:hidden;"
+             ondragover="LOS.fileDragOver(event)"
+             ondragleave="LOS.fileDragLeave(event)"
+             ondrop="LOS.fileDrop(event)">
+          <div id="finDropOverlay" style="display:none; position:absolute; inset:0; background:rgba(139,92,246,0.85); backdrop-filter:blur(4px); z-index:5; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
+            <i data-lucide="file-spreadsheet" style="width:40px; height:40px; color:#fff;"></i>
+            <span style="color:#fff; font-weight:600;">Drop CSV to Import</span>
+          </div>
+          <div class="card-title flex gap-2">
+            Royalty Statements
+            <span style="margin-left:auto; font-size:11px; color:var(--muted);">Drag & drop .csv</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Source</th><th>Release</th><th>Net Total</th><th>Label %</th><th>Artist %</th></tr></thead>
+              <tbody id="finTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Revenue Split</div>
+          <div style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; padding-top:16px;">
+            <canvas id="finChart" width="180" height="180"></canvas>
+            <div id="finLegend" style="display:flex; gap:16px; font-size:12px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BOOKINGS ───────────────────────────────────────────────── -->
+    <section id="view-bookings" class="view">
+      <div class="flex gap-2 mb-6">
+        <input class="input flex-1" placeholder="Search events…">
+        <button class="btn btn-primary" onclick="LOS.openModal('add-event')"><i data-lucide="plus" style="width:14px;"></i> New Event</button>
+      </div>
+      <div class="card table-wrap">
+        <table>
+          <thead><tr><th>Event</th><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th></tr></thead>
+          <tbody id="bookingTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── MEDIA ──────────────────────────────────────────────────── -->
+    <section id="view-media" class="view">
+      <div class="flex gap-2 mb-6">
+        <input class="input flex-1" placeholder="Search media…" id="mediaSearch" oninput="LOS.renderMedia()">
+        <select class="input" style="width:140px;" id="mediaTypeFilter" onchange="LOS.renderMedia()">
+          <option value="">All Types</option>
+          <option>Master</option><option>Demo</option><option>Artwork</option>
+          <option>Press Photo</option><option>Video</option>
+        </select>
+      </div>
+      <div class="g4" id="mediaGrid"></div>
+    </section>
+
+    <!-- ── RESEARCH ───────────────────────────────────────────────── -->
+    <section id="view-research" class="view">
+      <div class="g3 mb-6">
+        <div class="card">
+          <div class="card-title">A&R Conversion</div>
+          <canvas id="anrChart" width="300" height="200"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Genre Breakdown</div>
+          <canvas id="genreChart" width="300" height="200"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Pipeline Velocity</div>
+          <div id="pipelineStats" style="margin-top:8px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Curator & Blog Database</div>
+        <div id="curatorDB"></div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ── AUDIO PLAYER ─────────────────────────────────────────────────────── -->
+<div class="player" id="player">
+  <button class="btn-icon" id="playBtn" style="width:36px; height:36px; border-radius:50%; background:var(--accent); color:#fff; justify-content:center;">
+    <i data-lucide="play" id="playIcon" style="width:16px;"></i>
+  </button>
+  <div class="player-info">
+    <div class="player-title" id="pTitle">—</div>
+    <div class="player-sub" id="pSub">—</div>
+  </div>
+  <div id="waveform" style="flex:1; height:40px;"></div>
+  <div id="pTime" style="font-size:12px; color:var(--muted); min-width:80px; text-align:right;">0:00 / 0:00</div>
+  <button class="btn-icon" onclick="LOS.closePlayer()"><i data-lucide="x" style="width:16px;"></i></button>
+</div>
+
+<!-- ── TOAST ────────────────────────────────────────────────────────────── -->
+<div id="toastContainer"></div>
+
+<!-- ── MODALS ───────────────────────────────────────────────────────────── -->
+
+<!-- Add Artist / Contact -->
+<div class="modal-bg" id="modal-add-artist">
+  <div class="modal">
+    <div class="modal-title">Add Artist / Contact</div>
+    <div class="admin-grid">
+      <div class="form-field"><label class="form-label">Name / Alias *</label><input class="input" id="m-artist-name"></div>
+      <div class="form-field"><label class="form-label">Type</label>
+        <select class="input" id="m-artist-type">
+          <option>Core Artist</option><option>Development</option><option>Legacy</option>
+          <option>Manager</option><option>Booker</option><option>PR Agency</option>
+          <option>Distributor</option><option>Blog</option><option>Radio</option>
+        </select>
+      </div>
+      <div class="form-field"><label class="form-label">Status</label>
+        <select class="input" id="m-artist-status"><option>Active</option><option>Inactive</option><option>Partner</option></select>
+      </div>
+      <div class="form-field"><label class="form-label">Territory</label><input class="input" id="m-artist-territory" placeholder="DE, EU, WW…"></div>
+      <div class="form-field"><label class="form-label">Email</label><input class="input" id="m-artist-email" type="email"></div>
+      <div class="form-field"><label class="form-label">Phone</label><input class="input" id="m-artist-phone"></div>
+    </div>
+    <div class="form-field"><label class="form-label">Genres / Tags</label><input class="input" id="m-artist-genres" placeholder="Techno, Industrial…"></div>
+    <div class="form-field"><label class="form-label">Links (Spotify, IG, Beatport…)</label><input class="input" id="m-artist-links"></div>
+    <div class="form-field"><label class="form-label">Notes / Bio</label><textarea class="input" id="m-artist-notes"></textarea></div>
+    <div class="flex gap-2" style="justify-content:flex-end; margin-top:8px;">
+      <button class="btn btn-ghost" onclick="LOS.closeModal('add-artist')">Cancel</button>
+      <button class="btn btn-primary" onclick="LOS.saveArtist()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Demo -->
+<div class="modal-bg" id="modal-add-demo">
+  <div class="modal">
+    <div class="modal-title">Submit Demo</div>
+    <div class="admin-grid">
+      <div class="form-field"><label class="form-label">Track Title *</label><input class="input" id="m-demo-title"></div>
+      <div class="form-field"><label class="form-label">Artist</label><input class="input" id="m-demo-artist"></div>
+      <div class="form-field"><label class="form-label">Genre</label>
+        <select class="input" id="m-demo-genre"><option>Techno</option><option>House</option><option>Electro</option><option>Industrial</option><option>Ambient</option><option>Other</option></select>
+      </div>
+      <div class="form-field"><label class="form-label">BPM</label><input class="input" id="m-demo-bpm" type="number" placeholder="140"></div>
+      <div class="form-field"><label class="form-label">Email</label><input class="input" id="m-demo-email" type="email"></div>
+      <div class="form-field"><label class="form-label">Rating (1–5)</label><input class="input" id="m-demo-rating" type="number" min="0" max="5" value="0"></div>
+    </div>
+    <div class="form-field"><label class="form-label">Audio URL (S3, Dropbox, Drive…)</label><input class="input" id="m-demo-file" placeholder="https://…"></div>
+    <div class="form-field"><label class="form-label">Notes / References</label><textarea class="input" id="m-demo-notes"></textarea></div>
+    <div class="flex gap-2" style="justify-content:flex-end; margin-top:8px;">
+      <button class="btn btn-ghost" onclick="LOS.closeModal('add-demo')">Cancel</button>
+      <button class="btn btn-primary" onclick="LOS.saveDemo()">Submit Demo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Release -->
+<div class="modal-bg" id="modal-add-release">
+  <div class="modal">
+    <div class="modal-title">New Release</div>
+    <div class="admin-grid">
+      <div class="form-field"><label class="form-label">Title *</label><input class="input" id="m-rel-title"></div>
+      <div class="form-field"><label class="form-label">Artist</label><input class="input" id="m-rel-artist"></div>
+      <div class="form-field"><label class="form-label">Type</label>
+        <select class="input" id="m-rel-type"><option>Single</option><option>EP</option><option>Album</option><option>Compilation</option></select>
+      </div>
+      <div class="form-field"><label class="form-label">Catalogue #</label><input class="input" id="m-rel-cat" placeholder="BP-001"></div>
+      <div class="form-field"><label class="form-label">Release Date</label><input class="input" id="m-rel-date" type="date"></div>
+      <div class="form-field"><label class="form-label">Distributor</label><input class="input" id="m-rel-dist" placeholder="DistroKid, Believe…"></div>
+    </div>
+    <div class="form-field"><label class="form-label">Status</label>
+      <select class="input" id="m-rel-status">
+        <option>Idea</option><option>A&R Selected</option><option>In Production</option>
+        <option>Mastered</option><option>Distro Setup</option><option>Pre-Save</option>
+        <option>Released</option><option>Post-Campaign</option>
+      </select>
+    </div>
+    <div class="flex gap-2" style="justify-content:flex-end; margin-top:8px;">
+      <button class="btn btn-ghost" onclick="LOS.closeModal('add-release')">Cancel</button>
+      <button class="btn btn-primary" onclick="LOS.saveRelease()">Create Release</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Contract -->
+<div class="modal-bg" id="modal-add-contract">
+  <div class="modal">
+    <div class="modal-title">New Contract</div>
+    <div class="admin-grid">
+      <div class="form-field"><label class="form-label">Type *</label>
+        <select class="input" id="m-con-type"><option>Exclusive EP</option><option>Single Deal</option><option>Album Deal</option><option>Remix</option><option>License In</option><option>License Out</option><option>Publishing</option><option>360°</option></select>
+      </div>
+      <div class="form-field"><label class="form-label">Artist</label><input class="input" id="m-con-artist"></div>
+      <div class="form-field"><label class="form-label">Status</label>
+        <select class="input" id="m-con-status"><option>Draft</option><option>In Negotiation</option><option>Active</option><option>Expired</option></select>
+      </div>
+      <div class="form-field"><label class="form-label">Territory</label><input class="input" id="m-con-territory" placeholder="WW, DE, EU…"></div>
+      <div class="form-field"><label class="form-label">Label Split %</label><input class="input" id="m-con-label-split" type="number" value="50"></div>
+      <div class="form-field"><label class="form-label">Artist Split %</label><input class="input" id="m-con-artist-split" type="number" value="50"></div>
+      <div class="form-field"><label class="form-label">Advance (€)</label><input class="input" id="m-con-advance" type="number" value="0"></div>
+      <div class="form-field"><label class="form-label">Expires</label><input class="input" id="m-con-expires" type="date"></div>
+    </div>
+    <div class="flex gap-2" style="justify-content:flex-end; margin-top:8px;">
+      <button class="btn btn-ghost" onclick="LOS.closeModal('add-contract')">Cancel</button>
+      <button class="btn btn-primary" onclick="LOS.saveContract()">Save Contract</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Event -->
+<div class="modal-bg" id="modal-add-event">
+  <div class="modal">
+    <div class="modal-title">New Event / Booking</div>
+    <div class="admin-grid">
+      <div class="form-field"><label class="form-label">Event Name *</label><input class="input" id="m-ev-name"></div>
+      <div class="form-field"><label class="form-label">Artist</label><input class="input" id="m-ev-artist"></div>
+      <div class="form-field"><label class="form-label">Date</label><input class="input" id="m-ev-date" type="date"></div>
+      <div class="form-field"><label class="form-label">Venue</label><input class="input" id="m-ev-venue"></div>
+      <div class="form-field"><label class="form-label">Status</label>
+        <select class="input" id="m-ev-status"><option>Inquiry</option><option>Option</option><option>Confirmed</option><option>Settled</option><option>Cancelled</option></select>
+      </div>
+      <div class="form-field"><label class="form-label">Fee (€)</label><input class="input" id="m-ev-fee" type="number" value="0"></div>
+    </div>
+    <div class="flex gap-2" style="justify-content:flex-end; margin-top:8px;">
+      <button class="btn btn-ghost" onclick="LOS.closeModal('add-event')">Cancel</button>
+      <button class="btn btn-primary" onclick="LOS.saveEvent()">Save Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADMIN OVERLAY ─────────────────────────────────────────────────────── -->
+<div id="adminOverlay">
+  <div class="admin-wrap">
+    <div class="flex mb-6">
+      <h2 style="font-size:20px; font-weight:700;">JSON Database Editor</h2>
+      <button class="btn btn-ghost" style="margin-left:auto;" onclick="LOS.closeAdmin()"><i data-lucide="x" style="width:14px;"></i> Close</button>
+    </div>
+    <div class="admin-tabs" id="adminTabs"></div>
+    <div id="adminEditor"></div>
+  </div>
+</div>
+<script>
+// ── DATA MODEL ──────────────────────────────────────────────────────────────
+const SEED = {
+  artists: [
+    { id:'a1', name:'DJ Void', type:'Core Artist', status:'Active', territory:'DE, EU',
+      genres:'Techno, Industrial', email:'void@mail.com', phone:'', links:'spotify.com/void, @void_dj',
+      notes:'Resident at Tresor. 3 EPs released on the label.' },
+    { id:'a2', name:'Synth Kid', type:'Development', status:'Active', territory:'DE',
+      genres:'Electro, Acid', email:'', phone:'', links:'@synthkid', notes:'First demo submitted 2026-03.' },
+    { id:'a3', name:'Groove Agency Berlin', type:'Booker', status:'Partner', territory:'EU',
+      genres:'', email:'book@grooveagency.de', phone:'+49 30 123456', links:'grooveagency.de', notes:'' }
+  ],
+  demos: [
+    { id:'d1', title:'Berlin Nights', artist:'Unknown', genre:'Techno', bpm:138, email:'submitter@x.de',
+      status:'Neu', rating:0, file:'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
+      notes:'Interesting main motif', submitted:'2026-05-01' },
+    { id:'d2', title:'Deep Chords', artist:'Synth Kid', genre:'Electro', bpm:125, email:'',
+      status:'In Review', rating:4, file:'https://actions.google.com/sounds/v1/science_fiction/alien_breath.ogg',
+      notes:'Strong reference to Drexciya', submitted:'2026-04-28' },
+    { id:'d3', title:'Acid Rain', artist:'DJ Void', genre:'Acid', bpm:140, email:'void@mail.com',
+      status:'Shortlist', rating:5, file:'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
+      notes:'Potential label release, follow up asap', submitted:'2026-04-15' }
+  ],
+  releases: [
+    { id:'r1', title:'Void EP', artist_id:'a1', type:'EP', cat:'BP-001',
+      status:'Released', date:'2026-03-01', distributor:'DistroKid', territory:'WW',
+      tasks:'Mastering ✓, Distro Upload ✓, Spotify Pitch ✓, PR ✓' },
+    { id:'r2', title:'Deep Transmission', artist_id:'a2', type:'Single', cat:'BP-002',
+      status:'In Production', date:'2026-07-15', distributor:'Believe', territory:'WW',
+      tasks:'Mastering (pending), Distro Upload (pending), Spotify Pitch (pending)' }
+  ],
+  contracts: [
+    { id:'c1', type:'Exclusive EP', artist_id:'a1', status:'Active', territory:'WW',
+      label_split:50, artist_split:50, advance:0, expires:'2027-03-01' },
+    { id:'c2', type:'Single Deal', artist_id:'a2', status:'In Negotiation', territory:'WW',
+      label_split:60, artist_split:40, advance:200, expires:'2026-12-31' }
+  ],
+  events: [
+    { id:'e1', name:'Tresor Night', artist_id:'a1', date:'2026-06-14', venue:'Tresor, Berlin',
+      status:'Confirmed', fee:800 },
+    { id:'e2', name:'Festival Showcase', artist_id:'a1', date:'2026-08-22', venue:'Fusion Festival',
+      status:'Option', fee:1200 }
+  ],
+  media: [
+    { id:'m1', related_to:'r1', title:'Void EP – Master.wav', type:'Master', artist:'DJ Void',
+      file:'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg', tags:'Wav, 24bit' },
+    { id:'m2', related_to:'r2', title:'DeepTrans_Artwork.jpg', type:'Artwork', artist:'Synth Kid',
+      file:'', tags:'3000x3000' }
+  ],
+  royalties: [
+    { id:'ro1', release_id:'r1', source:'Spotify (DistroKid)', net_amount:1240.50 },
+    { id:'ro2', release_id:'r1', source:'Beatport', net_amount:320.00 },
+    { id:'ro3', release_id:'r1', source:'Apple Music', net_amount:850.00 }
+  ],
+  curators: [
+    { id:'cu1', name:'RA Reviews', type:'Blog', genre:'Techno', contact:'reviews@ra.co', submits:'ra.co/submit' },
+    { id:'cu2', name:'Acid Test Podcast', type:'Podcast', genre:'Techno, Acid', contact:'', submits:'acidtest.com' },
+    { id:'cu3', name:'Groove Magazine', type:'Print/Web', genre:'Electronic', contact:'redaktion@groove.de', submits:'' }
+  ]
+};
+
+// ── AUTO-MIGRATE ─────────────────────────────────────────────────────────────
+function loadDB() {
+  const raw = JSON.parse(localStorage.getItem('labelOS_db')) || {};
+  const db  = {};
+  Object.keys(SEED).forEach(k => {
+    db[k] = Array.isArray(raw[k]) ? raw[k] : SEED[k];
+  });
+  return db;
+}
+
+// ── KANBAN COLUMNS ───────────────────────────────────────────────────────────
+const ANR_COLS = [
+  { key:'Neu',       label:'New',       color:'#64748b' },
+  { key:'In Review', label:'In Review', color:'#3b82f6' },
+  { key:'Shortlist', label:'Shortlist', color:'#f59e0b' },
+  { key:'Gespräch',  label:'In Talk',   color:'#8b5cf6' },
+  { key:'Offer',     label:'Offer',     color:'#06b6d4' },
+  { key:'Signed',    label:'Signed ✓',  color:'#22c55e' },
+  { key:'Abgelehnt', label:'Pass',      color:'#ef4444' },
+];
+
+const STATUS_BADGE = {
+  Active:'badge-success', Confirmed:'badge-success', Released:'badge-success', Signed:'badge-success',
+  'In Review':'badge-cyan', 'In Production':'badge-cyan', 'In Talk':'badge-cyan', 'In Negotiation':'badge-cyan',
+  Shortlist:'badge-warn', Option:'badge-warn', Offer:'badge-warn', Mastered:'badge-warn',
+  Neu:'badge-default', Draft:'badge-default', Idea:'badge-default', Inactive:'badge-default',
+  Abgelehnt:'badge-danger', Expired:'badge-danger', Cancelled:'badge-danger',
+};
+const badgeOf = s => `<span class="badge ${STATUS_BADGE[s]||'badge-default'}">${s||'—'}</span>`;
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const uid = () => '_' + Math.random().toString(36).slice(2,9);
+const fmt  = v => typeof v === 'number' ? `€ ${v.toFixed(2)}` : (v||'—');
+const esc  = s => String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── MAIN APP ─────────────────────────────────────────────────────────────────
+const LOS = {
+  db: loadDB(),
+  ws: null,
+  dragId: null,
+
+  // ── INIT ────────────────────────────────────────────────────────────────
+  init() {
+    this.save();
+    this.setupNav();
+    this.setupPlayer();
+    this.renderAll();
+    lucide.createIcons();
+  },
+
+  save() { localStorage.setItem('labelOS_db', JSON.stringify(this.db)); },
+
+  toast(msg, type='success') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const ic = type === 'success' ? 'check-circle' : 'alert-circle';
+    t.innerHTML = `<i data-lucide="${ic}" style="width:14px;color:${type==='success'?'var(--success)':'var(--danger)'}"></i> ${msg}`;
+    document.getElementById('toastContainer').appendChild(t);
+    lucide.createIcons();
+    setTimeout(() => t.remove(), 3200);
+  },
+
+  // ── NAVIGATION ──────────────────────────────────────────────────────────
+  setupNav() {
+    document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+      el.addEventListener('click', () => {
+        const v = el.dataset.view;
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
+        document.getElementById('view-'+v).classList.add('active');
+        const titles = {
+          dashboard:'Dashboard', crm:'Artists & CRM', anr:'Demos & A&R',
+          releases:'Releases', contracts:'Contract Vault', finance:'Finance & Royalties',
+          bookings:'Bookings & Events', media:'Media Library', research:'Research & Intelligence'
+        };
+        document.getElementById('topbarTitle').textContent = titles[v]||v;
+      });
+    });
+  },
+
+  // ── RENDER ALL ──────────────────────────────────────────────────────────
+  renderAll() {
+    this.renderDashboard();
+    this.renderCRM();
+    this.renderANR();
+    this.renderReleases();
+    this.renderContracts();
+    this.renderFinance();
+    this.renderBookings();
+    this.renderMedia();
+    this.renderResearch();
+    // Update A&R badge
+    const newCount = this.db.demos.filter(d => d.status === 'Neu').length;
+    document.getElementById('navBadgeAnr').textContent = newCount;
+    document.getElementById('navBadgeAnr').style.display = newCount ? 'inline' : 'none';
+    lucide.createIcons();
+  },
+
+  // ── DASHBOARD ───────────────────────────────────────────────────────────
+  renderDashboard() {
+    const totalRev = this.db.royalties.reduce((a, r) => a + parseFloat(r.net_amount||0), 0);
+    const newDemos = this.db.demos.filter(d => d.status === 'Neu').length;
+    const upcomingGigs = this.db.events.filter(e => e.status === 'Confirmed').length;
+
+    document.getElementById('dashStats').innerHTML = [
+      { label:'Artists',        val: this.db.artists.filter(a=>a.type?.includes('Artist')).length, color:'var(--accent)',  icon:'user-circle' },
+      { label:'New Demos',      val: newDemos,     color:'var(--warn)',    icon:'inbox' },
+      { label:'Active Releases',val: this.db.releases.filter(r=>r.status!=='Released').length, color:'var(--accent2)', icon:'disc-3' },
+      { label:'Total Revenue',  val: `€ ${totalRev.toFixed(0)}`, color:'var(--success)', icon:'trending-up' },
+    ].map(s => `
+      <div class="card stat-card">
+        <div class="stat-label flex gap-2"><i data-lucide="${s.icon}" style="width:13px;"></i> ${s.label}</div>
+        <div class="stat-value" style="color:${s.color};">${s.val}</div>
+      </div>
+    `).join('');
+
+    // Recent demos
+    document.getElementById('dashDemos').innerHTML = this.db.demos.slice(0,4).map(d => `
+      <div class="flex gap-2 mb-4" style="align-items:flex-start; cursor:pointer;" onclick="LOS.play('${esc(d.file)}','${esc(d.title)}','${esc(d.artist)}')">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;shrink:0;">
+          <i data-lucide="music" style="width:14px;color:var(--accent);"></i>
+        </div>
+        <div class="flex-1">
+          <div style="font-weight:600; font-size:13px;">${esc(d.title)}</div>
+          <div style="font-size:11px;color:var(--muted);">${esc(d.artist)} · ${esc(d.genre)}</div>
+        </div>
+        ${badgeOf(d.status)}
+      </div>
+    `).join('');
+
+    // Upcoming releases
+    document.getElementById('dashReleases').innerHTML = this.db.releases.filter(r=>r.status!=='Released').map(r => {
+      const artist = this.db.artists.find(a=>a.id===r.artist_id);
+      return `
+        <div class="flex gap-2 mb-4" style="align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(6,182,212,0.15);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="disc-3" style="width:14px;color:var(--accent2);"></i>
+          </div>
+          <div class="flex-1">
+            <div style="font-weight:600; font-size:13px;">${esc(r.title)}</div>
+            <div style="font-size:11px;color:var(--muted);">${artist?.name||'Unknown'} · ${r.date||'TBA'}</div>
+          </div>
+          ${badgeOf(r.status)}
+        </div>
+      `;
+    }).join('') || '<div style="color:var(--muted);font-size:13px;">No active releases</div>';
+  },
+
+  // ── CRM ─────────────────────────────────────────────────────────────────
+  renderCRM() {
+    const q    = (document.getElementById('crmSearch')?.value||'').toLowerCase();
+    const type = document.getElementById('crmTypeFilter')?.value||'';
+    const rows = this.db.artists.filter(a =>
+      (!q || a.name.toLowerCase().includes(q) || (a.email||'').toLowerCase().includes(q)) &&
+      (!type || a.type === type)
+    );
+    document.getElementById('crmTable').innerHTML = rows.map(a => `
+      <tr>
+        <td><div style="font-weight:600;">${esc(a.name)}</div><div style="font-size:11px;color:var(--muted);">${esc(a.email)}</div></td>
+        <td>${badgeOf(a.type)}</td>
+        <td>${badgeOf(a.status)}</td>
+        <td><span style="font-size:12px;color:var(--muted);">${esc(a.territory)||'—'}</span></td>
+        <td><span style="font-size:12px;color:var(--muted);">${esc(a.links)||'—'}</span></td>
+        <td>
+          <button class="btn-icon" title="Delete" onclick="LOS.deleteItem('artists','${a.id}')">
+            <i data-lucide="trash-2" style="width:13px;"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  // ── A&R KANBAN ───────────────────────────────────────────────────────────
+  renderANR() {
+    const q  = (document.getElementById('anrSearch')?.value||'').toLowerCase();
+    const gf = document.getElementById('anrGenreFilter')?.value||'';
+    const filtered = this.db.demos.filter(d =>
+      (!q || d.title.toLowerCase().includes(q) || (d.artist||'').toLowerCase().includes(q)) &&
+      (!gf || d.genre === gf)
+    );
+    document.getElementById('anrBoard').innerHTML = ANR_COLS.map(col => {
+      const cards = filtered.filter(d => d.status === col.key);
+      return `
+        <div class="k-col">
+          <div class="k-col-header" style="background:${col.color}18; border:1px solid ${col.color}30;">
+            <span style="color:${col.color};">${col.label}</span>
+            <span style="background:${col.color}30;color:${col.color};padding:1px 7px;border-radius:20px;font-size:11px;">${cards.length}</span>
+          </div>
+          <div class="k-col-body" id="kcol-${col.key}"
+               ondragover="LOS.dragOver(event,'${col.key}')"
+               ondragleave="LOS.dragLeave(event,'${col.key}')"
+               ondrop="LOS.drop(event,'${col.key}')">
+            ${cards.map(d => `
+              <div class="k-card" draggable="true"
+                   ondragstart="LOS.dragStart(event,'${d.id}')"
+                   ondragend="LOS.dragEnd(event)">
+                <div class="k-card-title">${esc(d.title)}</div>
+                <div class="k-card-sub">${esc(d.artist)} · ${esc(d.genre)}</div>
+                <div class="stars" style="margin:6px 0;">${'★'.repeat(d.rating||0)}${'☆'.repeat(5-(d.rating||0))}</div>
+                <div class="flex gap-2" style="margin-top:8px;">
+                  ${d.file ? `<button class="btn-icon" title="Play" onclick="LOS.play('${esc(d.file)}','${esc(d.title)}','${esc(d.artist)}')">
+                    <i data-lucide="play-circle" style="width:14px;color:var(--accent);"></i>
+                  </button>` : ''}
+                  <button class="btn-icon" title="Delete" onclick="LOS.deleteItem('demos','${d.id}')">
+                    <i data-lucide="trash-2" style="width:13px;"></i>
+                  </button>
+                  <span style="margin-left:auto;font-size:11px;color:var(--muted);">${d.bpm ? d.bpm+' BPM' : ''}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  },
+
+  // ── DRAG & DROP ──────────────────────────────────────────────────────────
+  dragStart(e, id) {
+    this.dragId = id;
+    setTimeout(() => e.target.classList.add('dragging'), 0);
+  },
+  dragEnd(e) { e.target.classList.remove('dragging'); },
+  dragOver(e, col) {
+    e.preventDefault();
+    document.getElementById('kcol-'+col)?.classList.add('drag-over');
+  },
+  dragLeave(e, col) {
+    document.getElementById('kcol-'+col)?.classList.remove('drag-over');
+  },
+  drop(e, newStatus) {
+    e.preventDefault();
+    document.querySelectorAll('.k-col-body').forEach(c => c.classList.remove('drag-over'));
+    const demo = this.db.demos.find(d => d.id === this.dragId);
+    if (demo && demo.status !== newStatus) {
+      demo.status = newStatus;
+      this.save();
+      this.toast(`"${demo.title}" moved to ${newStatus}`);
+      this.renderAll();
+    }
+    this.dragId = null;
+  },
+
+  // ── RELEASES ─────────────────────────────────────────────────────────────
+  renderReleases() {
+    const q = (document.getElementById('relSearch')?.value||'').toLowerCase();
+    const STATUS_ORDER = ['Idea','A&R Selected','In Production','Mastered','Distro Setup','Pre-Save','Released','Post-Campaign'];
+    const filtered = this.db.releases.filter(r =>
+      !q || r.title.toLowerCase().includes(q)
+    );
+    document.getElementById('releasesList').innerHTML = filtered.map(r => {
+      const artist = this.db.artists.find(a => a.id === r.artist_id);
+      const step   = STATUS_ORDER.indexOf(r.status);
+      const pct    = Math.round(((step+1) / STATUS_ORDER.length) * 100);
+      return `
+        <div class="card mb-4">
+          <div class="flex gap-3 mb-4" style="align-items:flex-start;">
+            <div>
+              <div style="font-size:16px;font-weight:700;">${esc(r.title)}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">${artist?.name||'Unknown'} · ${r.type} · <span style="color:var(--accent2);">${esc(r.cat)}</span></div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+              ${badgeOf(r.status)}
+              <button class="btn-icon" onclick="LOS.deleteItem('releases','${r.id}')"><i data-lucide="trash-2" style="width:13px;"></i></button>
+            </div>
+          </div>
+          <!-- Progress bar -->
+          <div style="margin-bottom:12px;">
+            <div class="flex mb-4" style="justify-content:space-between;font-size:11px;color:var(--muted);">
+              <span>Pipeline Progress</span><span>${pct}%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;"></div></div>
+          </div>
+          <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+            ${STATUS_ORDER.map((s,i) => `
+              <span style="font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;transition:0.15s;
+                background:${i<=step?'rgba(139,92,246,0.2)':'rgba(255,255,255,0.04)'};
+                color:${i<=step?'#a78bfa':'var(--muted)'};
+                border:1px solid ${i===step?'rgba(139,92,246,0.5)':'transparent'};"
+                onclick="LOS.setReleaseStatus('${r.id}','${s}')">${s}</span>
+            `).join('')}
+          </div>
+          <div style="font-size:12px;color:var(--muted);">📋 ${esc(r.tasks)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;">📅 ${r.date||'TBA'} · 🌍 ${esc(r.territory)||'WW'} · 📦 ${esc(r.distributor)||'—'}</div>
+        </div>`;
+    }).join('') || '<div class="card" style="text-align:center;color:var(--muted);padding:40px;">No releases yet. Create your first one!</div>';
+  },
+
+  setReleaseStatus(id, status) {
+    const r = this.db.releases.find(r => r.id === id);
+    if (r) { r.status = status; this.save(); this.renderReleases(); this.toast(`Release status → ${status}`); }
+  },
+
+  // ── CONTRACTS ────────────────────────────────────────────────────────────
+  renderContracts() {
+    document.getElementById('contractTable').innerHTML = this.db.contracts.map(c => {
+      const artist = this.db.artists.find(a => a.id === c.artist_id);
+      const isExpiring = c.expires && new Date(c.expires) < new Date(Date.now() + 30*86400000);
+      return `
+        <tr>
+          <td><div style="font-weight:600;">${esc(c.type)}</div></td>
+          <td>${artist?.name||'—'}</td>
+          <td>${badgeOf(c.status)}</td>
+          <td><span style="font-size:12px;color:var(--muted);">${esc(c.territory)||'WW'}</span></td>
+          <td><span style="font-size:12px;color:var(--accent);">${c.label_split}% / ${c.artist_split}%</span></td>
+          <td><span style="font-size:12px;color:${isExpiring?'var(--warn)':'var(--muted)'};">${c.expires||'—'} ${isExpiring?'⚠️':''}</span></td>
+        </tr>`;
+    }).join('');
+  },
+
+  // ── FINANCE ──────────────────────────────────────────────────────────────
+  renderFinance() {
+    let totalRev=0, totalLabel=0, totalArtist=0;
+    const rows = this.db.royalties.map(ro => {
+      const contract = this.db.contracts.find(c => c.release_id === ro.release_id)
+                    || this.db.contracts[0]; // fallback
+      const lPct = parseFloat(contract?.label_split||50);
+      const aPct = parseFloat(contract?.artist_split||50);
+      const net  = parseFloat(ro.net_amount||0);
+      const lCut = net * lPct/100;
+      const aCut = net * aPct/100;
+      totalRev   += net; totalLabel += lCut; totalArtist += aCut;
+      const rel  = this.db.releases.find(r => r.id === ro.release_id);
+      return `<tr>
+        <td><div style="font-weight:600;">${esc(ro.source)}</div></td>
+        <td style="font-size:12px;color:var(--muted);">${rel?.title||'—'}</td>
+        <td style="font-weight:600;">€ ${net.toFixed(2)}</td>
+        <td style="color:var(--accent);">€ ${lCut.toFixed(2)} (${lPct}%)</td>
+        <td style="color:var(--muted);">€ ${aCut.toFixed(2)} (${aPct}%)</td>
+      </tr>`;
+    });
+    document.getElementById('finTable').innerHTML = rows.join('');
+    document.getElementById('finStats').innerHTML = [
+      { label:'Total Net Revenue', val:`€ ${totalRev.toFixed(2)}`,    color:'var(--text)' },
+      { label:'Label Share',       val:`€ ${totalLabel.toFixed(2)}`,  color:'var(--accent)' },
+      { label:'Artist Payouts',    val:`€ ${totalArtist.toFixed(2)}`, color:'var(--accent2)' },
+      { label:'Royalty Entries',   val: this.db.royalties.length,     color:'var(--warn)' },
+    ].map(s=>`
+      <div class="card stat-card">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value" style="color:${s.color};font-size:22px;">${s.val}</div>
+      </div>
+    `).join('');
+    this._drawDonut('finChart', totalLabel, totalArtist);
+    document.getElementById('finLegend').innerHTML = `
+      <span style="color:var(--accent);">▬ Label: €${totalLabel.toFixed(0)}</span>
+      <span style="color:var(--muted);">▬ Artists: €${totalArtist.toFixed(0)}</span>`;
+  },
+
+  _drawDonut(canvasId, a, b) {
+    const c = document.getElementById(canvasId);
+    if(!c) return;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const total = a + b; if(!total) return;
+    const cx=c.width/2, cy=c.height/2, r=65, lw=22;
+    const draw = (from, to, color) => {
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,from,to);
+      ctx.lineWidth=lw; ctx.strokeStyle=color;
+      ctx.lineCap='round'; ctx.stroke();
+    };
+    const aAngle = (a/total)*2*Math.PI;
+    draw(-Math.PI/2, -Math.PI/2+aAngle, '#8b5cf6');
+    draw(-Math.PI/2+aAngle, 1.5*Math.PI, '#334155');
+    // Center text
+    ctx.fillStyle = '#f1f5f9';
+    ctx.font = 'bold 16px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(`€${(a+b).toFixed(0)}`, cx, cy-4);
+    ctx.font = '11px Inter';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('net total', cx, cy+14);
+  },
+
+  // CSV Drop ─────────────────────────────────────────────────────────────
+  fileDragOver(e) {
+    e.preventDefault();
+    const o = document.getElementById('finDropOverlay');
+    o.style.display='flex'; lucide.createIcons();
+  },
+  fileDragLeave(e) {
+    document.getElementById('finDropOverlay').style.display='none';
+  },
+  fileDrop(e) {
+    e.preventDefault();
+    document.getElementById('finDropOverlay').style.display='none';
+    const f = e.dataTransfer.files[0];
+    if(!f||!f.name.endsWith('.csv')) return this.toast('Please drop a .csv file', 'error');
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const rows = ev.target.result.split('\n').slice(1);
+      let count = 0;
+      rows.forEach(row => {
+        const cols = row.split(',').map(c=>c.replace(/"/g,'').trim());
+        if(cols.length >= 3 && cols[2]) {
+          this.db.royalties.push({ id:uid(), source:cols[0]+' (CSV)', release_id:cols[1]||'r1', net_amount:parseFloat(cols[2])||0 });
+          count++;
+        }
+      });
+      this.save(); this.renderFinance();
+      this.toast(`${count} rows imported from ${f.name}`);
+    };
+    reader.readAsText(f);
+  },
+
+  // ── BOOKINGS ─────────────────────────────────────────────────────────────
+  renderBookings() {
+    document.getElementById('bookingTable').innerHTML = this.db.events.map(e => {
+      const artist = this.db.artists.find(a=>a.id===e.artist_id);
+      return `<tr>
+        <td><div style="font-weight:600;">${esc(e.name)}</div></td>
+        <td><span style="font-size:12px;">${e.date||'TBA'}</span></td>
+        <td>${artist?.name||'—'}</td>
+        <td><span style="font-size:12px;color:var(--muted);">${esc(e.venue)||'—'}</span></td>
+        <td>${badgeOf(e.status)}</td>
+        <td style="font-weight:600;color:var(--success);">${fmt(e.fee)}</td>
+      </tr>`;
+    }).join('');
+  },
+
+  // ── MEDIA ────────────────────────────────────────────────────────────────
+  renderMedia() {
+    const q  = (document.getElementById('mediaSearch')?.value||'').toLowerCase();
+    const tf = document.getElementById('mediaTypeFilter')?.value||'';
+    const TYPE_ICONS = { Master:'music', Demo:'headphones', Artwork:'image', 'Press Photo':'camera', Video:'film' };
+    const filtered = this.db.media.filter(m =>
+      (!q || m.title.toLowerCase().includes(q)) &&
+      (!tf || m.type === tf)
+    );
+    document.getElementById('mediaGrid').innerHTML = filtered.map(m => `
+      <div class="card" style="text-align:center;cursor:pointer;transition:var(--trans);"
+           onmouseover="this.style.borderColor='rgba(255,255,255,0.15)'"
+           onmouseout="this.style.borderColor='var(--border)'"
+           ${m.file ? `onclick="LOS.play('${esc(m.file)}','${esc(m.title)}','${esc(m.artist)}')"` : ''}>
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(139,92,246,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          <i data-lucide="${TYPE_ICONS[m.type]||'file'}" style="width:20px;color:var(--accent);"></i>
+        </div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${esc(m.title)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${esc(m.artist)||'—'}</div>
+        <span class="badge badge-accent">${esc(m.type)}</span>
+      </div>
+    `).join('') || '<div style="grid-column:span 4;text-align:center;color:var(--muted);padding:40px;">No media assets found.</div>';
+  },
+
+  // ── RESEARCH ─────────────────────────────────────────────────────────────
+  renderResearch() {
+    // Pipeline conversion stats
+    const totals = {};
+    ANR_COLS.forEach(c => totals[c.key] = this.db.demos.filter(d=>d.status===c.key).length);
+    document.getElementById('pipelineStats').innerHTML = ANR_COLS.map(c => {
+      const pct = this.db.demos.length ? Math.round(totals[c.key]/this.db.demos.length*100) : 0;
+      return `
+        <div class="flex gap-2 mb-4" style="align-items:center;">
+          <span style="font-size:12px;width:80px;color:var(--muted);">${c.label}</span>
+          <div class="progress-bar flex-1"><div class="progress-fill" style="width:${pct}%;background:${c.color};"></div></div>
+          <span style="font-size:11px;color:var(--muted);width:28px;text-align:right;">${totals[c.key]}</span>
+        </div>`;
+    }).join('');
+
+    // Curator DB
+    document.getElementById('curatorDB').innerHTML = `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Type</th><th>Genre</th><th>Contact</th><th>Submit Link</th></tr></thead>
+        <tbody>${this.db.curators.map(c=>`
+          <tr>
+            <td style="font-weight:600;">${esc(c.name)}</td>
+            <td>${badgeOf(c.type)}</td>
+            <td><span style="font-size:12px;color:var(--muted);">${esc(c.genre)}</span></td>
+            <td><a href="mailto:${esc(c.contact)}" style="color:var(--accent);font-size:12px;">${esc(c.contact)||'—'}</a></td>
+            <td><a href="${esc(c.submits)}" target="_blank" style="color:var(--accent2);font-size:12px;">${esc(c.submits)||'—'}</a></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+
+    // Draw A&R bar chart
+    this._drawBarChart('anrChart',
+      ANR_COLS.map(c=>c.label),
+      ANR_COLS.map(c=>totals[c.key]),
+      ANR_COLS.map(c=>c.color)
+    );
+    // Genre donut
+    const genres = {};
+    this.db.demos.forEach(d => { genres[d.genre||'Other'] = (genres[d.genre||'Other']||0)+1; });
+    this._drawPieChart('genreChart', Object.keys(genres), Object.values(genres));
+  },
+
+  _drawBarChart(id, labels, values, colors) {
+    const c = document.getElementById(id); if(!c) return;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const max = Math.max(...values,1);
+    const bw = (c.width-40) / labels.length;
+    values.forEach((v,i) => {
+      const h = v/max * (c.height-30);
+      const x = 20 + i*bw + bw*0.15;
+      const y = c.height-20-h;
+      ctx.fillStyle = colors[i]||'#8b5cf6';
+      ctx.beginPath();
+      ctx.roundRect(x, y, bw*0.7, h, 4);
+      ctx.fill();
+      ctx.fillStyle='#64748b'; ctx.font='9px Inter'; ctx.textAlign='center';
+      ctx.fillText(labels[i].slice(0,6), x+bw*0.35, c.height-6);
+      if(v) { ctx.fillStyle='#f1f5f9'; ctx.fillText(v, x+bw*0.35, y-4); }
+    });
+  },
+
+  _drawPieChart(id, labels, values) {
+    const c = document.getElementById(id); if(!c) return;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const total = values.reduce((a,v)=>a+v,0); if(!total) return;
+    const colors = ['#8b5cf6','#06b6d4','#f59e0b','#22c55e','#ef4444','#ec4899','#a78bfa'];
+    let start = -Math.PI/2;
+    const cx=c.width/2, cy=c.height/2, r=70;
+    values.forEach((v,i) => {
+      const angle = (v/total)*2*Math.PI;
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,start,start+angle);
+      ctx.closePath(); ctx.fillStyle=colors[i%colors.length]; ctx.fill();
+      start+=angle;
+    });
+    // Hole
+    ctx.beginPath(); ctx.arc(cx,cy,r*0.5,0,2*Math.PI);
+    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||'#0f0f1a';
+    ctx.fill();
+  },
+
+  // ── PLAYER ───────────────────────────────────────────────────────────────
+  setupPlayer() {
+    if(!window.WaveSurfer) return;
+    this.ws = WaveSurfer.create({
+      container: '#waveform', waveColor:'#1e293b',
+      progressColor:'#8b5cf6', cursorColor:'rgba(255,255,255,0.3)',
+      barWidth:2, barRadius:2, height:40, normalize:true,
+    });
+    this.ws.on('audioprocess', () => this._updateTime());
+    this.ws.on('ready',       () => this._updateTime());
+    this.ws.on('play',  () => { document.getElementById('playIcon').setAttribute('data-lucide','pause'); lucide.createIcons(); });
+    this.ws.on('pause', () => { document.getElementById('playIcon').setAttribute('data-lucide','play');  lucide.createIcons(); });
+    document.getElementById('playBtn').onclick = () => { this.ws.playPause(); };
+  },
+
+  _updateTime() {
+    const cur  = this.ws.getCurrentTime();
+    const dur  = this.ws.getDuration();
+    const fmt2 = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+    document.getElementById('pTime').textContent = `${fmt2(cur)} / ${fmt2(dur||0)}`;
+  },
+
+  play(url, title, sub) {
+    if(!url || !this.ws) return this.toast('No audio URL for this track', 'error');
+    document.getElementById('player').classList.add('visible');
+    document.getElementById('pTitle').textContent = title||'Unknown';
+    document.getElementById('pSub').textContent   = sub||'';
+    this.ws.load(url);
+    this.ws.once('ready', () => this.ws.play());
+    lucide.createIcons();
+  },
+
+  closePlayer() {
+    this.ws?.pause();
+    document.getElementById('player').classList.remove('visible');
+  },
+
+  // ── MODALS ───────────────────────────────────────────────────────────────
+  openModal(id)  { document.getElementById('modal-'+id).classList.add('open');    lucide.createIcons(); },
+  closeModal(id) { document.getElementById('modal-'+id).classList.remove('open'); },
+
+  saveArtist() {
+    const v = id => document.getElementById(id)?.value?.trim()||'';
+    if(!v('m-artist-name')) return this.toast('Name is required', 'error');
+    this.db.artists.push({ id:uid(), name:v('m-artist-name'), type:v('m-artist-type'),
+      status:v('m-artist-status'), territory:v('m-artist-territory'),
+      email:v('m-artist-email'), phone:v('m-artist-phone'),
+      genres:v('m-artist-genres'), links:v('m-artist-links'), notes:v('m-artist-notes') });
+    this.save(); this.renderAll(); this.closeModal('add-artist');
+    this.toast('Artist / Contact added');
+  },
+
+  saveDemo() {
+    const v = id => document.getElementById(id)?.value?.trim()||'';
+    if(!v('m-demo-title')) return this.toast('Title is required', 'error');
+    this.db.demos.push({ id:uid(), title:v('m-demo-title'), artist:v('m-demo-artist'),
+      genre:v('m-demo-genre'), bpm:parseInt(v('m-demo-bpm'))||0,
+      email:v('m-demo-email'), status:'Neu', rating:parseInt(v('m-demo-rating'))||0,
+      file:v('m-demo-file'), notes:v('m-demo-notes'), submitted:new Date().toISOString().slice(0,10) });
+    this.save(); this.renderAll(); this.closeModal('add-demo');
+    this.toast('Demo submitted — it\'s in the pipeline');
+  },
+
+  saveRelease() {
+    const v = id => document.getElementById(id)?.value?.trim()||'';
+    if(!v('m-rel-title')) return this.toast('Title is required', 'error');
+    const artistId = this.db.artists.find(a=>a.name===v('m-rel-artist'))?.id||'';
+    this.db.releases.push({ id:uid(), title:v('m-rel-title'), artist_id:artistId,
+      type:v('m-rel-type'), cat:v('m-rel-cat'), date:v('m-rel-date'),
+      distributor:v('m-rel-dist'), territory:'WW', status:v('m-rel-status'), tasks:'' });
+    this.save(); this.renderAll(); this.closeModal('add-release');
+    this.toast('Release created');
+  },
+
+  saveContract() {
+    const v  = id => document.getElementById(id)?.value?.trim()||'';
+    const vi = id => parseInt(document.getElementById(id)?.value||0);
+    const artistId = this.db.artists.find(a=>a.name===v('m-con-artist'))?.id||'';
+    this.db.contracts.push({ id:uid(), type:v('m-con-type'), artist_id:artistId,
+      status:v('m-con-status'), territory:v('m-con-territory'),
+      label_split:vi('m-con-label-split'), artist_split:vi('m-con-artist-split'),
+      advance:vi('m-con-advance'), expires:v('m-con-expires') });
+    this.save(); this.renderAll(); this.closeModal('add-contract');
+    this.toast('Contract saved');
+  },
+
+  saveEvent() {
+    const v  = id => document.getElementById(id)?.value?.trim()||'';
+    const artistId = this.db.artists.find(a=>a.name===v('m-ev-artist'))?.id||'';
+    this.db.events.push({ id:uid(), name:v('m-ev-name'), artist_id:artistId,
+      date:v('m-ev-date'), venue:v('m-ev-venue'), status:v('m-ev-status'),
+      fee:parseFloat(document.getElementById('m-ev-fee')?.value||0) });
+    this.save(); this.renderAll(); this.closeModal('add-event');
+    this.toast('Event / Booking saved');
+  },
+
+  deleteItem(table, id) {
+    if(!confirm('Delete this record?')) return;
+    this.db[table] = this.db[table].filter(x => x.id !== id);
+    this.save(); this.renderAll(); this.toast('Record deleted');
+  },
+
+  // ── ADMIN JSON EDITOR ────────────────────────────────────────────────────
+  openAdmin(tab='artists') {
+    document.getElementById('adminOverlay').style.display='block';
+    document.body.style.overflow='hidden';
+    const tabs = Object.keys(this.db);
+    document.getElementById('adminTabs').innerHTML = tabs.map(t =>
+      `<div class="admin-tab ${t===tab?'active':''}" onclick="LOS.renderAdmin('${t}')">${t}</div>`
+    ).join('');
+    this.renderAdmin(tab);
+  },
+
+  closeAdmin() {
+    document.getElementById('adminOverlay').style.display='none';
+    document.body.style.overflow='';
+  },
+
+  renderAdmin(tab) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.textContent===tab));
+    this._adminTab = tab;
+    const data = this.db[tab];
+    const keys = data.length ? Object.keys(data[0]) : Object.keys(SEED[tab]?.[0]||{id:''});
+    let html = `<div class="flex gap-2 mb-6">
+      <button class="btn btn-primary" onclick="LOS._adminAdd()"><i data-lucide="plus" style="width:13px;"></i> Add Row</button>
+      <button class="btn btn-ghost" onclick="LOS._adminSave()"><i data-lucide="save" style="width:13px;"></i> Save & Sync</button>
+    </div>`;
+    data.forEach((item, idx) => {
+      html += `<div class="admin-record"><div class="admin-grid">`;
+      keys.forEach(k => {
+        if(k==='id') { html += `<div class="form-field"><label class="form-label">id (auto)</label><input class="input" value="${esc(item[k])}" disabled style="opacity:0.3;"></div>`; return; }
+        html += `<div class="form-field"><label class="form-label">${k}</label><input class="input" value="${esc(item[k])}" onchange="LOS._adminChange(${idx},'${k}',this.value)"></div>`;
+      });
+      html += `</div><div style="margin-top:8px;"><button class="btn btn-danger btn-icon" onclick="LOS.deleteItem('${tab}','${item.id}');LOS.renderAdmin('${tab}')"><i data-lucide="trash-2" style="width:13px;"></i> Delete</button></div></div>`;
+    });
+    document.getElementById('adminEditor').innerHTML = html;
+    lucide.createIcons();
+  },
+
+  _adminChange(idx, key, val) { this.db[this._adminTab][idx][key] = val; },
+  _adminAdd() {
+    const keys = Object.keys(SEED[this._adminTab]?.[0]||{id:''});
+    const item = { id: uid() };
+    keys.forEach(k => { if(k!=='id') item[k]=''; });
+    this.db[this._adminTab].push(item);
+    this.renderAdmin(this._adminTab);
+  },
+  _adminSave() { this.save(); this.renderAll(); this.closeAdmin(); this.toast('Database saved & synced!'); },
+};
+
+// Modal close on bg click
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('open'); });
+});
+
+document.addEventListener('DOMContentLoaded', () => LOS.init());
+</script>
+</body>
+</html>

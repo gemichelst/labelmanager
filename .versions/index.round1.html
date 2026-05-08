@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Label OS · Bunte Panther</title>
+<script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="assets/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div id="app">
+<!-- ─── SIDEBAR ────────────────────────────────────────────────── -->
+<nav class="sb" id="sb">
+  <div class="sb-brand">
+    <div class="sb-logo">♪</div>
+    <div class="sb-name">Label OS</div>
+  </div>
+
+  <div class="nav on" data-view="dash"><i data-lucide="layout-dashboard" style="width:14px"></i> Dashboard</div>
+
+  <div class="sb-group">Core</div>
+  <div class="nav" data-view="crm"><i data-lucide="users" style="width:14px"></i> Artists & CRM</div>
+  <div class="nav" data-view="anr"><i data-lucide="headphones" style="width:14px"></i> Demos & A&R <span class="pill" id="navAnr" style="display:none">0</span></div>
+  <div class="nav" data-view="releases"><i data-lucide="calendar-days" style="width:14px"></i> Releases</div>
+
+  <div class="sb-group">Business</div>
+  <div class="nav" data-view="contracts"><i data-lucide="file-signature" style="width:14px"></i> Contracts <span class="pill" id="navExp" style="display:none;background:var(--err);color:#fff">!</span></div>
+  <div class="nav" data-view="finance"><i data-lucide="bar-chart-2" style="width:14px"></i> Finance</div>
+  <div class="nav" data-view="royalties"><i data-lucide="coins" style="width:14px"></i> Royalties Pro</div>
+  <div class="nav" data-view="bookings"><i data-lucide="mic-2" style="width:14px"></i> Bookings</div>
+
+  <div class="sb-group">Assets</div>
+  <div class="nav" data-view="media"><i data-lucide="folder" style="width:14px"></i> Media</div>
+  <div class="nav" data-view="catalog"><i data-lucide="database" style="width:14px"></i> Catalog & Rights</div>
+  <div class="nav" data-view="anrpro"><i data-lucide="telescope" style="width:14px"></i> A&R Intelligence</div>
+
+  <div class="sb-group">System</div>
+  <div class="nav" data-view="research"><i data-lucide="telescope" style="width:14px"></i> Research</div>
+  <div class="nav" data-view="users"><i data-lucide="shield-check" style="width:14px"></i> Users & Roles</div>
+  <div class="nav" data-view="actlog"><i data-lucide="scroll-text" style="width:14px"></i> Activity Log</div>
+
+  <div class="sb-foot">
+    <div class="nav" onclick="LOS.openAdm()"><i data-lucide="database" style="width:14px"></i> DB Editor</div>
+  </div>
+</nav>
+<div id="sbOverlay" onclick="LOS.closeSb()"></div>
+
+<!-- ─── MAIN ──────────────────────────────────────────────────── -->
+<div class="main">
+  <header class="topbar">
+    <button class="hbg" onclick="LOS.openSb()"><i data-lucide="menu" style="width:16px"></i></button>
+    <div class="topbar-title" id="tbTitle">Dashboard</div>
+    <div class="topbar-r">
+      <button class="btn btn-g" style="font-size:12px;gap:5px;" onclick="LOS.openSearch()">
+        <i data-lucide="search" style="width:12px"></i> Search
+        <kbd style="font-size:10px;opacity:.45;margin-left:3px">⌘K</kbd>
+      </button>
+      <div id="role" onclick="LOS.cycleRole()"></div>
+      <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
+        <i data-lucide="upload" style="width:13px"></i> Submit Demo
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <section id="view-dash" class="view on">
+      <div class="g4 mb6" id="dStats"></div>
+      <div class="g3 mb4">
+        <div class="card"><div class="ct">New Demos</div><div id="dDemos"></div></div>
+        <div class="card"><div class="ct">Active Releases</div><div id="dRels"></div></div>
+        <div class="card"><div class="ct">Confirmed Gigs</div><div id="dGigs"></div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ct">Open Tasks</div><div id="dTasks"></div></div>
+        <div class="card"><div class="ct">Finance Snapshot</div><div id="dFin"></div></div>
+      </div>
+    </section>
+
+    <!-- CRM -->
+    <section id="view-crm" class="view">
+      <div class="flex gap2 mb6">
+        <input class="inp flex-1" id="crmQ" placeholder="Search artists & contacts…" oninput="LOS.renderCRM()">
+        <select class="inp" style="width:150px" id="crmTy" onchange="LOS.renderCRM()">
+          <option value="">All Types</option>
+          <option>Core Artist</option><option>Development</option><option>Legacy</option>
+          <option>Manager</option><option>Booker</option><option>PR Agency</option>
+          <option>Distributor</option><option>Blog</option><option>Radio</option>
+        </select>
+        <button class="btn btn-p" onclick="LOS.openModal('add-artist')" id="btn-add-art">
+          <i data-lucide="user-plus" style="width:13px"></i> Add
+        </button>
+      </div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Name / Email</th><th>Type</th><th>Status</th><th>Territory</th><th>Genres</th><th>Releases</th><th></th></tr></thead>
+          <tbody id="crmTbl"></tbody>
+        </table>
+      </div>
+      <div id="artDrawer" style="display:none;margin-top:14px" class="card"></div>
+    </section>
+
+    <!-- A&R -->
+    <section id="view-anr" class="view">
+      <div class="flex gap2 mb6" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:160px" id="anrQ" placeholder="Search demos…" oninput="LOS.renderANR()">
+        <select class="inp" style="width:120px" id="anrG" onchange="LOS.renderANR()">
+          <option value="">All Genres</option>
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+        <label class="btn btn-g" style="font-size:12px;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="wlOnly" onchange="LOS.renderANR()" style="accent-color:var(--gold)"> Watchlist
+        </label>
+        <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
+          <i data-lucide="plus" style="width:13px"></i> Add Demo
+        </button>
+      </div>
+      <div class="kanban" id="anrBoard"></div>
+    </section>
+
+    <!-- RELEASES -->
+    <section id="view-releases" class="view">
+      <div class="flex gap2 mb6" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:160px" id="relQ" placeholder="Search releases…" oninput="LOS.renderReleases()">
+        <select class="inp" style="width:120px" id="relTy" onchange="LOS.renderReleases()">
+          <option value="">All Types</option>
+          <option>Single</option><option>EP</option><option>Album</option><option>Compilation</option>
+        </select>
+        <button class="btn btn-p" onclick="LOS.openModal('add-release')">
+          <i data-lucide="plus" style="width:13px"></i> New Release
+        </button>
+      </div>
+      <div id="relList"></div>
+    </section>
+
+    <!-- CONTRACTS -->
+    <section id="view-contracts" class="view">
+      <div id="conAlerts"></div>
+      <div class="flex gap2 mb6">
+        <input class="inp flex-1" placeholder="Search contracts…" id="conQ" oninput="LOS.renderContracts()">
+        <button class="btn btn-p" onclick="LOS.openModal('add-contract')">
+          <i data-lucide="plus" style="width:13px"></i> New Contract
+        </button>
+      </div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Type</th><th>Artist</th><th>Status</th><th>Splits</th><th>Advance</th><th>Territory</th><th>Expires</th><th></th></tr></thead>
+          <tbody id="conTbl"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FINANCE -->
+    <section id="view-finance" class="view">
+      <div class="g4 mb6" id="finStats"></div>
+      <div class="g2 mb4">
+        <div class="card" id="finDrop" style="position:relative;overflow:hidden"
+             ondragover="LOS.fDragOver(event)" ondragleave="LOS.fDragLeave(event)" ondrop="LOS.fDrop(event)">
+          <div id="finOvl" style="display:none;position:absolute;inset:0;background:rgba(201,168,76,.85);backdrop-filter:blur(4px);z-index:5;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+            <i data-lucide="file-spreadsheet" style="width:32px;height:32px;color:#0a0a0f"></i>
+            <span style="color:#0a0a0f;font-weight:700">Drop CSV to Import</span>
+          </div>
+          <div class="ct flex gap2">Royalty Statements <span style="margin-left:auto;font-size:10px">drag .csv here</span></div>
+          <div class="tw"><table>
+            <thead><tr><th>Source</th><th>Release</th><th>Net</th><th>Label</th><th>Artist</th><th>Recouped</th></tr></thead>
+            <tbody id="finTbl"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="ct">Split Breakdown</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px;">
+            <canvas id="finChart" width="160" height="160"></canvas>
+            <div id="finLeg" style="display:flex;gap:14px;font-size:11.5px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex gap2 mb4">
+          <div class="ct" style="margin-bottom:0">Expenses & Recoup</div>
+          <button class="btn btn-g" style="margin-left:auto;font-size:12px" onclick="LOS.openModal('add-expense')">
+            <i data-lucide="plus" style="width:12px"></i> Add Expense
+          </button>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>Description</th><th>Release</th><th>Artist</th><th>Amount</th><th>Recouped</th><th>Status</th><th></th></tr></thead>
+          <tbody id="expTbl"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- BOOKINGS -->
+    <section id="view-bookings" class="view">
+      <div class="flex gap2 mb6" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:140px" placeholder="Search events…" id="bokQ" oninput="LOS.renderBookings()">
+        <select class="inp" style="width:140px" id="bokS" onchange="LOS.renderBookings()">
+          <option value="">All Statuses</option>
+          <option>Inquiry</option><option>Option</option><option>Confirmed</option><option>Settled</option><option>Cancelled</option>
+        </select>
+        <button class="btn btn-p" onclick="LOS.openModal('add-event')">
+          <i data-lucide="plus" style="width:13px"></i> New Event
+        </button>
+      </div>
+      <div class="g2 mb4">
+        <div class="card tw">
+          <table>
+            <thead><tr><th>Event</th><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th><th></th></tr></thead>
+            <tbody id="bokTbl"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="ct">Booking Pipeline</div>
+          <div id="bokPipe"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEDIA -->
+    <section id="view-media" class="view">
+      <div class="flex gap2 mb4" style="flex-wrap:wrap">
+        <input class="inp flex-1" style="min-width:140px" id="medQ" placeholder="Search media…" oninput="LOS.renderMedia()">
+        <select class="inp" style="width:130px" id="medTy" onchange="LOS.renderMedia()">
+          <option value="">All Types</option>
+          <option>Master</option><option>Demo</option><option>Artwork</option>
+          <option>Press Photo</option><option>Video</option><option>STEMS</option>
+        </select>
+        <button class="btn btn-g" onclick="LOS.openModal('add-media')">
+          <i data-lucide="plus" style="width:13px"></i> Add Asset
+        </button>
+      </div>
+      <!-- Embed hint -->
+      <div class="embed-hint mb4">
+        <i data-lucide="code-2" style="width:14px;flex-shrink:0"></i>
+        Embeddable Demo Uploader:
+        <code>&lt;iframe src="upload.html" width="100%" height="520" frameborder="0"&gt;&lt;/iframe&gt;</code>
+        <button class="btn btn-g" style="font-size:11px;padding:4px 9px;margin-left:auto;flex-shrink:0" onclick="LOS.openUploader()">Preview</button>
+      </div>
+      <div class="g4" id="medGrid"></div>
+    </section>
+
+    <!-- RESEARCH -->
+    <section id="view-research" class="view">
+      <div class="g3 mb6">
+        <div class="card"><div class="ct">A&R Pipeline Funnel</div><canvas id="anrChart" width="280" height="180"></canvas></div>
+        <div class="card"><div class="ct">Genre Breakdown</div><canvas id="genChart" width="280" height="180"></canvas></div>
+        <div class="card"><div class="ct">Pipeline Velocity</div><div id="pipeVel" style="margin-top:8px"></div></div>
+      </div>
+      <div class="card">
+        <div class="ct">Curator & Blog Database</div>
+        <div id="curDB" class="tw"></div>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section id="view-users" class="view">
+      <div class="flex gap2 mb6">
+        <h2 style="font-size:14px;font-weight:700">Users & Role Management</h2>
+        <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('add-user')">
+          <i data-lucide="plus" style="width:13px"></i> Add User
+        </button>
+      </div>
+      <div class="card mb4"><div class="ct">RBAC Permission Matrix</div><div id="rbacMx" class="tw"></div></div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th><th></th></tr></thead>
+          <tbody id="usrTbl"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LOG -->
+    <section id="view-actlog" class="view">
+      <div class="flex gap2 mb6">
+        <input class="inp flex-1" id="logQ" placeholder="Filter activity log…" oninput="LOS.renderLog()">
+        <button class="btn btn-d" onclick="LOS.clearLog()"><i data-lucide="trash-2" style="width:13px"></i> Clear</button>
+      </div>
+      <div class="card"><div id="logList"></div></div>
+    </section>
+
+<!-- ═══ RUNDE 1 VIEWS ═══════════════════════════════════════════════ -->
+
+<!-- ROYALTIES PRO -->
+<section id="view-royalties" class="view">
+  <div class="tabs" id="royTabs">
+    <div class="tab on" onclick="LOS.royTab('overview',this)">Overview</div>
+    <div class="tab" onclick="LOS.royTab('contracts',this)">Contracts</div>
+    <div class="tab" onclick="LOS.royTab('import',this)">CSV Import</div>
+    <div class="tab" onclick="LOS.royTab('statements',this)">Statements</div>
+    <div class="tab" onclick="LOS.royTab('payouts',this)">Payouts</div>
+  </div>
+
+  <!-- Overview -->
+  <div id="roy-overview">
+    <div class="g4 mb6" id="royStats"></div>
+    <div class="g2">
+      <div class="card">
+        <div class="ct">Earnings by Release</div>
+        <canvas id="royChart" width="360" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="ct">Territory Breakdown</div>
+        <canvas id="terrChart" width="360" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contracts -->
+  <div id="roy-contracts" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Royalty Contracts</h3>
+      <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('add-roycon')">
+        <i data-lucide="plus" style="width:13px"></i> New Contract
+      </button>
+    </div>
+    <div class="card tw">
+      <table>
+        <thead><tr><th>Artist</th><th>Release / Track</th><th>Type</th><th>Splits</th><th>Advance</th><th>Recoup Balance</th><th>Payout Min</th><th>Status</th><th></th></tr></thead>
+        <tbody id="royConTbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CSV Import -->
+  <div id="roy-import" style="display:none">
+    <div class="g2 mb4">
+      <div class="card">
+        <div class="ct">Import Royalty Report</div>
+        <div class="dz" id="royDz" ondragover="LOS.fDragOver2(event)" ondragleave="LOS.fDragLeave2()" ondrop="LOS.fDrop2(event)">
+          <input type="file" accept=".csv,.tsv,.txt" onchange="LOS.royCsvFile(this)">
+          <i data-lucide="upload-cloud" style="width:26px;margin:0 auto 10px;display:block;color:var(--gold)"></i>
+          <div id="royDzTxt" style="font-size:13px;color:var(--muted)">Drop distributor CSV here or click</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">DistroKid · FUGA · Believe · The Orchard · Bandcamp</div>
+        </div>
+        <div class="ff mt3"><label class="lbl">Distributor Profile</label>
+          <select class="inp" id="royDistProf">
+            <option value="dk">DistroKid (source, ISRC, net, territory, period)</option>
+            <option value="bp">Beatport (release_id, net, period)</option>
+            <option value="bc">Bandcamp (item_name, net, date)</option>
+            <option value="custom">Custom Mapping…</option>
+          </select>
+        </div>
+        <div id="royCustomMap" style="display:none">
+          <div class="ct mt3">Column Mapping (0-indexed)</div>
+          <div class="map-row"><span class="lbl" style="margin:0">Source/Store</span><input class="inp" id="mcol0" type="number" value="0" min="0"><span></span></div>
+          <div class="map-row"><span class="lbl" style="margin:0">Release ID</span><input class="inp" id="mcol1" type="number" value="1" min="0"><span></span></div>
+          <div class="map-row"><span class="lbl" style="margin:0">Net Amount</span><input class="inp" id="mcol2" type="number" value="2" min="0"><span></span></div>
+          <div class="map-row"><span class="lbl" style="margin:0">Territory</span><input class="inp" id="mcol3" type="number" value="3" min="0"><span></span></div>
+          <div class="map-row"><span class="lbl" style="margin:0">Period</span><input class="inp" id="mcol4" type="number" value="4" min="0"><span></span></div>
+        </div>
+        <button class="btn btn-p mt3 w-full" onclick="LOS.processRoyCsv()" style="width:100%">
+          <i data-lucide="play" style="width:13px"></i> Process Import
+        </button>
+      </div>
+      <div class="card">
+        <div class="ct">Import Preview</div>
+        <div id="royImportPreview" style="color:var(--muted);font-size:12px;text-align:center;padding:28px">
+          Drop a CSV file to see preview
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statements -->
+  <div id="roy-statements" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Artist Statements</h3>
+      <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('gen-statement')">
+        <i data-lucide="file-text" style="width:13px"></i> Generate Statement
+      </button>
+    </div>
+    <div id="stmtList" class="g2"></div>
+  </div>
+
+  <!-- Payouts -->
+  <div id="roy-payouts" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Payout History</h3>
+      <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('add-payout')">
+        <i data-lucide="plus" style="width:13px"></i> Record Payout
+      </button>
+    </div>
+    <div class="card tw">
+      <table>
+        <thead><tr><th>Artist</th><th>Amount</th><th>Period</th><th>Method</th><th>Status</th><th>Date</th><th></th></tr></thead>
+        <tbody id="payTbl"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CATALOG & RIGHTS -->
+<section id="view-catalog" class="view">
+  <div class="tabs" id="catTabs">
+    <div class="tab on" onclick="LOS.catTab('tracks',this)">Tracks</div>
+    <div class="tab" onclick="LOS.catTab('rights',this)">Rights & Licenses</div>
+    <div class="tab" onclick="LOS.catTab('packager',this)">Release Packager</div>
+    <div class="tab" onclick="LOS.catTab('validator',this)">Metadata QC</div>
+  </div>
+
+  <!-- Tracks -->
+  <div id="cat-tracks">
+    <div class="flex gap2 mb4" style="flex-wrap:wrap">
+      <input class="inp flex-1" style="min-width:140px" id="catQ" placeholder="Search tracks, ISRC, artist…" oninput="LOS.renderTracks()">
+      <select class="inp" style="width:120px" id="catVer" onchange="LOS.renderTracks()">
+        <option value="">All Versions</option>
+        <option>Club</option><option>Radio</option><option>Extended</option>
+        <option>Instrumental</option><option>Dub</option><option>STEMS</option>
+      </select>
+      <button class="btn btn-p" onclick="LOS.openModal('add-track')">
+        <i data-lucide="plus" style="width:13px"></i> Add Track
+      </button>
+    </div>
+    <div id="trackList" class="card tw">
+      <table>
+        <thead><tr><th>Title</th><th>Artist</th><th>ISRC</th><th>Version</th><th>BPM</th><th>Key</th><th>Duration</th><th>Territory</th><th>QC</th><th></th></tr></thead>
+        <tbody id="trackTbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Rights -->
+  <div id="cat-rights" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Rights & Licenses</h3>
+      <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('add-rights')">
+        <i data-lucide="plus" style="width:13px"></i> Add License
+      </button>
+    </div>
+    <div class="card tw">
+      <table>
+        <thead><tr><th>Track / Release</th><th>Type</th><th>Licensor</th><th>Territory</th><th>Expires</th><th>Status</th><th></th></tr></thead>
+        <tbody id="rightsTbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Release Packager -->
+  <div id="cat-packager" style="display:none">
+    <div class="card mb4">
+      <div class="ct">Release Packager — Distributor Export</div>
+      <div class="g2">
+        <div class="ff"><label class="lbl">Select Release</label><div id="rsel-packager"></div></div>
+        <div class="ff"><label class="lbl">Target Format</label>
+          <select class="inp" id="pkgFmt">
+            <option>DistroKid CSV</option><option>FUGA XML</option><option>Generic CSV</option><option>JSON (API)</option>
+          </select>
+        </div>
+      </div>
+      <div class="ff"><label class="lbl">Include Assets</label>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="pkgAudio" checked style="accent-color:var(--gold)"> Audio Files
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="pkgArtwork" checked style="accent-color:var(--gold)"> Artwork
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="pkgMeta" checked style="accent-color:var(--gold)"> Metadata
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="pkgCredits" style="accent-color:var(--gold)"> Credits/ISRC
+          </label>
+        </div>
+      </div>
+      <button class="btn btn-p" onclick="LOS.generatePackage()">
+        <i data-lucide="package" style="width:13px"></i> Generate Package
+      </button>
+    </div>
+    <div id="pkgPreview" style="display:none" class="card">
+      <div class="ct flex gap2">Package Preview <button class="btn btn-g" style="font-size:11px;padding:4px 9px;margin-left:auto" onclick="LOS.downloadPackage()"><i data-lucide="download" style="width:12px"></i> Download</button></div>
+      <pre id="pkgOutput" style="font-size:11.5px;line-height:1.7;color:var(--muted);overflow-x:auto;max-height:420px"></pre>
+    </div>
+  </div>
+
+  <!-- Metadata QC -->
+  <div id="cat-validator" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Metadata Quality Control</h3>
+      <button class="btn btn-g" onclick="LOS.runQC()">
+        <i data-lucide="shield-check" style="width:13px"></i> Run Full QC
+      </button>
+    </div>
+    <div id="qcResults"></div>
+  </div>
+</section>
+
+<!-- ADVANCED A&R -->
+<section id="view-anrpro" class="view">
+  <div class="tabs" id="anrProTabs">
+    <div class="tab on" onclick="LOS.anrProTab('scoring',this)">A&R Scoring</div>
+    <div class="tab" onclick="LOS.anrProTab('intelligence',this)">Intelligence</div>
+    <div class="tab" onclick="LOS.anrProTab('watchlist',this)">Watchlist</div>
+    <div class="tab" onclick="LOS.anrProTab('contests',this)">Remix Contests</div>
+  </div>
+
+  <!-- Scoring -->
+  <div id="anrp-scoring">
+    <div class="flex gap2 mb4" style="flex-wrap:wrap">
+      <input class="inp flex-1" style="min-width:140px" id="scoreQ" placeholder="Search demos…" oninput="LOS.renderScoring()">
+      <button class="btn btn-g" onclick="LOS.calcAllScores()">
+        <i data-lucide="zap" style="width:13px"></i> Recalculate All Scores
+      </button>
+    </div>
+    <div class="card tw">
+      <table>
+        <thead><tr><th>Demo</th><th>Artist</th><th>Genre</th><th>Rating</th><th>BPM</th><th>Releases</th><th>Score</th><th>Recommendation</th><th></th></tr></thead>
+        <tbody id="scoreTbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Intelligence / Analytics -->
+  <div id="anrp-intelligence" style="display:none">
+    <div class="g3 mb6">
+      <div class="card"><div class="ct">Funnel Conversion</div><canvas id="funnelChart" width="280" height="180"></canvas></div>
+      <div class="card"><div class="ct">Top Genres Submitted</div><canvas id="genreBarChart" width="280" height="180"></canvas></div>
+      <div class="card"><div class="ct">Weekly Submissions</div><canvas id="weekChart" width="280" height="180"></canvas></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="ct">Submission Sources</div>
+        <div id="srcBreakdown"></div>
+      </div>
+      <div class="card">
+        <div class="ct">A&R Velocity (avg. days per stage)</div>
+        <div id="velBreakdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watchlist -->
+  <div id="anrp-watchlist" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Watchlist — Promising Artists</h3>
+    </div>
+    <div id="watchlistGrid" class="g3"></div>
+  </div>
+
+  <!-- Remix Contests -->
+  <div id="anrp-contests" style="display:none">
+    <div class="flex gap2 mb4">
+      <h3 style="font-size:14px;font-weight:700">Remix Contests</h3>
+      <button class="btn btn-p" style="margin-left:auto" onclick="LOS.openModal('add-contest')">
+        <i data-lucide="plus" style="width:13px"></i> New Contest
+      </button>
+    </div>
+    <div id="contestGrid" class="g3"></div>
+  </div>
+</section>
+
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+
+
+<!-- ─── AUDIO PLAYER ─────────────────────────────────────────────── -->
+<div class="player" id="player">
+  <button id="playBtn" style="width:32px;height:32px;border-radius:50%;background:var(--goldg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <i data-lucide="play" id="playIco" style="width:14px;color:#0a0a0f;margin-left:1px"></i>
+  </button>
+  <div class="p-inf">
+    <div class="p-tt" id="pTt">—</div>
+    <div class="p-sb" id="pSb">—</div>
+  </div>
+  <div id="waveform" style="flex:1;height:34px;min-width:0;"></div>
+  <div id="pTime" style="font-size:11.5px;color:var(--muted);min-width:74px;text-align:right">0:00 / 0:00</div>
+  <button class="btn-ic" onclick="LOS.closePlayer()"><i data-lucide="x" style="width:14px"></i></button>
+</div>
+
+<!-- ─── LIGHTBOX ──────────────────────────────────────────────────── -->
+<div id="lightbox" onclick="this.classList.remove('open')">
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- ─── GLOBAL SEARCH ─────────────────────────────────────────────── -->
+<div id="gs">
+  <div class="gs-box">
+    <input class="gs-inp" id="gsInp" placeholder="Search artists, demos, releases, media…" oninput="LOS.gsSearch()">
+    <div class="gs-res" id="gsRes"></div>
+    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Esc to close</div>
+  </div>
+</div>
+
+<!-- ─── TOASTS ────────────────────────────────────────────────────── -->
+<div id="toast"></div>
+
+<!-- ─── UPLOADER MODAL (Embed Preview) ───────────────────────────── -->
+<div class="mbb" id="modal-uploader">
+  <div class="modal modal-lg">
+    <div class="mt flex gap2">
+      Demo Submission
+      <button class="btn-ic" style="margin-left:auto" onclick="LOS.closeModal('uploader')"><i data-lucide="x" style="width:14px"></i></button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:18px;margin-top:-10px">
+      This form can be embedded on the Bunte Panther website via <code style="background:var(--s3);padding:1px 5px;border-radius:4px;font-size:11px">&lt;iframe src="upload.html"&gt;</code>
+    </p>
+    <div class="ff"><label class="lbl">Your Artist Name *</label><input class="inp" id="upN" placeholder="Stage name or act name"></div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Email *</label><input class="inp" id="upE" type="email"></div>
+      <div class="ff"><label class="lbl">Genre</label>
+        <select class="inp" id="upG">
+          <option value="">Select genre…</option>
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">BPM</label><input class="inp" id="upBpm" type="number" placeholder="138"></div>
+      <div class="ff"><label class="lbl">Key</label><input class="inp" id="upKey" placeholder="A minor"></div>
+    </div>
+    <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="upT" placeholder="Name of the track"></div>
+    <div class="ff"><label class="lbl">Reference Artists / Tracks</label><input class="inp" id="upRef" placeholder="e.g. Surgeon, Blawan, Function"></div>
+    <div class="ff"><label class="lbl">Soundcloud / Streaming URL</label><input class="inp" id="upUrl" placeholder="https://soundcloud.com/…"></div>
+    <div class="ff">
+      <label class="lbl">Upload Audio File (MP3 / WAV / AIFF / FLAC · max 50MB)</label>
+      <div class="dz" id="upDz">
+        <input type="file" accept="audio/*" onchange="LOS.upFile(this)">
+        <i data-lucide="upload-cloud" style="width:24px;margin:0 auto 8px;display:block"></i>
+        <div id="upDzTxt">Drop file here or click to browse</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">MP3, WAV, AIFF, FLAC — max 50 MB</div>
+      </div>
+    </div>
+    <div class="ff"><label class="lbl">Short Note to the Label</label><textarea class="inp" id="upNotes" rows="3" placeholder="Tell us about the track, context, mood…"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('uploader')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.submitUpload()">
+        <i data-lucide="send" style="width:13px"></i> Submit Demo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODALS ────────────────────────────────────────────────────── -->
+
+<!-- Add Artist -->
+<div class="mbb" id="modal-add-artist">
+  <div class="modal">
+    <div class="mt">Add Artist / Contact</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Name *</label><input class="inp" id="maN"></div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="maT">
+          <option>Core Artist</option><option>Development</option><option>Legacy</option>
+          <option>Manager</option><option>Booker</option><option>PR Agency</option>
+          <option>Distributor</option><option>Blog</option><option>Radio</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="maS"><option>Active</option><option>Inactive</option><option>Partner</option></select>
+      </div>
+      <div class="ff"><label class="lbl">Territory</label><input class="inp" id="maTe" placeholder="DE, EU, WW"></div>
+      <div class="ff"><label class="lbl">Email</label><input class="inp" id="maE" type="email"></div>
+      <div class="ff"><label class="lbl">Phone</label><input class="inp" id="maPh"></div>
+    </div>
+    <div class="ff"><label class="lbl">Genres / Tags</label><input class="inp" id="maG" placeholder="Techno, Electro…"></div>
+    <div class="ff"><label class="lbl">Spotify / RA / Instagram / Beatport URLs</label><input class="inp" id="maL" placeholder="https://…, https://…"></div>
+    <div class="ff"><label class="lbl">Notes / Bio</label><textarea class="inp" id="maNt"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-artist')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveArtist()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Demo -->
+<div class="mbb" id="modal-add-demo">
+  <div class="modal">
+    <div class="mt">Add Demo</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Track Title *</label><input class="inp" id="mdT"></div>
+      <div class="ff">
+        <label class="lbl">Artist (from roster)</label>
+        <div class="art-sel" id="asel-demo"></div>
+      </div>
+      <div class="ff"><label class="lbl">Genre</label>
+        <select class="inp" id="mdG">
+          <option>Techno</option><option>House</option><option>Electro</option>
+          <option>Industrial</option><option>Ambient</option><option>Other</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">BPM</label><input class="inp" id="mdB" type="number" placeholder="138"></div>
+      <div class="ff"><label class="lbl">Submitter Email</label><input class="inp" id="mdE" type="email"></div>
+      <div class="ff"><label class="lbl">Rating (0–5)</label><input class="inp" id="mdR" type="number" min="0" max="5" value="0"></div>
+    </div>
+    <div class="ff"><label class="lbl">Audio URL</label><input class="inp" id="mdF" placeholder="https://soundcloud.com/…"></div>
+    <div class="ff"><label class="lbl">Notes</label><textarea class="inp" id="mdN"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-demo')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveDemo()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Release -->
+<div class="mbb" id="modal-add-release">
+  <div class="modal">
+    <div class="mt">New Release</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Title *</label><input class="inp" id="mrT"></div>
+      <div class="ff">
+        <label class="lbl">Artist *</label>
+        <div class="art-sel" id="asel-release"></div>
+      </div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="mrTy">
+          <option>Single</option><option>EP</option><option>Album</option><option>Compilation</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Catalogue #</label><input class="inp" id="mrC" placeholder="BP-001"></div>
+      <div class="ff"><label class="lbl">Release Date</label><input class="inp" id="mrD" type="date"></div>
+      <div class="ff"><label class="lbl">Distributor</label>
+        <select class="inp" id="mrDist">
+          <option>DistroKid</option><option>Believe</option><option>Amuse</option>
+          <option>CD Baby</option><option>Awal</option><option>Self</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="ff"><label class="lbl">Initial Status</label>
+      <select class="inp" id="mrS">
+        <option>Idea</option><option>A&R Selected</option><option>In Production</option>
+        <option>Mastered</option><option>Distro Setup</option><option>Pre-Save</option>
+        <option>Released</option><option>Post-Campaign</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-release')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveRelease()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Contract -->
+<div class="mbb" id="modal-add-contract">
+  <div class="modal">
+    <div class="mt">New Contract</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Type *</label>
+        <select class="inp" id="mcTy">
+          <option>Exclusive EP</option><option>Single Deal</option><option>Album Deal</option>
+          <option>Remix</option><option>License In</option><option>License Out</option>
+          <option>Publishing</option><option>360°</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="lbl">Artist *</label>
+        <div class="art-sel" id="asel-contract"></div>
+      </div>
+      <div class="ff">
+        <label class="lbl">Release (optional)</label>
+        <div id="rsel-contract"></div>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="mcS">
+          <option>Draft</option><option>In Negotiation</option><option>Active</option><option>Expired</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Territory</label><input class="inp" id="mcTe" placeholder="WW"></div>
+      <div class="ff"><label class="lbl">Label Split %</label><input class="inp" id="mcL" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Artist Split %</label><input class="inp" id="mcAr" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Advance (€)</label><input class="inp" id="mcAdv" type="number" value="0"></div>
+      <div class="ff"><label class="lbl">Expires</label><input class="inp" id="mcExp" type="date"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-contract')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveContract()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Event -->
+<div class="mbb" id="modal-add-event">
+  <div class="modal">
+    <div class="mt">New Booking / Event</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Event Name *</label><input class="inp" id="meN"></div>
+      <div class="ff">
+        <label class="lbl">Artist *</label>
+        <div class="art-sel" id="asel-event"></div>
+      </div>
+      <div class="ff"><label class="lbl">Date</label><input class="inp" id="meD" type="date"></div>
+      <div class="ff"><label class="lbl">Venue</label><input class="inp" id="meV"></div>
+      <div class="ff"><label class="lbl">Promoter / Contact</label>
+        <div id="csel-event"></div>
+      </div>
+      <div class="ff"><label class="lbl">Deal Type</label>
+        <select class="inp" id="meDT"><option>Fee</option><option>Door-Deal</option><option>Hybrid</option></select>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="meS">
+          <option>Inquiry</option><option>Option</option><option>Confirmed</option><option>Settled</option><option>Cancelled</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Fee (€)</label><input class="inp" id="meF" type="number" value="0"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-event')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveEvent()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Expense -->
+<div class="mbb" id="modal-add-expense">
+  <div class="modal">
+    <div class="mt">Add Expense</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Description *</label><input class="inp" id="mxD"></div>
+      <div class="ff"><label class="lbl">Category</label>
+        <select class="inp" id="mxC">
+          <option>Mastering</option><option>Artwork</option><option>Video</option>
+          <option>PR</option><option>Ads</option><option>Pressing</option><option>Tour</option><option>Other</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Amount (€)</label><input class="inp" id="mxA" type="number" value="0"></div>
+      <div class="ff">
+        <label class="lbl">Artist</label>
+        <div class="art-sel" id="asel-expense"></div>
+      </div>
+    </div>
+    <div class="ff">
+      <label class="lbl">Release</label>
+      <div id="rsel-expense"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-expense')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveExpense()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Media -->
+<div class="mbb" id="modal-add-media">
+  <div class="modal">
+    <div class="mt">Add Media Asset</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Title *</label><input class="inp" id="mmT"></div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="mmTy">
+          <option>Master</option><option>Demo</option><option>Artwork</option>
+          <option>Press Photo</option><option>Video</option><option>STEMS</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="lbl">Artist</label>
+        <div class="art-sel" id="asel-media"></div>
+      </div>
+      <div class="ff">
+        <label class="lbl">Release</label>
+        <div id="rsel-media"></div>
+      </div>
+      <div class="ff"><label class="lbl">Version</label><input class="inp" id="mmV" placeholder="Club, Radio, Vinyl…"></div>
+      <div class="ff"><label class="lbl">Tags</label><input class="inp" id="mmTg" placeholder="24bit, WAV, 3000×3000…"></div>
+    </div>
+    <div class="ff">
+      <label class="lbl">File URL (audio / image)</label>
+      <input class="inp" id="mmF" placeholder="https://…">
+    </div>
+    <div class="ff">
+      <label class="lbl">Or Upload File (audio/image · max 50MB)</label>
+      <div class="dz">
+        <input type="file" accept="audio/*,image/*" onchange="LOS.mmFileUpload(this)">
+        <i data-lucide="upload-cloud" style="width:22px;margin:0 auto 6px;display:block"></i>
+        <div id="mmDzTxt">Drop file here or click to browse</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-media')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveMedia()">Add Asset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User -->
+<div class="mbb" id="modal-add-user">
+  <div class="modal">
+    <div class="mt">Add User</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Name *</label><input class="inp" id="muN"></div>
+      <div class="ff"><label class="lbl">Email *</label><input class="inp" id="muE" type="email"></div>
+      <div class="ff"><label class="lbl">Role</label>
+        <select class="inp" id="muR">
+          <option value="admin">Admin</option><option value="label_manager">Label Manager</option>
+          <option value="ar">A&R</option><option value="artist">Artist</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="lbl">Linked Artist</label>
+        <div class="art-sel" id="asel-user"></div>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="muS"><option>Active</option><option>Inactive</option></select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-user')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Royalty Contract -->
+<div class="mbb" id="modal-add-roycon">
+  <div class="modal">
+    <div class="mt">New Royalty Contract</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Artist *</label><div class="art-sel" id="asel-roycon"></div></div>
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="rcTy">
+          <option>Recording</option><option>Publishing</option><option>Neighboring Rights</option><option>Sync</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Release (optional)</label><div id="rsel-roycon"></div></div>
+      <div class="ff"><label class="lbl">Label Split %</label><input class="inp" id="rcLS" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Artist Split %</label><input class="inp" id="rcAS" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Advance (€)</label><input class="inp" id="rcAdv" type="number" value="0"></div>
+      <div class="ff"><label class="lbl">Minimum Payout (€)</label><input class="inp" id="rcMin" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Currency</label>
+        <select class="inp" id="rcCur"><option>EUR</option><option>USD</option><option>GBP</option></select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-roycon')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveRoyContract()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generate Statement -->
+<div class="mbb" id="modal-gen-statement">
+  <div class="modal modal-lg">
+    <div class="mt">Generate Artist Statement</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Artist *</label><div class="art-sel" id="asel-stmt"></div></div>
+      <div class="ff"><label class="lbl">Period</label>
+        <select class="inp" id="stmtPeriod">
+          <option>Q1 2026</option><option>Q2 2026</option><option>Q3 2026</option><option>Q4 2026</option>
+          <option>Full Year 2025</option><option>Full Year 2026</option>
+        </select>
+      </div>
+    </div>
+    <div class="ff"><label class="lbl">Include</label>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="siRoy" checked style="accent-color:var(--gold)"> Royalties
+        </label>
+        <label style="display:flex;align-items:center;gap=6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="siExp" checked style="accent-color:var(--gold)"> Expenses/Recoup
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="siPay" checked style="accent-color:var(--gold)"> Previous Payouts
+        </label>
+      </div>
+    </div>
+    <div id="stmtPreviewBox" style="margin-top:14px"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+      <button class="btn btn-g" onclick="LOS.previewStatement()">Preview</button>
+      <button class="btn btn-p" onclick="LOS.saveStatement()">
+        <i data-lucide="save" style="width:13px"></i> Save Statement
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Payout -->
+<div class="mbb" id="modal-add-payout">
+  <div class="modal">
+    <div class="mt">Record Payout</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Artist *</label><div class="art-sel" id="asel-payout"></div></div>
+      <div class="ff"><label class="lbl">Amount (€) *</label><input class="inp" id="pyAmt" type="number" value="0"></div>
+      <div class="ff"><label class="lbl">Period</label><input class="inp" id="pyPeriod" placeholder="Q1 2026"></div>
+      <div class="ff"><label class="lbl">Method</label>
+        <select class="inp" id="pyMeth">
+          <option>Bank Transfer</option><option>PayPal</option><option>Wise</option><option>Cash</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="pyStat"><option>Pending</option><option>Paid</option><option>On Hold</option></select>
+      </div>
+      <div class="ff"><label class="lbl">Date</label><input class="inp" id="pyDate" type="date"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-payout')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.savePayout()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Track -->
+<div class="mbb" id="modal-add-track">
+  <div class="modal modal-lg">
+    <div class="mt">Add Track to Catalog</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Title *</label><input class="inp" id="trT"></div>
+      <div class="ff"><label class="lbl">Artist *</label><div class="art-sel" id="asel-track"></div></div>
+      <div class="ff"><label class="lbl">Release</label><div id="rsel-track"></div></div>
+      <div class="ff"><label class="lbl">ISRC</label><input class="inp" id="trISRC" placeholder="DE-A1B-26-00001"></div>
+      <div class="ff"><label class="lbl">Version</label>
+        <select class="inp" id="trVer">
+          <option>Club</option><option>Radio Edit</option><option>Extended</option>
+          <option>Instrumental</option><option>Dub</option><option>Remix</option><option>STEMS</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">BPM</label><input class="inp" id="trBPM" type="number" placeholder="138"></div>
+      <div class="ff"><label class="lbl">Key</label><input class="inp" id="trKey" placeholder="A minor"></div>
+      <div class="ff"><label class="lbl">Duration</label><input class="inp" id="trDur" placeholder="6:32"></div>
+      <div class="ff"><label class="lbl">Composer</label><input class="inp" id="trComp"></div>
+      <div class="ff"><label class="lbl">Publisher</label><input class="inp" id="trPub" placeholder="Self"></div>
+      <div class="ff"><label class="lbl">P-Line</label><input class="inp" id="trPL" placeholder="2026 Bunte Panther"></div>
+      <div class="ff"><label class="lbl">C-Line</label><input class="inp" id="trCL" placeholder="2026 Bunte Panther"></div>
+      <div class="ff"><label class="lbl">Territory</label><input class="inp" id="trTerr" value="WW"></div>
+      <div class="ff"><label class="lbl">Explicit</label>
+        <select class="inp" id="trExp"><option value="false">Clean</option><option value="true">Explicit</option></select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Rights In</label>
+        <select class="inp" id="trRI"><option value="true">Yes</option><option value="false">No</option></select>
+      </div>
+      <div class="ff"><label class="lbl">License Expires</label><input class="inp" id="trLE" type="date"></div>
+    </div>
+    <div class="ff"><label class="lbl">Tags</label><input class="inp" id="trTags" placeholder="dark, industrial, 4/4…"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-track')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveTrack()">Add to Catalog</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Rights/License -->
+<div class="mbb" id="modal-add-rights">
+  <div class="modal">
+    <div class="mt">Add License / Rights</div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Type</label>
+        <select class="inp" id="rgTy">
+          <option>Rights In</option><option>Rights Out</option><option>Sync License</option>
+          <option>Mechanical</option><option>Neighboring Rights</option>
+        </select>
+      </div>
+      <div class="ff"><label class="lbl">Licensor / Licensee</label><input class="inp" id="rgLic"></div>
+      <div class="ff"><label class="lbl">Track</label><div id="tsel-rights"></div></div>
+      <div class="ff"><label class="lbl">Release</label><div id="rsel-rights"></div></div>
+      <div class="ff"><label class="lbl">Territory</label><input class="inp" id="rgTerr" value="WW"></div>
+      <div class="ff"><label class="lbl">Expires</label><input class="inp" id="rgExp" type="date"></div>
+      <div class="ff"><label class="lbl">Fee (€)</label><input class="inp" id="rgFee" type="number" value="0"></div>
+      <div class="ff"><label class="lbl">Status</label>
+        <select class="inp" id="rgStat">
+          <option>Active</option><option>Pending</option><option>Expired</option><option>Negotiating</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-rights')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveRights()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Remix Contest -->
+<div class="mbb" id="modal-add-contest">
+  <div class="modal">
+    <div class="mt">New Remix Contest</div>
+    <div class="ff"><label class="lbl">Contest Title *</label><input class="inp" id="cnT" placeholder="Void EP Remix Contest"></div>
+    <div class="g2">
+      <div class="ff"><label class="lbl">Source Release</label><div id="rsel-contest"></div></div>
+      <div class="ff"><label class="lbl">Artist</label><div class="art-sel" id="asel-contest"></div></div>
+      <div class="ff"><label class="lbl">Deadline</label><input class="inp" id="cnDL" type="date"></div>
+      <div class="ff"><label class="lbl">Max Submissions</label><input class="inp" id="cnMax" type="number" value="50"></div>
+      <div class="ff"><label class="lbl">Prize</label><input class="inp" id="cnPrize" placeholder="Official release on Bunte Panther"></div>
+      <div class="ff"><label class="lbl">Genres Allowed</label><input class="inp" id="cnGenres" placeholder="Techno, Electro, Industrial"></div>
+    </div>
+    <div class="ff"><label class="lbl">Brief / Instructions</label>
+      <textarea class="inp" id="cnBrief" rows="3" placeholder="What are you looking for in a remix?"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+      <button class="btn btn-g" onclick="LOS.closeModal('add-contest')">Cancel</button>
+      <button class="btn btn-p" onclick="LOS.saveContest()">Create Contest</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- DB ADMIN OVERLAY -->
+<div id="adm">
+  <div class="adm-w">
+    <div class="flex gap2 mb6">
+      <h2 style="font-size:17px;font-weight:700">JSON Database Editor</h2>
+      <button class="btn btn-g" style="margin-left:auto" onclick="LOS.closeAdm()">
+        <i data-lucide="x" style="width:13px"></i> Close
+      </button>
+    </div>
+    <div class="adm-tb" id="admTbs"></div>
+    <div id="admEd"></div>
+  </div>
+</div>
+
+</body>
+<script src="assets/js/script.js"></script>
+</html>
