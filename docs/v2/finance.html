@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance — LabelManager OS Docs</title>
+  <meta name="description" content="LabelManager OS user manual: Finance" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <style>
+:root {
+  --bg: #0d0f14;
+  --surface: #13161e;
+  --card: #1a1d28;
+  --border: #252836;
+  --brand: #4c7bff;
+  --brand-dim: rgba(76,123,255,.12);
+  --brand-hover: #6b94ff;
+  --text: #e8eaf0;
+  --muted: #8892a4;
+  --dim: #4a5264;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --red: #ef4444;
+  --purple: #a78bfa;
+  --orange: #f97316;
+  --teal: #14b8a6;
+  --sidebar-w: 280px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; min-height: 100vh; display: flex; flex-direction: column; }
+a { color: var(--brand); text-decoration: none; transition: color .2s; }
+a:hover { color: var(--brand-hover); }
+img { max-width: 100%; }
+code { font-family: var(--mono); font-size: .875em; background: var(--card); color: #a5b4fc; padding: .15em .4em; border-radius: 4px; border: 1px solid var(--border); }
+pre { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 1.2rem 0; position: relative; }
+pre code { background: none; border: none; padding: 0; color: #a5b4fc; font-size: .875rem; line-height: 1.65; }
+pre .copy-btn { position: absolute; top: .6rem; right: .6rem; background: var(--border); border: none; color: var(--muted); border-radius: 5px; padding: .25rem .55rem; font-size: .75rem; cursor: pointer; transition: all .2s; font-family: var(--font); }
+pre .copy-btn:hover { background: var(--brand); color: #fff; }
+kbd { background: var(--card); border: 1px solid var(--dim); border-bottom-width: 2px; border-radius: 4px; padding: .1em .45em; font-family: var(--mono); font-size: .8em; color: var(--text); }
+h1 { font-size: 2rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; color: #fff; }
+h2 { font-size: 1.35rem; font-weight: 650; letter-spacing: -.01em; margin-top: 2.5rem; margin-bottom: .75rem; color: #fff; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.8rem; margin-bottom: .5rem; color: var(--text); }
+h4 { font-size: .95rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: .4rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-size: .8rem; }
+p { margin-bottom: .9rem; color: var(--muted); }
+ul, ol { padding-left: 1.4rem; margin-bottom: .9rem; }
+li { color: var(--muted); margin-bottom: .3rem; }
+li strong { color: var(--text); }
+strong { color: var(--text); font-weight: 600; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+table { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: .9rem; }
+th { background: var(--card); color: var(--text); font-weight: 600; padding: .65rem 1rem; text-align: left; border-bottom: 2px solid var(--border); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+td { padding: .6rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,.02); }
+.badge { display: inline-flex; align-items: center; padding: .2em .65em; border-radius: 999px; font-size: .75rem; font-weight: 600; line-height: 1.4; }
+.badge-green { background: rgba(34,197,94,.15); color: #4ade80; }
+.badge-blue  { background: rgba(76,123,255,.15); color: #7aa2ff; }
+.badge-yellow{ background: rgba(234,179,8,.15);  color: #fbbf24; }
+.badge-red   { background: rgba(239,68,68,.15);  color: #f87171; }
+.badge-purple{ background: rgba(167,139,250,.15);color: #c4b5fd; }
+.badge-orange{ background: rgba(249,115,22,.15); color: #fb923c; }
+.badge-gray  { background: rgba(148,163,184,.12);color: #94a3b8; }
+.callout { border-radius: 10px; padding: 1rem 1.2rem; margin: 1.2rem 0; display: flex; gap: .75rem; align-items: flex-start; }
+.callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+.callout-body p { margin: 0; font-size: .9rem; }
+.callout-body p + p { margin-top: .4rem; }
+.callout-title { font-weight: 700; color: var(--text); display: block; margin-bottom: .2rem; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; }
+.callout.tip    { background: rgba(76,123,255,.1);  border-left: 3px solid var(--brand); }
+.callout.warn   { background: rgba(234,179,8,.1);   border-left: 3px solid var(--yellow); }
+.callout.danger { background: rgba(239,68,68,.1);   border-left: 3px solid var(--red); }
+.callout.info   { background: rgba(20,184,166,.1);  border-left: 3px solid var(--teal); }
+.callout.success{ background: rgba(34,197,94,.1);   border-left: 3px solid var(--green); }
+.step-list { list-style: none; padding: 0; counter-reset: steps; }
+.step-list li { counter-increment: steps; display: flex; gap: 1rem; margin-bottom: 1.4rem; align-items: flex-start; }
+.step-list li::before { content: counter(steps); display: flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; background: var(--brand); color: #fff; border-radius: 50%; font-size: .8rem; font-weight: 700; flex-shrink: 0; margin-top: .2rem; }
+.step-body { flex: 1; }
+.step-body strong { display: block; color: var(--text); margin-bottom: .25rem; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); height: 56px; display: flex; align-items: center; gap: 1rem; padding: 0 1.5rem; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); background: rgba(19,22,30,.92); }
+.topbar-logo { display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1rem; color: #fff; min-width: var(--sidebar-w); padding-left: .5rem; text-decoration: none; }
+.topbar-logo-icon { width: 30px; height: 30px; background: var(--brand); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+.topbar-version { font-size: .75rem; color: var(--dim); background: var(--card); border: 1px solid var(--border); padding: .2rem .65rem; border-radius: 999px; }
+.topbar-github { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: .4rem; transition: color .2s; }
+.topbar-github:hover { color: var(--text); }
+.layout { display: flex; flex: 1; min-height: 0; }
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 1.2rem 0; position: sticky; top: 56px; height: calc(100vh - 56px); }
+.sidebar-section { margin-bottom: 1.5rem; }
+.sidebar-section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 0 1.2rem; margin-bottom: .4rem; }
+.sidebar a { display: flex; align-items: center; gap: .55rem; padding: .45rem 1.2rem; color: var(--muted); font-size: .875rem; transition: all .15s; border-left: 2px solid transparent; text-decoration: none; }
+.sidebar a:hover { color: var(--text); background: rgba(255,255,255,.03); }
+.sidebar a.active { color: var(--brand); background: var(--brand-dim); border-left-color: var(--brand); font-weight: 500; }
+.sidebar a .icon { font-size: 1rem; flex-shrink: 0; width: 20px; text-align: center; }
+.sidebar a .badge-new { background: var(--brand); color: #fff; font-size: .6rem; padding: .1em .45em; border-radius: 3px; margin-left: auto; font-weight: 700; letter-spacing: .05em; }
+.content { flex: 1; min-width: 0; padding: 2.5rem 3rem 4rem; max-width: 900px; }
+.content-wide { flex: 1; min-width: 0; padding: 2.5rem 3rem 4rem; }
+.page-header { margin-bottom: 2.5rem; }
+.page-header .label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--brand); margin-bottom: .5rem; }
+.page-header h1 { margin-bottom: .6rem; }
+.page-header .desc { font-size: 1.05rem; color: var(--muted); max-width: 680px; margin: 0; }
+.toc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; margin-bottom: 2rem; }
+.toc-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); margin-bottom: .75rem; }
+.toc ol { margin: 0; padding-left: 1.2rem; }
+.toc li { margin-bottom: .2rem; }
+.toc a { font-size: .875rem; color: var(--muted); }
+.toc a:hover { color: var(--brand); }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; transition: border-color .2s; }
+.card:hover { border-color: var(--brand); }
+.card-icon { font-size: 1.6rem; margin-bottom: .6rem; }
+.card h3 { margin: 0 0 .35rem; font-size: .95rem; }
+.card p { margin: 0; font-size: .85rem; }
+.shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.shortcut-row { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: .55rem .85rem; }
+.shortcut-label { font-size: .875rem; color: var(--muted); }
+.shortcut-keys { display: flex; gap: .3rem; }
+.breadcrumb { display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: var(--dim); margin-bottom: 1.5rem; }
+.breadcrumb a { color: var(--dim); }
+.breadcrumb a:hover { color: var(--brand); }
+.breadcrumb span { color: var(--muted); }
+.footer { background: var(--surface); border-top: 1px solid var(--border); padding: 1.5rem 3rem; display: flex; align-items: center; justify-content: space-between; font-size: .8rem; color: var(--dim); }
+.footer a { color: var(--dim); }
+.footer a:hover { color: var(--brand); }
+.on-this-page { width: 220px; flex-shrink: 0; }
+.on-this-page-inner { position: sticky; top: calc(56px + 2rem); }
+.on-this-page-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); margin-bottom: .75rem; }
+.on-this-page a { display: block; font-size: .8rem; color: var(--dim); padding: .25rem 0 .25rem .8rem; border-left: 1px solid var(--border); transition: all .2s; text-decoration: none; }
+.on-this-page a:hover, .on-this-page a.active { color: var(--brand); border-left-color: var(--brand); }
+.page-nav { display: flex; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+.page-nav-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; transition: border-color .2s; text-decoration: none; }
+.page-nav-card:hover { border-color: var(--brand); }
+.page-nav-card .dir { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); margin-bottom: .3rem; font-weight: 700; }
+.page-nav-card .title { font-size: .95rem; font-weight: 600; color: var(--text); }
+.page-nav-card.next { text-align: right; }
+@media (max-width: 1100px) { .on-this-page { display: none; } }
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .content { padding: 1.5rem 1.2rem 3rem; }
+  h1 { font-size: 1.5rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .shortcut-grid { grid-template-columns: 1fr; }
+  .footer { flex-direction: column; gap: .5rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">
+    <div class="topbar-logo-icon">♪</div>
+    LabelManager OS
+  </a>
+  <nav style="display:flex;gap:.2rem;flex:1;padding-left:1rem;">
+    <a href="quickstart.html" style="font-size:.85rem;color:var(--muted);padding:.3rem .75rem;border-radius:6px;transition:all .2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Docs</a>
+    <a href="anr.html" style="font-size:.85rem;color:var(--muted);padding:.3rem .75rem;border-radius:6px;transition:all .2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">A&R Guide</a>
+    <a href="admin.html" style="font-size:.85rem;color:var(--muted);padding:.3rem .75rem;border-radius:6px;transition:all .2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Admin</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="topbar-version">v1.0.0</span>
+    <a href="https://github.com/yourusername/labelmanager-os" target="_blank" class="topbar-github">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Getting Started</div>
+    <a href="index.html"><span class="icon">📖</span> Overview</a>
+    <a href="quickstart.html"><span class="icon">⚡</span> Quick Start</a>
+    <a href="roles.html"><span class="icon">🔐</span> Roles & Permissions</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Core Modules</div>
+    <a href="crm.html"><span class="icon">🎤</span> Artists & CRM</a>
+    <a href="anr.html"><span class="icon">🎧</span> Demos & A&R</a>
+    <a href="releases.html"><span class="icon">💿</span> Releases</a>
+    <a href="media.html"><span class="icon">📁</span> Media Library</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Business & Finance</div>
+    <a href="finance.html"><span class="icon">💰</span> Finance</a>
+    <a href="royalties.html"><span class="icon">📊</span> Royalties & Splits</a>
+    <a href="events.html"><span class="icon">🎪</span> Bookings & Events</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Growth & Analytics</div>
+    <a href="marketing.html"><span class="icon">📣</span> Marketing</a>
+    <a href="analytics.html"><span class="icon">📈</span> Analytics</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Team & Platform</div>
+    <a href="collaboration.html"><span class="icon">🤝</span> Tasks & Collaboration</a>
+    <a href="portals.html"><span class="icon">👤</span> Artist & Manager Portals</a>
+    <a href="integrations.html"><span class="icon">🔌</span> Integrations</a>
+    <a href="admin.html"><span class="icon">⚙️</span> Settings & Admin</a>
+  </div>
+</aside>
+
+  <main style="flex:1;display:flex;min-width:0;">
+    <div class="content">
+      
+<div class="breadcrumb"><a href="index.html">Docs</a> <span>/</span> <span>Finance</span></div>
+<div class="page-header">
+  <div class="label">Business & Finance</div>
+  <h1>💰 Finance</h1>
+  <p class="desc">Track all label income and expenses, monitor recoupment per release and artist, and get a clear overview of your label's financial health.</p>
+</div>
+<h2 id="entries">Income & Expense Entries</h2>
+<p>Every financial event is logged as an entry with:</p>
+<table>
+  <thead><tr><th>Field</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>Type</td><td>Income or Expense</td></tr>
+    <tr><td>Category</td><td>Streaming, Physical Sales, Sync, Merch, Mastering Cost, Artwork Cost, Marketing Spend, etc.</td></tr>
+    <tr><td>Amount</td><td>In the configured label currency (multi-currency supported)</td></tr>
+    <tr><td>Date</td><td>Transaction date</td></tr>
+    <tr><td>Linked artist</td><td>Optional — for per-artist P&amp;L</td></tr>
+    <tr><td>Linked release</td><td>Optional — for per-release P&amp;L</td></tr>
+    <tr><td>Notes</td><td>Reference number, description, invoice link</td></tr>
+    <tr><td>Attachment</td><td>Invoice or receipt PDF (stored in Media Library)</td></tr>
+  </tbody>
+</table>
+<h2 id="recoupment">Recoupment Tracking</h2>
+<p>For each release, the Finance module automatically calculates the <strong>recoupment balance</strong>: total costs minus income assigned to that release. A progress bar on the release card shows how close you are to breaking even. This feeds directly into the Royalties module — artist royalty payments are blocked until the advance is recouped (if so configured in the contract).</p>
+<h2 id="reports">Reports & Export</h2>
+<p>Go to <em>Finance → Reports</em> to generate:</p>
+<ul>
+  <li><strong>P&L by period</strong> — monthly, quarterly or annual profit &amp; loss</li>
+  <li><strong>Cost per release</strong> — total spend vs revenue for each release</li>
+  <li><strong>Artist P&L</strong> — income and costs attributed to a specific artist</li>
+  <li><strong>Export to CSV/XLSX</strong> — for your accountant or external software</li>
+</ul>
+
+      <div class="page-nav"><a href="media.html" class="page-nav-card"><div class="dir">← Previous</div><div class="title">Media Library</div></a><a href="royalties.html" class="page-nav-card next"><div class="dir">Next →</div><div class="title">Royalties & Splits</div></a></div>
+    </div>
+    
+        <aside class="on-this-page" style="padding-top:2.5rem;padding-right:1rem;">
+          <div class="on-this-page-inner">
+            <div class="on-this-page-title">On this page</div>
+            <a href="#entries">Income & Expense</a><a href="#recoupment">Recoupment</a><a href="#reports">Reports</a>
+          </div>
+        </aside>
+  </main>
+</div>
+
+<footer class="footer">
+  <span>© 2026 LabelManager OS — Built for independent labels</span>
+  <span><a href="index.html">Docs</a> · <a href="https://github.com/yourusername/labelmanager-os" target="_blank">GitHub</a> · <a href="admin.html#faq">FAQ</a></span>
+</footer>
+
+<script>
+function setActive() {
+  const path = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    const href = a.getAttribute('href')?.split('/').pop();
+    a.classList.toggle('active', href === path);
+  });
+}
+function addCopyButtons() {
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn'; btn.textContent = 'Copy';
+    btn.onclick = () => { navigator.clipboard.writeText(pre.querySelector('code')?.innerText || '');
+      btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); };
+    pre.appendChild(btn);
+  });
+}
+function initOTP() {
+  const links = document.querySelectorAll('.on-this-page a');
+  if (!links.length) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) {
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+e.target.id));
+    }});
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('h2[id], h3[id]').forEach(h => obs.observe(h));
+}
+document.addEventListener('DOMContentLoaded', () => { setActive(); addCopyButtons(); initOTP(); });
+</script>
+</body>
+</html>

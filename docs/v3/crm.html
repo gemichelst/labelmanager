@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Artists & CRM — LabelManager OS Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0c0f;
+  --s1: #0e0f14;
+  --s2: #13151c;
+  --s3: #1a1d26;
+  --s4: #21253200;
+  --b1: #2a2d3a;
+  --b2: #3a3f54;
+  --text: #e8eaf0;
+  --muted: #7c82a0;
+  --gold: #c9a84c;
+  --teal: #4a9fa8;
+  --ok: #3d9970;
+  --err: #c0524e;
+  --warn: #d4a043;
+  --info: #4a6fa8;
+  --r: 10px;
+  --tr: all .18s ease;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --sidebar-w: 260px;
+  --content-max: 860px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.7;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--s1);
+  border-right: 1px solid var(--b1);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.sidebar-logo .icon {
+  width: 36px; height: 36px;
+  background: var(--gold);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.sidebar-logo .brand { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
+.sidebar-logo .sub { font-size: 11px; color: var(--muted); }
+.sidebar-section { padding: 16px 12px 4px; font-size: 10px; font-weight: 700;
+  color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+.sidebar nav a {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px;
+  font-size: 13px; color: var(--muted);
+  text-decoration: none;
+  border-radius: 7px;
+  margin: 1px 8px;
+  transition: var(--tr);
+}
+.sidebar nav a:hover { background: var(--s3); color: var(--text); }
+.sidebar nav a.active { background: rgba(201,168,76,.12); color: var(--gold); font-weight: 600; }
+.sidebar nav a .ico { font-size: 15px; width: 18px; text-align: center; }
+.sidebar-footer {
+  margin-top: auto;
+  padding: 14px 16px;
+  border-top: 1px solid var(--b1);
+  font-size: 11px; color: var(--muted);
+}
+.sidebar-footer a { color: var(--teal); text-decoration: none; }
+
+/* ── Main content ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(11,12,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--b1);
+  padding: 14px 40px;
+  display: flex; align-items: center; gap: 16px;
+}
+.topbar .breadcrumb { font-size: 12px; color: var(--muted); }
+.topbar .breadcrumb span { color: var(--gold); }
+.search-bar {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--s2); border: 1px solid var(--b1);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 13px; color: var(--muted);
+}
+.search-bar kbd {
+  background: var(--s3); border: 1px solid var(--b2);
+  border-radius: 4px; padding: 1px 5px; font-size: 10px;
+  font-family: var(--mono);
+}
+
+/* ── Article content ── */
+.content {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 48px 40px 80px;
+}
+.page-header { margin-bottom: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--b1); }
+.page-header .tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(201,168,76,.1); color: var(--gold);
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+}
+.page-header h1 { font-size: 32px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 10px; }
+.page-header .lead { font-size: 16px; color: var(--muted); line-height: 1.6; }
+.page-header .meta { margin-top: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
+.page-header .meta span { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+
+/* ── Typography ── */
+h2 { font-size: 22px; font-weight: 700; color: var(--text); margin: 40px 0 14px;
+     padding-top: 12px; border-top: 1px solid var(--b1); }
+h3 { font-size: 16px; font-weight: 700; color: var(--text); margin: 28px 0 10px; }
+h4 { font-size: 14px; font-weight: 600; color: var(--gold); margin: 20px 0 8px; }
+p { margin-bottom: 14px; color: #c8cad6; }
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--gold); font-style: normal; }
+
+/* ── Lists ── */
+ul, ol { padding-left: 22px; margin-bottom: 16px; color: #c8cad6; }
+li { margin-bottom: 5px; }
+li strong { color: var(--text); }
+
+/* ── Tables ── */
+.table-wrap { overflow-x: auto; margin: 20px 0; border-radius: var(--r); border: 1px solid var(--b1); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead { background: var(--s2); }
+th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700;
+     color: var(--muted); letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--b1); }
+td { padding: 11px 16px; border-bottom: 1px solid var(--b1); color: #c8cad6; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--s2); }
+td code, th code { background: var(--s3); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: var(--mono); color: var(--teal); }
+
+/* ── Code ── */
+code { background: var(--s3); padding: 2px 6px; border-radius: 4px;
+  font-size: 12.5px; font-family: var(--mono); color: var(--teal); }
+pre { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r);
+  padding: 20px; overflow-x: auto; margin: 20px 0; }
+pre code { background: none; padding: 0; font-size: 13px; color: #a8b4d0; }
+
+/* ── Callouts ── */
+.callout { border-radius: var(--r); padding: 16px 18px; margin: 20px 0;
+  display: flex; gap: 12px; align-items: flex-start; }
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout-body { flex: 1; }
+.callout-body strong { display: block; margin-bottom: 4px; font-size: 13px; }
+.callout-body p { margin: 0; font-size: 13.5px; }
+.callout.tip  { background: rgba(74,159,168,.08); border-left: 3px solid var(--teal); }
+.callout.tip .callout-icon { color: var(--teal); }
+.callout.tip strong { color: var(--teal); }
+.callout.warn { background: rgba(212,160,67,.08); border-left: 3px solid var(--warn); }
+.callout.warn .callout-icon { color: var(--warn); }
+.callout.warn strong { color: var(--warn); }
+.callout.info { background: rgba(74,111,168,.08); border-left: 3px solid var(--info); }
+.callout.info .callout-icon { color: var(--info); }
+.callout.info strong { color: var(--info); }
+.callout.ok   { background: rgba(61,153,112,.08); border-left: 3px solid var(--ok); }
+.callout.ok .callout-icon { color: var(--ok); }
+.callout.ok strong { color: var(--ok); }
+
+/* ── Steps ── */
+.steps { margin: 20px 0; }
+.step { display: flex; gap: 16px; margin-bottom: 20px; }
+.step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(201,168,76,.12); border: 1px solid rgba(201,168,76,.3);
+  color: var(--gold); font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-body { flex: 1; padding-top: 5px; }
+.step-body h4 { margin: 0 0 6px; color: var(--text); font-size: 14px; }
+.step-body p { margin: 0; font-size: 13.5px; }
+
+/* ── Keyboard shortcuts ── */
+.kbd-table { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.kbd-row { display: flex; align-items: center; gap: 10px;
+  background: var(--s2); border: 1px solid var(--b1);
+  border-radius: 8px; padding: 8px 14px; min-width: 220px; }
+kbd { background: var(--s3); border: 1px solid var(--b2); border-radius: 5px;
+  padding: 3px 8px; font-size: 11px; font-family: var(--mono); color: var(--text); }
+.kbd-desc { font-size: 12.5px; color: var(--muted); }
+
+/* ── TOC ── */
+.toc { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r);
+  padding: 20px 22px; margin-bottom: 36px; }
+.toc h4 { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 12px; font-weight: 700; }
+.toc ol { margin: 0; padding-left: 18px; }
+.toc li { margin-bottom: 4px; }
+.toc a { font-size: 13px; color: var(--muted); }
+.toc a:hover { color: var(--gold); }
+
+/* ── Badge ── */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; }
+.badge-gold { background: rgba(201,168,76,.15); color: var(--gold); }
+.badge-teal { background: rgba(74,159,168,.15); color: var(--teal); }
+.badge-ok   { background: rgba(61,153,112,.15); color: #5dba90; }
+.badge-err  { background: rgba(192,82,78,.15);  color: #e07773; }
+.badge-gray { background: var(--s3); color: var(--muted); }
+
+/* ── Role table ── */
+.role-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin: 20px 0; }
+.role-card { background: var(--s2); border: 1px solid var(--b1); border-radius: var(--r); padding: 16px; }
+.role-card .role-name { font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.role-card .role-badge { margin-bottom: 10px; }
+.role-card ul { padding-left: 16px; margin: 0; }
+.role-card li { font-size: 12.5px; color: var(--muted); margin-bottom: 3px; }
+
+/* ── Pagination ── */
+.page-nav { display: flex; justify-content: space-between; margin-top: 60px;
+  padding-top: 24px; border-top: 1px solid var(--b1); gap: 16px; }
+.page-nav a {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px 18px; background: var(--s2); border: 1px solid var(--b1);
+  border-radius: var(--r); text-decoration: none; transition: var(--tr);
+  max-width: 260px; flex: 1;
+}
+.page-nav a:hover { border-color: var(--gold); }
+.page-nav .nav-dir { font-size: 11px; color: var(--muted); }
+.page-nav .nav-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.page-nav a.next { text-align: right; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 28px 20px 60px; }
+  .topbar { padding: 12px 20px; }
+}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="icon">♪</div>
+    <div><div class="brand">LabelManager OS</div><div class="sub">Documentation</div></div>
+  </div>
+  <div class="sidebar-section">Getting started</div><nav><a href="index.html"><span class="ico">📖</span>Overview</a><a href="quickstart.html"><span class="ico">⚡</span>Quick Start</a><a href="roles.html"><span class="ico">🔐</span>Roles & Permissions</a></nav><div class="sidebar-section">Core modules</div><nav><a href="crm.html" class="active"><span class="ico">🎤</span>Artists & CRM</a><a href="anr.html"><span class="ico">🎧</span>Demos & A&R</a><a href="releases.html"><span class="ico">💿</span>Releases</a><a href="media.html"><span class="ico">📁</span>Media Library</a><a href="events.html"><span class="ico">🎪</span>Bookings & Events</a><a href="finance.html"><span class="ico">💰</span>Finance</a><a href="royalties.html"><span class="ico">📊</span>Royalties & Splits</a></nav><div class="sidebar-section">Advanced</div><nav><a href="marketing.html"><span class="ico">📣</span>Marketing</a><a href="analytics.html"><span class="ico">📈</span>Analytics</a><a href="collaboration.html"><span class="ico">🤝</span>Collaboration</a><a href="portals.html"><span class="ico">👤</span>Portals</a><a href="integrations.html"><span class="ico">🔌</span>Integrations</a></nav><div class="sidebar-section">Reference</div><nav><a href="admin.html"><span class="ico">⚙️</span>Settings & Admin</a></nav>
+  <div class="sidebar-footer">v1.0 · <a href="https://github.com/yourusername/labelmanager-os">GitHub</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+  <div class="breadcrumb">LabelManager OS Docs &nbsp;›&nbsp; <span>Core Modules</span> &nbsp;›&nbsp; Artists & CRM</div>
+  <div class="search-bar">🔍 &nbsp;Search docs… &nbsp;<kbd>Ctrl+K</kbd></div>
+</div>
+  <div class="content">
+    <div class="page-header">
+      <div class="tag">🎤 Core Modules</div>
+      <h1>Artists & CRM</h1>
+      <p class="lead">Manage your entire label roster and every external contact — managers, bookers, PR, distributors, blogs and more.</p>
+      <div class="meta">
+        <span>📖 8 min read</span>
+        <span>🕐 Last updated May 2026</span>
+      </div>
+    </div>
+    
+<p>The CRM is the heart of LabelManager OS. Every artist on your roster and every external contact — manager, booker, PR agent, blog, radio station, distributor — lives here, fully interlinked.</p>
+
+<h2>Artist Profiles</h2>
+<p>Each artist profile is a 360° view of everything connected to that artist: releases, demos, events, royalty history, contracts, media assets and contacts.</p>
+
+<h3>Creating an Artist</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body">
+    <h4>Click + New Artist in the Artists tab</h4>
+    <p>The artist creation modal opens with all fields.</p>
+  </div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body">
+    <h4>Fill in the Artist Profile form</h4>
+    <div class="table-wrap"><table>
+    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+    <tbody>
+    <tr><td><strong>Name *</strong></td><td>Stage name / artist alias</td></tr>
+    <tr><td>Real Name</td><td>Legal name for contracts and royalty statements</td></tr>
+    <tr><td>Type</td><td>Core Artist, Development, Legacy, External, Compilation-only</td></tr>
+    <tr><td>Status</td><td>Active, Development, Inactive, Legacy</td></tr>
+    <tr><td>Genres</td><td>Comma-separated tags (e.g. Techno, Industrial, EBM)</td></tr>
+    <tr><td>Territory</td><td>Primary territory for rights and distribution</td></tr>
+    <tr><td>Bio</td><td>Full artist biography (shown on EPK)</td></tr>
+    <tr><td>Short Bio</td><td>One-liner for press releases</td></tr>
+    <tr><td>Email</td><td>Direct artist contact</td></tr>
+    <tr><td>Phone</td><td>Direct phone / WhatsApp</td></tr>
+    <tr><td>Booking Email</td><td>Booking enquiries email</td></tr>
+    <tr><td>Social Links</td><td>Spotify, SoundCloud, Beatport, RA, Instagram, TikTok, YouTube</td></tr>
+    <tr><td>Contract Info</td><td>Free-text notes about deal structure (superseded by Royalties contracts)</td></tr>
+    <tr><td>Internal Notes</td><td>Private label notes — not visible in Artist Portal</td></tr>
+    </tbody></table></div>
+  </div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body">
+    <h4>Save and open the full Artist Detail view</h4>
+    <p>Click the artist card or name to open the 360° detail view with tabbed sections: Overview, Releases, Demos, Events, Financials, Contacts, Media, Contracts.</p>
+  </div></div>
+</div>
+
+<h3>Artist Status Types</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-ok">Active</span></td><td>Currently releasing music on the label</td></tr>
+<tr><td><span class="badge badge-gold">Development</span></td><td>In the pipeline — no official release yet</td></tr>
+<tr><td><span class="badge badge-gray">Legacy</span></td><td>No longer active but catalogue still managed</td></tr>
+<tr><td><span class="badge badge-err">Inactive</span></td><td>Suspended or deal ended</td></tr>
+</tbody></table></div>
+
+<h2>Contacts</h2>
+<p>The Contacts section manages all external relationships: managers, booking agencies, PR companies, distributors, blogs, radio shows, promoters and more.</p>
+
+<h3>Contact Types</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Type</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-teal">Manager</span></td><td>Artist management</td></tr>
+<tr><td><span class="badge badge-gold">Booker</span></td><td>Booking agent or agency</td></tr>
+<tr><td><span class="badge badge-gray">PR</span></td><td>Press & PR agencies</td></tr>
+<tr><td><span class="badge badge-gray">Label</span></td><td>Other labels (licensing, co-releases)</td></tr>
+<tr><td><span class="badge badge-gray">Distributor</span></td><td>Digital and physical distributors</td></tr>
+<tr><td><span class="badge badge-gray">Blog / Playlist</span></td><td>Editorial contacts, playlist curators</td></tr>
+<tr><td><span class="badge badge-gray">Radio</span></td><td>Radio show hosts, DJs with radio slots</td></tr>
+<tr><td><span class="badge badge-gray">Promoter</span></td><td>Club and festival promoters</td></tr>
+</tbody></table></div>
+
+<h3>Linking Contacts to Artists</h3>
+<p>In the Artist Detail view, go to the <strong>Contacts</strong> tab and click <strong>+ Link Contact</strong>. Select the contact, specify the relationship type (e.g. "Manager", "Booking EU", "Booking US") and save.</p>
+
+<h2>Interaction History & Notes</h2>
+<p>In both Artist and Contact detail views, the <strong>Activity</strong> tab shows a chronological log of status changes, new releases and events linked to this entity, manual notes added by team members, and contract updates.</p>
+<p>To add a manual note, click <strong>+ Add Note</strong>. Notes support <code>@mentions</code> of other team members and are timestamped automatically.</p>
+
+<h2>Search & Filter</h2>
+<p>The Artists list supports:</p>
+<ul>
+  <li><strong>Text search</strong> — searches name, bio, genres, email simultaneously</li>
+  <li><strong>Status filter</strong> — show only Active / Development / Legacy / Inactive</li>
+  <li><strong>Type filter</strong> — Core, Development, External, etc.</li>
+  <li><strong>Sort</strong> — by name, release count, demo count, date added</li>
+</ul>
+
+<div class="callout tip">
+  <div class="callout-icon">💡</div>
+  <div class="callout-body">
+    <strong>Consistent genre tags</strong>
+    <p>Use genre tags consistently (e.g. always "Techno" not "techno" or "TECHNO"). The A&R scoring engine uses genre matching to suggest related demos to existing artists.</p>
+  </div>
+</div>
+
+<h2>Exporting Artist Data</h2>
+<p>From any artist detail view, click the <strong>⋯ menu → Export</strong> to generate:</p>
+<ul>
+  <li><strong>EPK (Electronic Press Kit)</strong> — HTML page with bio, stats, releases, social links and player</li>
+  <li><strong>vCard (.vcf)</strong> — Import directly into address book or phone</li>
+  <li><strong>JSON</strong> — Full artist record for backup or migration</li>
+</ul>
+
+    <div class="page-nav"><a href="roles.html"><div class="nav-dir">← Previous</div><div class="nav-title">Roles & Permissions</div></a><a href="anr.html" class="next"><div class="nav-dir">Next →</div><div class="nav-title">Demos & A&R</div></a></div>
+  </div>
+</div>
+</body>
+</html>
