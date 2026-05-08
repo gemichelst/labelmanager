@@ -1,6 +1,13 @@
 // ────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
 // ────────────────────────────────────────────────────────────────────────────
+const LABEL_CONFIG = {
+  name:    'Bunte Panther',
+  color:   '#c9a84c',   // gold accent
+  country: 'DE',
+  currency:'EUR',
+};
+
 const TASK_TPL = {
   Single:['Artwork erstellen (3000×3000)','Mastering abschließen','DistroKid Upload','ISRC + UPC beantragen','Spotify Editorial Pitch','Pre-Save Link','Social Media Countdown','DJ Promo Links','Blog Outreach (5)','Post-Release Analytics'],
   EP:['Tracklist finalisieren','Artwork + Label Copy','Mastering aller Tracks','Katalognummer','DistroKid/Believe Upload','ISRC alle Tracks','Beatport Exclusive (4W)','Spotify Pitch','Pre-Save Kampagne','DJ Promo CSV','PR Outreach (10 Blogs)','Instagram Reel','Post-Release Check'],
@@ -491,6 +498,19 @@ const LOS = {
     lucide.createIcons();
   },
 
+  _goTo(viewName) {
+    const navEl = document.querySelector(`.nav[data-view="${viewName}"]`);
+    if(navEl) {
+      navEl.click();
+    } else {
+      // Direkter Fallback
+      document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+      const t = document.getElementById(`view-${viewName}`);
+      if(t) t.style.display = 'block';
+      document.querySelectorAll('.nav').forEach(n => n.classList.remove('on'));
+      document.querySelector(`.nav[data-view="${viewName}"]`)?.classList.add('on');
+    }
+  },
 
   // ── RENDER ALL ────────────────────────────────────────────────────────
   renderAll() {
@@ -3444,10 +3464,10 @@ const LOS = {
       this.openModal('add-webhook');
       setTimeout(()=>{ const sel=document.getElementById('whPlatform'); if(sel) sel.value=id==='slack'?'Slack':id==='discord'?'Discord':'Make/Zapier'; },100);
     } else if(['labelradar','soundplate','droptrack','submithub'].includes(id)) {
-      this.navigate('integrations');
+      this._goTo('integrations');
       setTimeout(()=>{ this.integTab('import', document.querySelector('#integTabs .tab:nth-child(3)')); },200);
     } else if(['distrokid','fuga','bandcamp'].includes(id)) {
-      this.navigate('integrations');
+      this._goTo('integrations');
       setTimeout(()=>{ this.integTab('export', document.querySelector('#integTabs .tab:nth-child(4)')); },200);
     } else {
       this.toast(`${id} integration coming soon`,'warn');
