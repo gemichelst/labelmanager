@@ -479,5 +479,5 @@ Built with:
 
 <p align="center">
   Made with 🖤 for independent labels<br>
-  <a href="https://github.com/gemichelst/labelmanager">github.com/gemichels/labelmanager</a>
+  <a href="https://github.com/gemichelst/labelmanager">github.com/gemichelst/labelmanager</a>
 </p>
