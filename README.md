@@ -1,19 +1,27 @@
-# 🎵 LabelManager
+# 🎵 labelmanager
 
 > **The all-in-one operating system for independent record labels.**  
 > Manage artists, A&R pipelines, releases, royalties, bookings, media and your entire team — in one dark, fast, single-file web app.
 
 ![LabelManager Screenshot](docs/screenshot.png)
-![Version](https://img.shields.io/badge/version-1.0.0-gold)
+![Version](https://img.shields.io/badge/version-1.2-gold)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%2B%20LocalStorage-teal)
 
 ---
 
+## 📖 Documentation & User Manual
+
+**[👉 Click here to read the complete User Manual](docs/index.html)**
+
+The documentation includes detailed step-by-step guides on setting up your label, managing the A&R pipeline, calculating royalties, using the Artist/Manager portals, and configuring integrations.
+
+---
+
 ## ✨ Overview
 
-LabelManager is a feature-complete, **single-file progressive web app** built for independent labels, A&R managers, booking agents and music producers. No backend required — everything runs in the browser using localStorage with a clean, dark-mode UI inspired by modern SaaS tools.
+labelmanager is a feature-complete, **single-file progressive web app** built for independent labels, A&R managers, booking agents and music producers. No backend required — everything runs in the browser using localStorage with a clean, dark-mode UI inspired by modern SaaS tools.
 
 It was designed to replace the fragmented label workflow of juggling Notion, Google Sheets, Dropbox, email chains and spreadsheets — and replace them with one coherent system.
 
@@ -61,7 +69,7 @@ It was designed to replace the fragmented label workflow of juggling Notion, Goo
 
 ## 🏗️ Architecture
 
-LabelManager is intentionally built as a **zero-dependency, single-file app** for maximum portability and zero DevOps overhead. All data lives in `localStorage` and can be exported/imported as JSON at any time.
+labelmanager is intentionally built as a **zero-dependency, single-file app** for maximum portability and zero DevOps overhead. All data lives in `localStorage` and can be exported/imported as JSON at any time.
 
 ```
 labelmanager/
@@ -72,7 +80,8 @@ labelmanager/
 │   ├── css/
 │   │   └── style.css   ← Design system, dark theme, component library
 │   └── fonts/          ← Optional: local font files
-├── docs/               ← Screenshots for README
+├── docs/               ← User Manual and Screenshots
+│   └── index.html      ← Documentation Entry Point
 ├── README.md
 └── LICENSE
 ```
@@ -112,8 +121,8 @@ notifications  → In-app notification queue
 ### Option A — Just open it
 
 ```bash
-git clone https://github.com/yourusername/labelmanager-os.git
-cd labelmanager-os
+git clone https://github.com/gemichelst/labelmanager.git
+cd labelmanager
 open index.html
 ```
 
@@ -380,7 +389,7 @@ npx netlify deploy --dir=. --prod
 # In repo Settings → Pages → Source: Deploy from branch → main → / (root)
 ```
 
-Your app will be live at `https://yourusername.github.io/labelmanager-os/`
+Your app will be live at `https://gemichelst.github.io/labelmanager/`
 
 ### Docker (optional, for team hosting)
 
@@ -392,32 +401,9 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 ```bash
-docker build -t labelmanager-os .
-docker run -p 8080:80 labelmanager-os
+docker build -t labelmanager .
+docker run -p 8080:80 labelmanager
 ```
-
----
-
-## 🛣️ Roadmap
-
-### v1.1
-- [ ] PWA manifest + service worker (full offline support)
-- [ ] PDF statement generator (jsPDF)
-- [ ] Bulk demo actions (accept/reject/move)
-- [ ] Dark/light mode toggle
-
-### v1.2
-- [ ] Real-time multi-user sync (Firebase / Supabase option)
-- [ ] Live webhook delivery (server-side)
-- [ ] Spotify API integration (monthly listeners, follower pull)
-- [ ] Email notifications (SMTP / SendGrid)
-
-### v2.0 (React + Node + PostgreSQL)
-- [ ] Full backend API (Node.js / Express)
-- [ ] PostgreSQL database with Prisma ORM
-- [ ] S3-compatible file storage (Supabase Storage / R2)
-- [ ] Real audio file uploads with server-side waveform generation
-- [ ] Multi-tenant (multiple labels / imprints per instance)
 
 ---
 
@@ -439,7 +425,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ```bash
 # Fork and clone
-git clone https://github.com/yourusername/labelmanager-os.git
+git clone https://github.com/gemichelst/labelmanager.git
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
