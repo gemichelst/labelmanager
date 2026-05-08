@@ -1,5 +1,7 @@
 # 🎵 labelmanager
 
+![LabelManagerLogoCard](assets/icons/twitter-card.png)
+
 > **The all-in-one operating system for independent record labels.**  
 > Manage artists, A&R pipelines, releases, royalties, bookings, media and your entire team — in one dark, fast, single-file web app.
 
