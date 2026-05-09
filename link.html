@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LabelManager – Smart Link</title>
+<meta property="og:type" content="music.song">
+<meta name="theme-color" content="#0e0f14">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0e0f14;--s1:#13141b;--s2:#191b24;--s3:#1f2130;
+    --b1:#2d3244;--text:#e8eaf0;--muted:#6b7091;
+    --gold:#c9a84c;--teal:#4a9fa8;--ok:#3d9970;--err:#c0524e;--warn:#e0a030;
+    --acc: #c9a84c;
+  }
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0}
+
+  /* Hero */
+  .hero{width:100%;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:40px 24px 32px;position:relative;overflow:hidden;background:linear-gradient(160deg,var(--acc,#c9a84c)22,var(--acc,#c9a84c)08,#0e0f14 70%)}
+  .hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,color-mix(in srgb,var(--acc,#c9a84c) 18%,transparent),color-mix(in srgb,var(--acc,#c9a84c) 5%,transparent) 50%,#0e0f14 75%);z-index:0}
+  .hero-content{position:relative;z-index:1;text-align:center;max-width:480px;width:100%}
+  .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--acc,#c9a84c);box-shadow:0 0 32px color-mix(in srgb,var(--acc,#c9a84c) 40%,transparent);margin:0 auto 16px;display:block;background:var(--s3)}
+  .avatar-placeholder{width:100px;height:100px;border-radius:50%;background:var(--s3);border:3px solid var(--acc,#c9a84c);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px}
+  .artist-name{font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff}
+  .track-title{font-size:15px;color:var(--muted);margin-top:6px}
+  .meta-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;border:1px solid;background:rgba(255,255,255,.04)}
+  .badge-gold{color:var(--gold);border-color:rgba(201,168,76,.25)}
+  .badge-teal{color:var(--teal);border-color:rgba(74,159,168,.25)}
+  .badge-pre{color:#fff;background:color-mix(in srgb,var(--acc,#c9a84c) 25%,transparent);border-color:color-mix(in srgb,var(--acc,#c9a84c) 40%,transparent);font-weight:700}
+
+  /* Main content */
+  .main{width:100%;max-width:480px;padding:24px 16px 48px;flex:1}
+
+  /* Destination buttons */
+  .dest-btn{display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;border-radius:14px;border:1px solid var(--b1);background:var(--s2);color:var(--text);text-decoration:none;font-size:14.5px;font-weight:600;margin-bottom:10px;transition:all .18s;cursor:pointer}
+  .dest-btn:hover{background:var(--s3);border-color:color-mix(in srgb,var(--acc,#c9a84c) 50%,var(--b1));transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+  .dest-btn:active{transform:none}
+  .dest-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+  .dest-label{flex:1}
+  .dest-arrow{color:var(--muted);font-size:18px}
+  .dest-disabled{opacity:.4;pointer-events:none}
+
+  /* Sections */
+  .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:24px 0 12px}
+
+  /* Email capture */
+  .email-form{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px}
+  .email-form h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
+  .email-form p{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+  .email-row{display:flex;gap:8px}
+  .email-input{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:10px;padding:10px 14px;font-size:13.5px;color:var(--text);outline:none}
+  .email-input:focus{border-color:var(--acc,#c9a84c)}
+  .email-btn{padding:10px 18px;border-radius:10px;background:var(--acc,#c9a84c);color:#000;font-size:13.5px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+  .email-btn:hover{opacity:.85}
+  .email-success{text-align:center;color:var(--ok);font-size:13px;padding:8px 0}
+
+  /* Release info */
+  .release-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px;margin-bottom:16px}
+  .release-card h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+  .release-card p{font-size:12.5px;color:var(--muted);line-height:1.5}
+
+  /* Error / loading states */
+  .state-box{text-align:center;padding:60px 24px}
+  .state-box .icon{font-size:48px;margin-bottom:16px}
+  .state-box h2{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
+  .state-box p{font-size:13.5px;color:var(--muted);line-height:1.6;max-width:320px;margin:0 auto}
+
+  /* Footer */
+  .footer{text-align:center;font-size:11.5px;color:var(--muted);padding:16px 0 32px}
+  .footer a{color:var(--acc,#c9a84c);text-decoration:none}
+  .footer a:hover{text-decoration:underline}
+
+  /* Spinner */
+  .spinner{width:32px;height:32px;border:3px solid var(--s3);border-top-color:var(--acc,#c9a84c);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Platform icon colors */
+  .icon-spotify{background:#1DB954;color:#000}
+  .icon-apple{background:#FB233B;color:#fff}
+  .icon-soundcloud{background:#FF5500;color:#fff}
+  .icon-youtube{background:#FF0000;color:#fff}
+  .icon-beatport{background:#00c45a;color:#000}
+  .icon-bandcamp{background:#1da0c3;color:#fff}
+  .icon-tidal{background:#fff;color:#000}
+  .icon-amazon{background:#FF9900;color:#000}
+  .icon-deezer{background:#A238FF;color:#fff}
+  .icon-default{background:var(--s3);color:var(--teal)}
+
+  @media(max-width:400px){
+    .hero{min-height:240px;padding:32px 16px 24px}
+    .avatar,.avatar-placeholder{width:80px;height:80px}
+    .artist-name{font-size:18px}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Loading state -->
+  <div class="state-box" id="loadingState">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);font-size:13px">Loading…</p>
+  </div>
+</div>
+
+<script>
+// ── Slug resolution ──────────────────────────────────────────────────────────
+// Fix: All regex operations are proper string methods — no bare regex flags
+function getSlug() {
+  var params = new URLSearchParams(window.location.search);
+  var fromParam = params.get('s') || params.get('slug');
+  if (fromParam) return fromParam.trim();
+
+  var path = window.location.pathname;
+  // Fix: use string replace with a proper string pattern, not a broken regex
+  var linkPrefix = '/link/';
+  if (path.indexOf(linkPrefix) === 0) {
+    return path.slice(linkPrefix.length).replace(/\/$/, '').trim();
+  }
+  return '';
+}
+
+// ── Data access ──────────────────────────────────────────────────────────────
+function getData() {
+  try {
+    var raw = localStorage.getItem('los_v3');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+// ── Platform helpers ─────────────────────────────────────────────────────────
+var PLATFORM_ICONS = {
+  spotify:    { emoji: '♫', cls: 'icon-spotify',    label: 'Spotify' },
+  apple:      { emoji: '♪', cls: 'icon-apple',      label: 'Apple Music' },
+  'apple music': { emoji: '♪', cls: 'icon-apple',   label: 'Apple Music' },
+  soundcloud: { emoji: '☁', cls: 'icon-soundcloud', label: 'SoundCloud' },
+  youtube:    { emoji: '▶', cls: 'icon-youtube',    label: 'YouTube' },
+  beatport:   { emoji: '◈', cls: 'icon-beatport',   label: 'Beatport' },
+  bandcamp:   { emoji: '◉', cls: 'icon-bandcamp',   label: 'Bandcamp' },
+  tidal:      { emoji: '◎', cls: 'icon-tidal',      label: 'Tidal' },
+  amazon:     { emoji: '◇', cls: 'icon-amazon',     label: 'Amazon Music' },
+  deezer:     { emoji: '◈', cls: 'icon-deezer',     label: 'Deezer' },
+};
+
+function getPlatformMeta(name) {
+  var key = (name || '').toLowerCase().trim();
+  return PLATFORM_ICONS[key] || { emoji: '→', cls: 'icon-default', label: name || 'Listen' };
+}
+
+// ── Analytics ────────────────────────────────────────────────────────────────
+function logClick(db, slId, platform) {
+  if (!db) return;
+  // Increment smart link click counter
+  var sl = (db.smart_links || []).find(function(s) { return s.id === slId; });
+  if (sl) {
+    sl.clicks = (sl.clicks || 0) + 1;
+  }
+  // Push to click log
+  if (!db.smartlinkclicks) db.smartlinkclicks = [];
+  db.smartlinkclicks.push({
+    id: Date.now().toString(36),
+    slid: slId,
+    platform: platform,
+    ts: new Date().toISOString(),
+    ua: navigator.userAgent.slice(0, 80)
+  });
+  try {
+    localStorage.setItem('los_v3', JSON.stringify(db));
+  } catch (e) {}
+}
+
+// ── Email capture ────────────────────────────────────────────────────────────
+function handleEmailSubmit(db, slId, emailInput, btn, container) {
+  var email = emailInput.value.trim();
+  if (!email || email.indexOf('@') < 0) {
+    emailInput.style.borderColor = 'var(--err)';
+    setTimeout(function() { emailInput.style.borderColor = ''; }, 1500);
+    return;
+  }
+  if (!db.emailleads) db.emailleads = [];
+  // Deduplicate
+  var exists = db.emailleads.some(function(e) { return e.email === email && e.slid === slId; });
+  if (!exists) {
+    db.emailleads.push({ email: email, slid: slId, ts: new Date().toISOString() });
+    try { localStorage.setItem('los_v3', JSON.stringify(db)); } catch(e) {}
+  }
+  container.innerHTML = '<div class="email-success">✓ You are on the list! Thanks.</div>';
+}
+
+// ── HTML escape ──────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render(sl, db) {
+  var acc = sl.accent || '#c9a84c';
+  document.documentElement.style.setProperty('--acc', acc);
+
+  // Find linked artist & release
+  var artist = (db.artists || []).find(function(a) { return a.id === sl.artistid; });
+  var release = (db.releases || []).find(function(r) { return r.id === sl.releaseid; });
+
+  // Find artwork from media lib
+  var artworkUrl = '';
+  if (sl.artistid) {
+    var artMedia = (db.media || []).find(function(m) {
+      return m.artistid === sl.artistid && m.type === 'Artwork' && m.file;
+    });
+    if (artMedia) artworkUrl = artMedia.file;
+  }
+
+  // OG meta update
+  if (sl.metatitle) document.title = esc(sl.metatitle) + ' – LabelManager';
+  if (sl.metaimg) {
+    var og = document.querySelector('meta[property="og:image"]');
+    if (!og) { og = document.createElement('meta'); og.setAttribute('property','og:image'); document.head.appendChild(og); }
+    og.setAttribute('content', sl.metaimg);
+  }
+
+  // Pre-save badge
+  var preBadge = sl.presaveactive
+    ? '<span class="badge badge-pre">⚡ Pre-Save</span>'
+    : '';
+
+  // Release type badge
+  var relBadge = release
+    ? '<span class="badge badge-teal">' + esc(release.type || 'Release') + '</span>'
+    : '';
+
+  // Release date badge
+  var dateBadge = (release && release.date)
+    ? '<span class="badge badge-gold">📅 ' + esc(release.date) + '</span>'
+    : (sl.releasedate ? '<span class="badge badge-gold">📅 ' + esc(sl.releasedate) + '</span>' : '');
+
+  // Avatar
+  var avatarHtml = artworkUrl
+    ? '<img class="avatar" src="' + esc(artworkUrl) + '" alt="' + esc(sl.title) + ' onerror="handleAvatarError(this)"'
+      + '<div class="avatar-placeholder" id="avatarPh" style="display:none">♫</div>'
+    : '<div class="avatar-placeholder">♫</div>';
+
+  // Destinations
+  var dests = (sl.destinations || []).filter(function(d) { return d.active !== false; });
+  var destHtml = '';
+  if (dests.length === 0) {
+    destHtml = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0">No streaming links added yet.</p>';
+  } else {
+    destHtml = dests.map(function(d) {
+      var pm = getPlatformMeta(d.platform);
+      return '<a href="' + esc(d.url) + '" target="_blank" rel="noopener" class="dest-btn" '
+//        + 'onclick="logClickProxy(' + esc(sl.id) + ',' + esc(d.platform) + ')">'
+        + ' data-slid="' + esc(sl.id) + '" data-platform="' + esc(d.platform) + '">'
+        + '<div class="dest-icon ' + pm.cls + '">' + pm.emoji + '</div>'
+        + '<span class="dest-label">' + esc(d.platform || pm.label) + '</span>'
+        + '<span class="dest-arrow">›</span>'
+        + '</a>';
+    }).join('');
+  }
+
+  // Email capture
+  var emailHtml = '';
+  if (sl.emailcapture) {
+    emailHtml = '<div class="section-title">Stay Updated</div>'
+      + '<div class="email-form" id="emailCapture">'
+      + '<h3>Get notified on new releases</h3>'
+      + '<p>Drop your email and be the first to know when new music drops.</p>'
+      + '<div class="email-row">'
+      + '<input type="email" class="email-input" id="emailInput" placeholder="your@email.com">'
+      + '<button class="email-btn" onclick="submitEmail()">Notify me</button>'
+      + '</div>'
+      + '</div>';
+  }
+
+  // Release info card
+  var releaseHtml = '';
+  if (release) {
+    releaseHtml = '<div class="section-title">About this Release</div>'
+      + '<div class="release-card">'
+      + '<h3>' + esc(release.title) + '</h3>'
+      + (release.distributor ? '<p>via ' + esc(release.distributor) + '</p>' : '')
+      + (release.cat ? '<p>Cat. No: ' + esc(release.cat) + '</p>' : '')
+      + '</div>';
+  }
+
+  // Full HTML
+  var html =
+    '<div class="hero">'
+    + '<div class="hero-bg"></div>'
+    + '<div class="hero-content">'
+    + avatarHtml
+    + '<div class="artist-name">' + esc(sl.title) + '</div>'
+    + (artist ? '<div class="track-title">' + esc(artist.name) + '</div>' : '')
+    + '<div class="meta-row">' + preBadge + relBadge + dateBadge + '</div>'
+    + '</div>'
+    + '</div>'
+    + '<div class="main">'
+    + '<div class="section-title">' + (sl.presaveactive ? 'Pre-Save Now' : 'Listen Now') + '</div>'
+    + destHtml
+    + emailHtml
+    + releaseHtml
+    + '</div>'
+    + '<div class="footer">Powered by <a href="/" target="_blank">LabelManager</a></div>';
+
+  document.getElementById('app').innerHTML = html;
+}
+
+// ── Error states ─────────────────────────────────────────────────────────────
+function showError(type) {
+  var messages = {
+    noslug: {
+      icon: '🔗',
+      title: 'No Link Specified',
+      text: 'This page requires a valid smart link slug in the URL.<br>Example: <code style="color:var(--teal)">/link/your-release-slug</code>'
+    },
+    nodata: {
+      icon: '💾',
+      title: 'App Data Not Found',
+      text: 'LabelManager data could not be found. Make sure you are visiting this page from the same domain as your LabelManager instance.'
+    },
+    notfound: {
+      icon: '🔍',
+      title: 'Link Not Found',
+      text: 'This smart link doesnt exist or may have been removed. Double-check the URL and try again.'
+    }
+  };
+  var m = messages[type] || messages.notfound;
+  document.getElementById('app').innerHTML =
+    '<div class="state-box">'
+    + '<div class="icon">' + m.icon + '</div>'
+    + '<h2>' + m.title + '</h2>'
+    + '<p>' + m.text + '</p>'
+    + '</div>'
+    + '<div class="footer">Powered by <a href="/" target="_blank">LabelManager</a></div>';
+}
+
+// ── Globals for inline handlers ───────────────────────────────────────────────
+var _db = null;
+var _sl = null;
+
+function logClickProxy(slId, platform) {
+  if (_db) logClick(_db, slId, platform);
+}
+
+function submitEmail() {
+  if (!_db || !_sl) return;
+  var input = document.getElementById('emailInput');
+  var container = document.getElementById('emailCapture');
+  if (input && container) {
+    handleEmailSubmit(_db, _sl.id, input, null, container);
+  }
+}
+
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+(function init() {
+  var slug = getSlug();
+
+  if (!slug) {
+    showError('noslug');
+    return;
+  }
+
+  var db = getData();
+  if (!db) {
+    showError('nodata');
+    return;
+  }
+
+  var smartlinks = db.smart_links || [];
+  var sl = smartlinks.find(function(l) {
+    return l.slug === slug || l.id === slug;
+  });
+
+  if (!sl) {
+    showError('notfound');
+    return;
+  }
+
+  _db = db;
+  _sl = sl;
+  render(sl, db);
+})();
+</script>
+</body>
+</html>

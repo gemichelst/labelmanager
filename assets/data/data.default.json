@@ -1,0 +1,938 @@
+{
+    "artists": [
+        {
+            "id": "_vm2c3y0",
+            "name": "doerd",
+            "type": "Core Artist",
+            "status": "Active",
+            "territory": "WW",
+            "email": "me@doerd.de",
+            "phone": "+4917646560517",
+            "genres": "House, Deep Houe, Tech House, Breakbeat, Dub, Dub House",
+            "links": "https://instagram.com/micha.doerd, https://facebook.com/doerdMUSIC, https://www.discogs.com/artist/13394895-doerd, https://open.spotify.com/artist/54FAWeprinaFoAgojTEYJZ, https://www.junodownload.com/artists/Doerd/, https://www.beatport.com/de/artist/doerd/1438284, https://www.traxsource.com/artist/991643/doerd, https://music.apple.com/us/artist/doerd/1689888147, https://soundcloud.com/doert-solo",
+            "notes": "DOERD (DÖRT / DOERT)  is a Germany-based Electronic Music Producer, whose prolific and varied output embodies a deliberate \"musical schizophrenia\" by encompassing a wide spectrum of genres. His repertoire seamlessly transitions between Deep House, Tech House, Melodic House, and Breakbeats to introspective soundscapes like Chillout, Ambient, and Easy Listening.\n\nHis signature sound is defined by deep chords, driving grooves, and pulsating rhythms. DOERD maintains the constant objective of creating tracks that resonate with audiences and \"generate excitement on the dance floor\", producing always with \"at least one ear and one eye at the dancefloor\".\n\nDOERD operates under the core philosophy: \"This music should not be defined by genres but solely by your ♥\"."
+        },
+        {
+            "id": "_nz1kb0u",
+            "name": "OX",
+            "type": "Core Artist",
+            "status": "Active",
+            "territory": "WW",
+            "email": "ox@buntepanther.de",
+            "phone": "+49170000000",
+            "genres": "House, DeepHoue, TechHouse, Breakbeat, Dub, DubHouse",
+            "links": "",
+            "notes": ""
+        },
+        {
+            "id": "_aqyxvl9",
+            "name": "Subfari",
+            "type": "Core Artist",
+            "status": "Active",
+            "territory": "WW",
+            "email": "subfari@buntepanther.de",
+            "phone": "+49170000000",
+            "genres": "House, DeepHoue, TechHouse, Breakbeat, Dub, DubHouse",
+            "links": "",
+            "notes": ""
+        }
+    ],
+    "demos": [
+        {
+            "id": "_968qsi0",
+            "title": "DADDYWASA (Original Mix)",
+            "artist_id": "_vm2c3y0",
+            "artist_name": "doerd",
+            "genre": "House",
+            "bpm": "124",
+            "email": "me@doerd.de",
+            "rating": 5,
+            "file": "https://drive.google.com/file/d/1ucAlELIvGglljSKyVxhfrePyYrlHRyCS/view?usp=drive_link",
+            "notes": "",
+            "status": "In Review",
+            "watchlist": true,
+            "submitted": "2026-05-08",
+            "score": 65
+        }
+    ],
+    "releases": [
+        {
+            "id": "_l5s48b3",
+            "title": "Test EP",
+            "artist_id": "_vm2c3y0",
+            "type": "EP",
+            "cat": "BP-001",
+            "date": "2026-05-09",
+            "distributor": "Other",
+            "status": "Released",
+            "territory": "WW",
+            "tasks": [
+                {
+                    "id": "_ogs5elo",
+                    "text": "Tracklist finalisieren",
+                    "done": false
+                },
+                {
+                    "id": "_wql6c16",
+                    "text": "Artwork + Label Copy",
+                    "done": false
+                },
+                {
+                    "id": "_k2uss88",
+                    "text": "Mastering aller Tracks",
+                    "done": false
+                },
+                {
+                    "id": "_pjxgndm",
+                    "text": "Katalognummer",
+                    "done": false
+                },
+                {
+                    "id": "_hx9unry",
+                    "text": "DistroKid/Believe Upload",
+                    "done": false
+                },
+                {
+                    "id": "_1kfefeo",
+                    "text": "ISRC alle Tracks",
+                    "done": false
+                },
+                {
+                    "id": "_b0gyyiz",
+                    "text": "Beatport Exclusive (4W)",
+                    "done": false
+                },
+                {
+                    "id": "_8u6lp58",
+                    "text": "Spotify Pitch",
+                    "done": false
+                },
+                {
+                    "id": "_4yhdy7s",
+                    "text": "Pre-Save Kampagne",
+                    "done": false
+                },
+                {
+                    "id": "_z324v6b",
+                    "text": "DJ Promo CSV",
+                    "done": false
+                },
+                {
+                    "id": "_6f1yguo",
+                    "text": "PR Outreach (10 Blogs)",
+                    "done": false
+                },
+                {
+                    "id": "_xjj81dz",
+                    "text": "Instagram Reel",
+                    "done": false
+                },
+                {
+                    "id": "_mtjg36w",
+                    "text": "Post-Release Check",
+                    "done": false
+                }
+            ]
+        }
+    ],
+    "contracts": [],
+    "events": [],
+    "media": [
+        {
+            "id": "_xx15gv2",
+            "title": "doerd - DADDYWASA (liverecord)",
+            "type": "Demo",
+            "artist_id": "_vm2c3y0",
+            "related_to": "",
+            "version": "LiveRecord",
+            "tags": "24bit, wav, doerd, live",
+            "file": "blob:https://labelmanager.doerd.de/0463b6f8-6734-45c1-a31f-5b4cbc618423",
+            "is_image": false
+        },
+        {
+            "id": "_ln45urr",
+            "title": "doerd - DADDYWASA (liverecord)",
+            "type": "Artwork",
+            "artist_id": "_vm2c3y0",
+            "related_to": "",
+            "version": "v1",
+            "tags": "arrwork",
+            "file": "blob:https://labelmanager.doerd.de/ef44e1df-cbdb-4783-9188-514c8a496d3a",
+            "is_image": true
+        }
+    ],
+    "royalties": [
+        {
+            "id": "ro1",
+            "release_id": "r1",
+            "source": "Spotify (DistroKid)",
+            "net_amount": 1240.5
+        },
+        {
+            "id": "ro2",
+            "release_id": "r1",
+            "source": "Beatport",
+            "net_amount": 320
+        },
+        {
+            "id": "ro3",
+            "release_id": "r1",
+            "source": "Apple Music",
+            "net_amount": 850
+        }
+    ],
+    "expenses": [],
+    "curators": [
+        {
+            "id": "cu1",
+            "name": "RA Reviews",
+            "type": "Blog",
+            "genre": "Techno",
+            "contact": "reviews@ra.co",
+            "submits": "ra.co/submit"
+        },
+        {
+            "id": "cu2",
+            "name": "Acid Test Podcast",
+            "type": "Podcast",
+            "genre": "Techno, Acid",
+            "contact": "",
+            "submits": "acidtest.com"
+        },
+        {
+            "id": "cu3",
+            "name": "Groove Magazine",
+            "type": "Print/Web",
+            "genre": "Electronic",
+            "contact": "redaktion@groove.de",
+            "submits": ""
+        }
+    ],
+    "users": [
+        {
+            "id": "_ld74r1k",
+            "name": "Micha",
+            "email": "doerd@buntepanther.de",
+            "role": "admin",
+            "artist_id": "_vm2c3y0",
+            "status": "Active",
+            "last_active": "2026-05-08",
+            "lastactive": "2026-05-09"
+        },
+        {
+            "id": "_msvcnw7",
+            "name": "Oscar",
+            "email": "ox@buntepanther.de",
+            "role": "admin",
+            "artist_id": "_nz1kb0u",
+            "status": "Active",
+            "last_active": "2026-05-09"
+        },
+        {
+            "id": "_l4asmcl",
+            "name": "Hardy",
+            "email": "subfari@buntepanther.de",
+            "role": "admin",
+            "artist_id": "_aqyxvl9",
+            "status": "Active",
+            "last_active": "2026-05-09"
+        },
+        {
+            "id": "_0x0k0gl",
+            "name": "Admin",
+            "email": "admin@buntepanther.de",
+            "role": "admin",
+            "artist_id": "",
+            "status": "Active",
+            "last_active": "2026-05-09"
+        }
+    ],
+    "activity_log": [
+        {
+            "id": "_8z5fxdh",
+            "ts": "2026-05-09T16:35:00.960Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_iwby8ir",
+            "ts": "2026-05-09T16:35:00.839Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_gtdwv67",
+            "ts": "2026-05-09T16:13:31.625Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_zqeg3ak",
+            "ts": "2026-05-09T16:13:31.541Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_wp84a5s",
+            "ts": "2026-05-09T06:53:37.612Z",
+            "user": "Micha",
+            "action": "Demo \"DADDYWASA (Original Mix)\" → In Review",
+            "module": "A&R"
+        },
+        {
+            "id": "_bp5nwwf",
+            "ts": "2026-05-09T06:53:22.404Z",
+            "user": "Micha",
+            "action": "Webhook \"#notify-🔔\" added",
+            "module": "Integrations"
+        },
+        {
+            "id": "_1e8rr5y",
+            "ts": "2026-05-09T06:46:17.658Z",
+            "user": "Micha",
+            "action": "Webhook \"#notify-🔔\" added",
+            "module": "Integrations"
+        },
+        {
+            "id": "_2ivakbf",
+            "ts": "2026-05-09T06:39:06.554Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_mewfj8h",
+            "ts": "2026-05-09T06:39:06.460Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_b3l63ww",
+            "ts": "2026-05-09T06:36:36.498Z",
+            "user": "Micha",
+            "action": "Demo \"DADDYWASA (Original Mix)\" → Neu",
+            "module": "A&R"
+        },
+        {
+            "id": "_d0wvx5e",
+            "ts": "2026-05-09T06:35:52.641Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_7owxqpx",
+            "ts": "2026-05-09T06:35:52.546Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_tt8fd29",
+            "ts": "2026-05-09T06:31:43.747Z",
+            "user": "Micha",
+            "action": "User \"Admin\" created",
+            "module": "System"
+        },
+        {
+            "id": "_8weferj",
+            "ts": "2026-05-09T06:30:14.255Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_yex6wv7",
+            "ts": "2026-05-09T06:30:14.149Z",
+            "user": "Micha",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_9f683l2",
+            "ts": "2026-05-09T06:11:04.240Z",
+            "user": "Micha",
+            "action": "Deleted users item \"Max Mustermann\"",
+            "module": "System"
+        },
+        {
+            "id": "_8g02y4h",
+            "ts": "2026-05-09T06:10:40.704Z",
+            "user": "Max Mustermann",
+            "action": "User \"Hardy\" created",
+            "module": "System"
+        },
+        {
+            "id": "_kbtrj6j",
+            "ts": "2026-05-09T06:10:27.455Z",
+            "user": "Max Mustermann",
+            "action": "User \"Oscar\" created",
+            "module": "System"
+        },
+        {
+            "id": "_2w2ify9",
+            "ts": "2026-05-09T06:09:55.379Z",
+            "user": "Max Mustermann",
+            "action": "Artist/Contact \"Subfari\" created",
+            "module": "CRM"
+        },
+        {
+            "id": "_da4bi0o",
+            "ts": "2026-05-09T06:09:32.175Z",
+            "user": "Max Mustermann",
+            "action": "Artist/Contact \"OX\" created",
+            "module": "CRM"
+        },
+        {
+            "id": "_e629hjy",
+            "ts": "2026-05-09T04:53:42.599Z",
+            "user": "Max Mustermann",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_mogj41o",
+            "ts": "2026-05-09T04:53:42.490Z",
+            "user": "Max Mustermann",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_nxfmlvy",
+            "ts": "2026-05-09T04:15:19.095Z",
+            "user": "Max Mustermann",
+            "action": "DB Admin: demos updated",
+            "module": "System"
+        },
+        {
+            "id": "_9ax6yf8",
+            "ts": "2026-05-09T04:14:04.304Z",
+            "user": "Max Mustermann",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_m5pu1tb",
+            "ts": "2026-05-08T22:31:36.990Z",
+            "user": "Max Mustermann",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_a74fvmh",
+            "ts": "2026-05-08T21:07:08.578Z",
+            "user": "Max Mustermann",
+            "action": "Micha signed in",
+            "module": "System"
+        },
+        {
+            "id": "_3k79vvz",
+            "ts": "2026-05-08T21:05:05.825Z",
+            "user": "Max Mustermann",
+            "action": "Deleted users item \"DJ Void (Artist Portal)\"",
+            "module": "System"
+        },
+        {
+            "id": "_uvzddyx",
+            "ts": "2026-05-08T21:05:02.797Z",
+            "user": "Max Mustermann",
+            "action": "Deleted users item \"Lena A&R\"",
+            "module": "System"
+        },
+        {
+            "id": "_ba3dfpe",
+            "ts": "2026-05-08T21:04:53.737Z",
+            "user": "Max Mustermann",
+            "action": "User \"Micha\" created",
+            "module": "System"
+        },
+        {
+            "id": "_7ubdg8d",
+            "ts": "2026-05-08T21:03:40.512Z",
+            "user": "Max Mustermann",
+            "action": "Media \"doerd - DADDYWASA (liverecord)\" added",
+            "module": "Media"
+        },
+        {
+            "id": "_jd3c8yr",
+            "ts": "2026-05-08T21:01:39.945Z",
+            "user": "Max Mustermann",
+            "action": "Media \"doerd - DADDYWASA (liverecord)\" added",
+            "module": "Media"
+        },
+        {
+            "id": "_30wasl7",
+            "ts": "2026-05-08T21:00:03.675Z",
+            "user": "Max Mustermann",
+            "action": "Deleted media item \"Deep Transmission – Press Photo\"",
+            "module": "System"
+        },
+        {
+            "id": "_dqcy66i",
+            "ts": "2026-05-08T21:00:01.122Z",
+            "user": "Max Mustermann",
+            "action": "Deleted media item \"Void EP – Artwork\"",
+            "module": "System"
+        },
+        {
+            "id": "_w1l2xtv",
+            "ts": "2026-05-08T20:59:58.337Z",
+            "user": "Max Mustermann",
+            "action": "Deleted media item \"Void EP – Club Master\"",
+            "module": "System"
+        },
+        {
+            "id": "_ryf9cxx",
+            "ts": "2026-05-08T20:59:30.077Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"DADDYWASA (Original Mix)\" → In Review",
+            "module": "A&R"
+        },
+        {
+            "id": "_fvaznqf",
+            "ts": "2026-05-08T20:58:34.954Z",
+            "user": "Max Mustermann",
+            "action": "Track \"DADDYWASA (liveRecord)\" added to catalog",
+            "module": "Catalog"
+        },
+        {
+            "id": "_756ty4t",
+            "ts": "2026-05-08T20:57:33.484Z",
+            "user": "Max Mustermann",
+            "action": "Deleted tracks item \"Void EP - Track 1\"",
+            "module": "System"
+        },
+        {
+            "id": "_96zahsl",
+            "ts": "2026-05-08T20:57:17.459Z",
+            "user": "Max Mustermann",
+            "action": "Deleted events item \"Tresor Night\"",
+            "module": "System"
+        },
+        {
+            "id": "_396rehs",
+            "ts": "2026-05-08T20:57:15.379Z",
+            "user": "Max Mustermann",
+            "action": "Deleted events item \"Fusion Festival\"",
+            "module": "System"
+        },
+        {
+            "id": "_96j1qd1",
+            "ts": "2026-05-08T20:57:05.901Z",
+            "user": "Max Mustermann",
+            "action": "Deleted royalty_contracts item \"rc1\"",
+            "module": "System"
+        },
+        {
+            "id": "_ml894v6",
+            "ts": "2026-05-08T20:57:00.767Z",
+            "user": "Max Mustermann",
+            "action": "Deleted expenses item \"x1\"",
+            "module": "System"
+        },
+        {
+            "id": "_6u5imgy",
+            "ts": "2026-05-08T20:56:58.162Z",
+            "user": "Max Mustermann",
+            "action": "Deleted expenses item \"x2\"",
+            "module": "System"
+        },
+        {
+            "id": "_lslcczs",
+            "ts": "2026-05-08T20:56:48.766Z",
+            "user": "Max Mustermann",
+            "action": "Deleted royalty_contracts item \"rc1\"",
+            "module": "System"
+        },
+        {
+            "id": "_d48uvho",
+            "ts": "2026-05-08T20:55:49.427Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"DADDYWASA (Original Mix)\" submitted",
+            "module": "A&R"
+        },
+        {
+            "id": "_z316lvt",
+            "ts": "2026-05-08T20:54:17.187Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Acid Rain\" rated 1★",
+            "module": "A&R"
+        },
+        {
+            "id": "_jr4vd3g",
+            "ts": "2026-05-08T20:54:15.761Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Deep Chords\" rated 1★",
+            "module": "A&R"
+        },
+        {
+            "id": "_ollikrc",
+            "ts": "2026-05-08T20:54:15.096Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Deep Chords\" rated 1★",
+            "module": "A&R"
+        },
+        {
+            "id": "_isl0g4t",
+            "ts": "2026-05-08T20:54:07.462Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Acid Rain\" → Abgelehnt",
+            "module": "A&R"
+        },
+        {
+            "id": "_inl74wo",
+            "ts": "2026-05-08T20:54:05.368Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Berlin Nights\" → Abgelehnt",
+            "module": "A&R"
+        },
+        {
+            "id": "_pcc1rrg",
+            "ts": "2026-05-08T20:54:03.089Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Deep Chords\" → Abgelehnt",
+            "module": "A&R"
+        },
+        {
+            "id": "_wmrd09n",
+            "ts": "2026-05-08T20:53:56.265Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Berlin Nights\" → Neu",
+            "module": "A&R"
+        },
+        {
+            "id": "_5c3baz1",
+            "ts": "2026-05-08T20:53:55.431Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Berlin Nights\" → Neu",
+            "module": "A&R"
+        },
+        {
+            "id": "_dwmfcix",
+            "ts": "2026-05-08T20:53:51.768Z",
+            "user": "Max Mustermann",
+            "action": "Deleted artists item \"Synth Kid\"",
+            "module": "System"
+        },
+        {
+            "id": "_vz2oyn1",
+            "ts": "2026-05-08T20:53:48.839Z",
+            "user": "Max Mustermann",
+            "action": "Deleted artists item \"DJ Void\"",
+            "module": "System"
+        },
+        {
+            "id": "_dv3gjgk",
+            "ts": "2026-05-08T20:53:32.678Z",
+            "user": "Max Mustermann",
+            "action": "Deleted contracts item \"c1\"",
+            "module": "System"
+        },
+        {
+            "id": "_ijc1t9a",
+            "ts": "2026-05-08T20:53:30.296Z",
+            "user": "Max Mustermann",
+            "action": "Deleted contracts item \"c2\"",
+            "module": "System"
+        },
+        {
+            "id": "_67gc7x8",
+            "ts": "2026-05-08T20:53:25.694Z",
+            "user": "Max Mustermann",
+            "action": "Deleted releases item \"Void EP\"",
+            "module": "System"
+        },
+        {
+            "id": "_ekeq0ou",
+            "ts": "2026-05-08T20:53:22.845Z",
+            "user": "Max Mustermann",
+            "action": "Deleted releases item \"Deep Transmission\"",
+            "module": "System"
+        },
+        {
+            "id": "_7z2fphe",
+            "ts": "2026-05-08T20:53:12.485Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Deep Chords\" → Neu",
+            "module": "A&R"
+        },
+        {
+            "id": "_xsay7w5",
+            "ts": "2026-05-08T20:52:33.789Z",
+            "user": "Max Mustermann",
+            "action": "Deleted artists item \"Groove Agency Berlin\"",
+            "module": "System"
+        },
+        {
+            "id": "_dl9bz39",
+            "ts": "2026-05-08T20:52:28.612Z",
+            "user": "Max Mustermann",
+            "action": "Artist/Contact \"doerd\" created",
+            "module": "CRM"
+        },
+        {
+            "id": "_p52xul1",
+            "ts": "2026-05-08T20:44:26.092Z",
+            "user": "Max Mustermann",
+            "action": "Demo \"Acid Rain\" → Gespräch",
+            "module": "A&R"
+        },
+        {
+            "id": "_td4njao",
+            "ts": "2026-05-08T20:44:11.651Z",
+            "user": "Max Mustermann",
+            "action": "Max Mustermann signed in",
+            "module": "System"
+        },
+        {
+            "id": "_wtslm9h",
+            "ts": "2026-05-08T20:44:11.531Z",
+            "user": "Max Mustermann",
+            "action": "Max Mustermann signed in",
+            "module": "System"
+        },
+        {
+            "id": "_vfgm9sv",
+            "ts": "2026-05-08T18:59:23.826Z",
+            "user": "Max Mustermann",
+            "action": "Max Mustermann signed in",
+            "module": "System"
+        },
+        {
+            "id": "_z4tqrmt",
+            "ts": "2026-05-08T18:59:23.700Z",
+            "user": "Max Mustermann",
+            "action": "Max Mustermann signed in",
+            "module": "System"
+        },
+        {
+            "id": "_g3n2qk4",
+            "ts": "2026-05-08T18:46:50.679Z",
+            "user": "Max Mustermann",
+            "action": "Max Mustermann signed in",
+            "module": "System"
+        },
+        {
+            "id": "_cnoyg46",
+            "ts": "2026-05-08T18:36:25.831Z",
+            "user": "Max Mustermann",
+            "action": "Max Mustermann signed in",
+            "module": "System"
+        },
+        {
+            "id": "l1",
+            "ts": "2026-05-03T00:30:00",
+            "user": "Max",
+            "action": "Demo \"Acid Rain\" moved to Shortlist",
+            "module": "A&R"
+        },
+        {
+            "id": "l2",
+            "ts": "2026-05-02T18:12:00",
+            "user": "Lena",
+            "action": "Contract \"Single Deal\" created for Synth Kid",
+            "module": "Contracts"
+        },
+        {
+            "id": "l3",
+            "ts": "2026-05-02T14:05:00",
+            "user": "Max",
+            "action": "Release \"Deep Transmission\" → In Production",
+            "module": "Releases"
+        }
+    ],
+    "tracks": [
+        {
+            "id": "_uaef1rh",
+            "title": "DADDYWASA (liveRecord)",
+            "artist_id": "_vm2c3y0",
+            "release_id": "",
+            "isrc": "",
+            "version": "Club",
+            "bpm": "124",
+            "key": "",
+            "duration": "",
+            "composer": "Michael Matzat",
+            "publisher": "Bunte Panther",
+            "p_line": "",
+            "c_line": "",
+            "territory": "WW",
+            "explicit": true,
+            "rights_in": true,
+            "license_expires": "",
+            "tags": "house, doerd, club",
+            "genre": "",
+            "quality_score": null,
+            "credits": []
+        }
+    ],
+    "royalty_contracts": [],
+    "royalty_statements": [],
+    "distributor_mappings": [
+        {
+            "id": "dm1",
+            "name": "DistroKid",
+            "col_source": 0,
+            "col_release_id": 1,
+            "col_net": 2,
+            "col_territory": 3,
+            "col_period": 4,
+            "delimiter": ","
+        }
+    ],
+    "remix_contests": [],
+    "ar_scores": [],
+    "smart_links": [
+		    {
+		        "id": "_cw0kyac",
+		        "title": "Test EP - SmartLink",
+		        "slug": "testep",
+		        "artist_id": "_vm2c3y0",
+		        "release_id": "_l5s48b3",
+		        "type": "release",
+		        "accent": "#6f5f34",
+		        "destinations": [
+		            {
+		                "platform": "Instagram",
+		                "url": "https://instagram.com/micha.doerd",
+		                "active": true
+		            },
+		            {
+		                "platform": "TikTok",
+		                "url": "https://www.tiktok.com/@gemichelst",
+		                "active": true
+		            },
+		            {
+		                "platform": "Juno Download",
+		                "url": "https://www.junodownload.com/artists/Doerd/",
+		                "active": true
+		            },
+		            {
+		                "platform": "Beatport",
+		                "url": "https://www.beatport.com/de/artist/doerd/1438284",
+		                "active": true
+		            },
+		            {
+		                "platform": "Traxsource",
+		                "url": "https://www.traxsource.com/artist/991643/doerd",
+		                "active": true
+		            },
+		            {
+		                "platform": "Soundcloud",
+		                "url": "https://soundcloud.com/doert-solo",
+		                "active": true
+		            }
+		        ],
+		        "presave_active": false,
+		        "email_capture": true,
+		        "clicks": 0,
+		        "created": "2026-05-09"
+		    }
+    ],
+    "promo_links": [],
+    "epks": [],
+    "global_tasks": [],
+    "automations": [
+        {
+            "id": "au1",
+            "trigger": "demo_status_offer",
+            "action": "create_contract_draft",
+            "active": true,
+            "label": "Demo → Offer creates Contract Draft"
+        },
+        {
+            "id": "au2",
+            "trigger": "release_created",
+            "action": "create_release_tasks",
+            "active": true,
+            "label": "New Release creates Task Checklist"
+        },
+        {
+            "id": "au3",
+            "trigger": "gig_confirmed",
+            "action": "create_gig_tasks",
+            "active": true,
+            "label": "Confirmed Gig creates Itinerary Tasks"
+        }
+    ],
+    "notes": [],
+    "comments": [],
+    "channel_stats": [],
+    "notifications": [
+        {
+            "id": "n1",
+            "type": "demo_new",
+            "msg": "New demo: \"Acid Dreams\" by External Artist",
+            "read": true,
+            "ts": "2026-05-03 05:10",
+            "link": "anr"
+        },
+        {
+            "id": "n2",
+            "type": "task_due",
+            "msg": "Task \"Submit to Spotify Editorial\" is due today",
+            "read": true,
+            "ts": "2026-05-03 06:00",
+            "link": "releases"
+        },
+        {
+            "id": "n3",
+            "type": "contract",
+            "msg": "Contract for DJ Void expires in 28 days",
+            "read": true,
+            "ts": "2026-05-02 12:00",
+            "link": "crm"
+        }
+    ],
+    "webhooks": [
+        {
+            "id": "_jr4n1xw",
+            "name": "#notify-🔔",
+            "url": "https://discord.com/api/webhooks/1502561854218833970/3EZFmXP3ksqy8CkLUYvydFfuOKrVPvmFDHtTSJtx2eYgGpWRzCEcd5HslPw5PFZXQznZ",
+            "active": true,
+            "platform": "Discord",
+            "events": [
+                "demo.new",
+                "demo.status_changed",
+                "release.created",
+                "gig.confirmed",
+                "payout.created",
+                "contract.expiring"
+            ],
+            "created": "2026-05-09"
+        },
+        {
+            "id": "_woitvk3",
+            "name": "#notify-🔔",
+            "url": "https://discord.com/api/webhooks/1502561854218833970/3EZFmXP3ksqy8CkLUYvydFfuOKrVPvmFDHtTSJtx2eYgGpWRzCEcd5HslPw5PFZXQznZ",
+            "active": true,
+            "platform": "Discord",
+            "events": [
+                "demo.new",
+                "demo.status_changed",
+                "release.created",
+                "gig.confirmed",
+                "payout.created",
+                "contract.expiring"
+            ],
+            "created": "2026-05-09"
+        }
+    ],
+    "integration_logs": [
+        {
+            "id": "_farlfgn",
+            "type": "distributor_export",
+            "name": "dk",
+            "event": "Export for \"Deep Transmission\"",
+            "status": "generated",
+            "ts": "8.5.2026, 22:47:59"
+        }
+    ],
+    "portal_sessions": [],
+    "distributor_exports": []
+}

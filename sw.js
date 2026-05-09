@@ -2,6 +2,7 @@
 const CACHE = 'lm-v1';
 const PRECACHE = [
   './index.html',
+  './link.html',
   './upload.html',
   './manifest.json',
   './assets/css/style_merged.css',

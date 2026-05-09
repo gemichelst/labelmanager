@@ -23,7 +23,7 @@ const TASK_TPL = {
 
 const ROLES = {
   admin:         {label:'Admin',         col:'#c9a84c', mods:['dash','crm','anr','releases','contracts','finance','bookings','media','research','users','actlog','royalties','tracks','catalog','anrpro','marketing','analytics','collab','user-circle','manager-portal','integrations'], write:['*']},
-  label_manager: {label:'Label Manager', col:'#4a9fa8', mods:['dash','crm','anr','releases','contracts','finance','bookings','media','research','actlog'],         write:['crm','anr','releases','contracts','bookings','media']},
+  label_manager: {label:'Manager',       col:'#4a9fa8', mods:['dash','crm','anr','releases','contracts','finance','bookings','media','research','actlog'],          write:['crm','anr','releases','contracts','bookings','media']},
   ar:            {label:'A&R',           col:'#7c6fa8', mods:['dash','crm','anr','releases','media','research'],                                                     write:['anr','media']},
   artist:        {label:'Artist',        col:'#3d9970', mods:['dash','anr','releases','media'],                                                                      write:[]},
 };
@@ -44,14 +44,14 @@ const RBAC_MX = {
 };
 
 const ANR_COLS = [
-  {key:'Neu',       label:'New',       col:'#5a5a72'},
-  {key:'In Review', label:'In Review', col:'#4a9fa8'},
-  {key:'Shortlist', label:'Shortlist', col:'#c9a84c'},
-  {key:'Gespräch',  label:'In Talk',   col:'#7c6fa8'},
-  {key:'Offer',     label:'Offer',     col:'#c9a84c'},
-  {key:'Signed',    label:'Signed ✓',  col:'#3d9970'},
-  {key:'Abgelehnt', label:'Pass',      col:'#c0524e'},
+  {key:'Neu',       label:'New ♫',        col:'#5a5a72'},
+  {key:'In Review', label:'Review ▶',     col:'#4a9fa8'},
+  {key:'Gespräch',  label:'Interest ♥︎',   col:'#7c6fa8'},
+  {key:'Offer',     label:'Contract ✉',   col:'#c9a84c'},
+  {key:'Signed',    label:'Signed ✓',     col:'#3d9970'},
+  {key:'Abgelehnt', label:'Pass ⃠',      col:'#c0524e'},
 ];
+//  {key:'Shortlist', label:'Shortlist', col:'#c9a84c'},
 
 const REL_ST = ['Idea','A&R Selected','In Production','Mastered','Distro Setup','Pre-Save','Released','Post-Campaign'];
 
@@ -68,40 +68,23 @@ const STATUS_CLS = {
 // ────────────────────────────────────────────────────────────────────────────
 const SEED = {
   artists:[
-    {id:'a1',name:'DJ Void',type:'Core Artist',status:'Active',territory:'DE, EU',genres:'Techno, Industrial',email:'void@mail.com',phone:'+49 151 11223344',links:'https://ra.co/djvoid, @void_dj',notes:'Resident at Tresor. 3 EPs on roster.'},
-    {id:'a2',name:'Synth Kid',type:'Development',status:'Active',territory:'DE',genres:'Electro, Acid',email:'synthkid@web.de',phone:'',links:'@synthkid_de',notes:'First submission 2026-03. Very promising.'},
-    {id:'a3',name:'Groove Agency Berlin',type:'Booker',status:'Partner',territory:'EU',genres:'',email:'book@grooveagency.de',phone:'+49 30 123456',links:'https://grooveagency.de',notes:'Handles DJ Void EU bookings.'}
+    {id:'_vm2c3y0',name:'doerd',type:'Core Artist',status:'Active',territory:'WW',email:'me@doerd.de',phone:'+4917646560517',genres:'House, DeepHoue, TechHouse, Breakbeat, Dub, DubHouse',links:'https://instagram.com/micha.doerd, https://facebook.com/doerdMUSIC, https://www.discogs.com/artist/13394895-doerd, https://open.spotify.com/artist/54FAWeprinaFoAgojTEYJZ, https://www.junodownload.com/artists/Doerd/, https://www.beatport.com/de/artist/doerd/1438284, https://www.traxsource.com/artist/991643/doerd, https://music.apple.com/us/artist/doerd/1689888147, https://soundcloud.com/doert-solo',notes:'DOERD (DÖRT / DOERT)  is a Germany-based Electronic Music Producer, whose prolific and varied output embodies a deliberate \"musical schizophrenia\" by encompassing a wide spectrum of genres. His repertoire seamlessly transitions between Deep House, Tech House, Melodic House, and Breakbeats to introspective soundscapes like Chillout, Ambient, and Easy Listening.\n\nHis signature sound is defined by deep chords, driving grooves, and pulsating rhythms. DOERD maintains the constant objective of creating tracks that resonate with audiences and \"generate excitement on the dance floor\',producing always with \"at least one ear and one eye at the dancefloor\".\n\nDOERD operates under the core philosophy: \"This music should not be defined by genres but solely by your ♥'},
+    {id:'_nz1kb0u',name:'OX',type:'Core Artist',status:'Active',territory:'WW',email:'ox@buntepanther.de',phone:'+49170000000',genres:'House, DeepHoue, TechHouse, Breakbeat, Dub, DubHouse',links:'',notes:''},
+    {id:'_aqyxvl9',name:'Subfari',type:'Core Artist',status:'Active',territory:'WW',email:'subfari@buntepanther.de',phone:'+49170000000',genres:'House, DeepHoue, TechHouse, Breakbeat, Dub, DubHouse',links:'',notes:''}
   ],
-  demos:[
-    {id:'d1',title:'Berlin Nights',artist_id:'',artist_name:'Unknown Submitter',genre:'Techno',bpm:138,email:'sub@x.de',status:'Neu',rating:0,watchlist:false,file:'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',notes:'Interesting main motif.',submitted:'2026-05-01'},
-    {id:'d2',title:'Deep Chords',artist_id:'a2',artist_name:'Synth Kid',genre:'Electro',bpm:125,email:'synthkid@web.de',status:'In Review',rating:4,watchlist:true,file:'https://actions.google.com/sounds/v1/science_fiction/alien_breath.ogg',notes:'Strong Drexciya reference.',submitted:'2026-04-28'},
-    {id:'d3',title:'Acid Rain',artist_id:'a1',artist_name:'DJ Void',genre:'Acid',bpm:140,email:'void@mail.com',status:'Shortlist',rating:5,watchlist:false,file:'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',notes:'Potential label release.',submitted:'2026-04-15'}
-  ],
-  releases:[
-    {id:'r1',title:'Void EP',artist_id:'a1',type:'EP',cat:'BP-001',status:'Released',date:'2026-03-01',distributor:'DistroKid',territory:'WW',tasks:TASK_TPL.EP.map((t,i)=>({id:'t'+i,text:t,done:true}))},
-    {id:'r2',title:'Deep Transmission',artist_id:'a2',type:'Single',cat:'BP-002',status:'In Production',date:'2026-07-15',distributor:'Believe',territory:'WW',tasks:TASK_TPL.Single.map((t,i)=>({id:'s'+i,text:t,done:i<2}))}
-  ],
-  contracts:[
-    {id:'c1',type:'Exclusive EP',artist_id:'a1',release_id:'r1',status:'Active',territory:'WW',label_split:50,artist_split:50,advance:0,expires:'2027-03-01'},
-    {id:'c2',type:'Single Deal',artist_id:'a2',release_id:'r2',status:'In Negotiation',territory:'WW',label_split:60,artist_split:40,advance:200,expires:'2026-06-01'}
-  ],
-  events:[
-    {id:'e1',name:'Tresor Night',artist_id:'a1',date:'2026-06-14',venue:'Tresor, Berlin',promoter_id:'',promoter_name:'Tresor GmbH',deal_type:'Fee',status:'Confirmed',fee:800},
-    {id:'e2',name:'Fusion Festival',artist_id:'a1',date:'2026-08-22',venue:'Fusion, Lärz',promoter_id:'',promoter_name:'Kulturkosmos',deal_type:'Fee',status:'Option',fee:1200}
-  ],
-  media:[
-    {id:'m1',related_to:'r1',title:'Void EP – Club Master',type:'Master',artist_id:'a1',version:'Club',file:'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',tags:'WAV, 24bit, 44.1kHz',is_image:false},
-    {id:'m2',related_to:'r1',title:'Void EP – Artwork',type:'Artwork',artist_id:'a1',version:'',file:'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=400&q=80',tags:'3000×3000, RGB, JPG',is_image:true},
-    {id:'m3',related_to:'r2',title:'Deep Transmission – Press Photo',type:'Press Photo',artist_id:'a2',version:'',file:'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80',tags:'1200×800, JPG',is_image:true}
-  ],
+  demos:[],
+  releases:[],
+  contracts:[],
+  events:[],
+  media:[],
   royalties:[
-    {id:'ro1',release_id:'r1',source:'Spotify (DistroKid)',net_amount:1240.50},
-    {id:'ro2',release_id:'r1',source:'Beatport',net_amount:320.00},
-    {id:'ro3',release_id:'r1',source:'Apple Music',net_amount:850.00}
+    // {id:'ro1',release_id:'r1',source:'Spotify (DistroKid)',net_amount:1240.50},
+    // {id:'ro2',release_id:'r1',source:'Beatport',net_amount:320.00},
+    // {id:'ro3',release_id:'r1',source:'Apple Music',net_amount:850.00}
   ],
   expenses:[
-    {id:'x1',description:'Mastering Void EP',category:'Mastering',amount:250,artist_id:'a1',release_id:'r1',recouped:250},
-    {id:'x2',description:'PR Campaign Void EP',category:'PR',amount:500,artist_id:'a1',release_id:'r1',recouped:320}
+    {id:'x1',description:'Mastering - EXAMPLE',category:'Mastering',amount:250,artist_id:'a1',release_id:'r1',recouped:250},
+    {id:'x2',description:'PR Campaign - EXAMPLE',category:'PR',amount:500,artist_id:'a1',release_id:'r1',recouped:320}
   ],
   curators:[
     {id:'cu1',name:'RA Reviews',type:'Blog',genre:'Techno',contact:'reviews@ra.co',submits:'ra.co/submit'},
@@ -109,36 +92,20 @@ const SEED = {
     {id:'cu3',name:'Groove Magazine',type:'Print/Web',genre:'Electronic',contact:'redaktion@groove.de',submits:''}
   ],
   users:[
-    {id:'u1',name:'Max Mustermann',email:'admin@bunterpanther.de',role:'admin',artist_id:'',status:'Active',last_active:'2026-05-03'},
-    {id:'u2',name:'Lena A&R',email:'ar@bunterpanther.de',role:'ar',artist_id:'',status:'Active',last_active:'2026-05-02'},
-    {id:'u3',name:'DJ Void (Artist Portal)',email:'void@mail.com',role:'artist',artist_id:'a1',status:'Active',last_active:'2026-04-28'}
+    {id:'_0x0k0gl',name:'Admin',email:'admin@buntepanther.de',role:'admin',artist_id:'',status:'Active',last_active:'2026-05-09'},
+    {id:'_ld74r1k',name:'Micha',email:'doerd@buntepanther.de',role:'admin',artist_id:'_vm2c3y0',status:'Active',last_active:'2026-05-08',lastactive:'2026-05-09'},
+    {id:'_msvcnw7',name:'Oscar',email:'ox@buntepanther.de',role:'admin',artist_id:'_nz1kb0u',status:'Active',last_active:'2026-05-09'},
+    {id:'_l4asmcl',name:'Hardy',email:'subfari@buntepanther.de',role:'admin',artist_id:'_aqyxvl9',status:'Active',last_active:'2026-05-09'}
   ],
   activity_log:[
-    {id:'l1',ts:'2026-05-03T00:30:00',user:'Max',action:'Demo "Acid Rain" moved to Shortlist',module:'A&R'},
-    {id:'l2',ts:'2026-05-02T18:12:00',user:'Lena',action:'Contract "Single Deal" created for Synth Kid',module:'Contracts'},
-    {id:'l3',ts:'2026-05-02T14:05:00',user:'Max',action:'Release "Deep Transmission" → In Production',module:'Releases'}
+
   ],
   tracks: [
-    {
-      id:'tr1', title:'Void EP - Track 1', isrc:'DE-A1B-26-00001',
-      artist_id:'a1', release_id:'r1', version:'Club',
-      composer:'DJ Void', publisher:'Self', p_line:'2026 Bunte Panther',
-      c_line:'2026 Bunte Panther', bpm:138, key:'A minor',
-      duration:'6:32', explicit:false, language:'Instrumental',
-      lyrics:'', genre:'Techno', tags:'dark,industrial', credits:[],
-      territory:'WW', rights_in:true, rights_out:false,
-      license_expires:'', quality_score:null
-    }
+      {
+        id:'_uaef1rh', title:'DADDYWASA (liveRecord)', artist_id:'_vm2c3y0', release_id:', isrc:', version:'Club', bpm:'124', key:', duration:', composer:'Michael Matzat', publisher:'Bunte Panther', p_line:', c_line:', territory:'WW', explicit:true, rights_in:true, license_expires:'', tags:'house, doerd, club', genre:'', quality_score:null, credits:[]
+      }
   ],
-  royalty_contracts: [
-    {
-      id:'rc1', artist_id:'a1', release_id:'r1', track_id:'',
-      type:'Recording', label_split:50, artist_split:50,
-      advance:0, recoup_balance:0, minimum_payout:50,
-      currency:'EUR', territory:'WW', active:true,
-      created:'2026-03-01'
-    }
-  ],
+  royalty_contracts: [],
   royalty_statements: [],
   distributor_mappings: [
     {
@@ -150,18 +117,20 @@ const SEED = {
   ar_scores: [],
   smart_links: [
     {
-      id:'sl1', title:'Void EP — Smart Link', release_id:'r1', artist_id:'a1',
-      slug:'void-ep', type:'release',
+      id:'_cw0kyac', title:'Test EP - SmartLink', release_id:'_l5s48b3', artist_id:'_vm2c3y0',
+      slug:'testep', type:'release',
       destinations:[
-        {platform:'Spotify',   url:'https://open.spotify.com/album/example', active:true},
-        {platform:'Beatport',  url:'https://beatport.com/release/void-ep/1', active:true},
-        {platform:'Bandcamp',  url:'https://buntepanther.bandcamp.com',       active:true},
-        {platform:'Apple Music',url:'https://music.apple.com/album/example', active:true},
+        {platform:'Instagram',   url:'https://instagram.com/micha.doerd', active:true},
+        {platform:'TikTok',  url:'https://www.tiktok.com/@gemichelst', active:true},
+        {platform:'JunoDownload',  url:'https://www.junodownload.com/artists/Doerd/',       active:true},
+        {platform:'Beatport',url:'https://www.beatport.com/de/artist/doerd/1438284', active:true},
+        {platform:'Traxsource',url:'https://www.traxsource.com/artist/991643/doerd', active:true},
+        {platform:'Soundcloud',url:'https://soundcloud.com/doert-solo', active:true},
       ],
       presave_active:false, email_capture:true, clicks:0,
-      created:'2026-04-01', expires:'',
-      bg_color:'#0e0f14', accent:'#c9a84c',
-      meta_title:'Void EP by Bunte Panther', meta_img:''
+      created:'2026-05-09', expires:'',
+      bg_color:'#0e0f14', accent:'#6f5f34',
+      meta_title:'Test EP by doerd', meta_img:''
     }
   ],
   promo_links: [],
@@ -176,11 +145,12 @@ const SEED = {
   comments: [],
   channel_stats: [],
   notifications: [
-    {id:'n1', type:'demo_new',    msg:'New demo: "Acid Dreams" by External Artist', read:false, ts:'2026-05-03 05:10', link:'anr'},
-    {id:'n2', type:'task_due',    msg:'Task "Submit to Spotify Editorial" is due today', read:false, ts:'2026-05-03 06:00', link:'releases'},
-    {id:'n3', type:'contract',    msg:'Contract for DJ Void expires in 28 days', read:true,  ts:'2026-05-02 12:00', link:'crm'},
+    {id:'n1', type:'task_due',    msg:'Bunte Panther Dataset Loaded.', read:false, ts:'2026-05-03 06:00', link:'dash'},
+    {id:'n2', type:'demo_new',    msg:'New demo: "DADDYWASA" by doerd', read:false, ts:'2026-05-03 05:10', link:'anr'},
   ],
-  webhooks: [],
+  webhooks: [
+    {id:'_jr4n1xw',name:'#notify-🔔',url:'https://discord.com/api/webhooks/1502561854218833970/3EZFmXP3ksqy8CkLUYvydFfuOKrVPvmFDHtTSJtx2eYgGpWRzCEcd5HslPw5PFZXQznZ',active:true,platform:'Discord',events: ['demo.new','demo.status_changed','release.created','gig.confirmed','payout.created','contract.expiring'],created:'2026-05-09'}
+  ],
   integration_logs: [],
   portal_sessions: [],
   distributor_exports: []
@@ -951,31 +921,62 @@ const LOS = {
     if (t) { t.done=done; this.save(); this.renderReleases(); this.log(`Task "${t.text}" ${done?'completed':'reopened'}`,'Releases'); }
   },
 
-  saveRelease() {
-    const t = document.getElementById('mrT')?.value.trim();
-    if (!t) return this.toast('Title required','err');
-    const artId = ArtSel.getValue('asel-release');
-    if (!artId) return this.toast('Please select an artist','err');
-    const ty = document.getElementById('mrTy')?.value||'Single';
-    const r = {
-      id:uid(), title:t, artist_id:artId, type:ty,
-      cat:   document.getElementById('mrC')?.value,
-      date:  document.getElementById('mrD')?.value,
-      distributor: document.getElementById('mrDist')?.value,
-      status: document.getElementById('mrS')?.value||'Idea',
-      territory:'WW',
-      tasks: (TASK_TPL[ty]||TASK_TPL.Single).map((tx,i)=>({id:uid(),text:tx,done:false})),
-    };
-    this.db.releases.push(r);
-    this.save(); 
-    this._runAutomations('release_created', { release_id: rel.id });
-    this.closeModal('add-release'); this.renderAll();
+  // saveRelease() {
+  //   const t = document.getElementById('mrT')?.value.trim();
+  //   if (!t) return this.toast('Title required','err');
+  //   const artId = ArtSel.getValue('asel-release');
+  //   if (!artId) return this.toast('Please select an artist','err');
+  //   const ty = document.getElementById('mrTy')?.value||'Single';
+  //   const r = {
+  //     id:uid(), title:t, artist_id:artId, type:ty,
+  //     cat:   document.getElementById('mrC')?.value,
+  //     date:  document.getElementById('mrD')?.value,
+  //     distributor: document.getElementById('mrDist')?.value,
+  //     status: document.getElementById('mrS')?.value||'Idea',
+  //     territory:'WW',
+  //     tasks: (TASK_TPL[ty]||TASK_TPL.Single).map((tx,i)=>({id:uid(),text:tx,done:false})),
+  //   };
+  //   this.db.releases.push(r);
+  //   this.save(); 
+  //   this.runAutomations('releasecreated', { releaseid: r.id });
+  //   this.closeModal('add-release');
+  //   this.renderAll();
+  //   this.log(`Release "${t}" created`,'Releases');
+  //   this.toast(`Release "${t}" created`);
+  //   buildRelSel('rsel-contract','',true);
+  //   buildRelSel('rsel-expense','',true);
+  //   buildRelSel('rsel-media','',true);
+  // },
 
-    this.log(`Release "${t}" created`,'Releases'); this.toast(`Release "${t}" created`);
-    buildRelSel('rsel-contract','',true);
-    buildRelSel('rsel-expense','',true);
-    buildRelSel('rsel-media','',true);
-  },
+  saveRelease() {
+  const t = document.getElementById('mrT')?.value.trim()
+  if (!t) return this.toast('Title required', 'err')
+  const artId = ArtSel.getValue('asel-release')
+  if (!artId) return this.toast('Please select an artist', 'err')
+  const ty = document.getElementById('mrTy')?.value || 'Single'
+  const r = {
+    id: uid(),
+    title: t,
+    artistid: artId,
+    type: ty,
+    cat: document.getElementById('mrC')?.value,
+    date: document.getElementById('mrD')?.value,
+    distributor: document.getElementById('mrDist')?.value,
+    status: document.getElementById('mrS')?.value || 'Idea',
+    territory: 'WW',
+    tasks: (TASKTPL[ty] || TASKTPL['Single']).map((tx, i) => ({ id: uid(), text: tx, done: false }))
+  }
+  this.db.releases.push(r)
+  this.save()
+  this.runAutomations('releasecreated', { releaseid: r.id })  // ← r.id statt rel.id
+  this.closeModal('add-release')
+  this.renderAll()
+  this.log(`Release '${t}' created`, 'Releases')
+  this.toast(`Release '${t}' created`)
+  buildRelSel('rsel-contract', '', true)
+  buildRelSel('rsel-expense', '', true)
+  buildRelSel('rsel-media', '', true)
+},
 
   // ── CONTRACTS ─────────────────────────────────────────────────────────
   renderContracts() {
@@ -2327,6 +2328,10 @@ const LOS = {
       const art=this.db.artists.find(a=>a.id===sl.artist_id);
       const rel=this.db.releases.find(r=>r.id===sl.release_id);
       const link=`${window.location.origin}/link/${sl.slug}`;
+      // const slData = btoa(JSON.stringify(sl))
+      // const link = window.location.origin + '/smartlink.html?slug=' + sl.slug + '#data=' + slData
+      // const slPayload = btoa(unescape(encodeURIComponent(JSON.stringify(sl))))
+      // const link = window.location.origin + '/smartlink.html?d=' + slPayload
       return `<div class="sl-card">
         <div class="sl-head" style="background:linear-gradient(135deg,${sl.accent||'#c9a84c'}22,${sl.accent||'#c9a84c'}08)">
           <div class="sl-head-bg"></div>
@@ -2351,7 +2356,7 @@ const LOS = {
           </div>
           <div class="flex gap2 mt3">
             <button class="btn btn-g" style="flex:1;font-size:11.5px;gap:5px;padding:5px"
-              onclick="window.open('/link/${sl.slug}','_blank')">
+              onclick="window.open('${link}', '_blank')">
               <i data-lucide="external-link" style="width:12px"></i> Preview
             </button>
             <button class="btn-ic" onclick="LOS.deleteItem('smart_links','${sl.id}')"><i data-lucide="trash-2" style="width:13px"></i></button>
@@ -2405,6 +2410,24 @@ const LOS = {
     if(d) d.active=!d.active;
     this.save(); this.renderSmartLinks();
   },
+
+  previewSmartLink(id) {
+    const sl = this.db.smartlinks?.find(s => s.id === id)
+    if (!sl) return
+    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(sl))))
+    const url = window.location.origin + '/link.html?d=' + payload
+    window.open(url, '_blank')
+  },
+
+copySmartLink(id) {
+  const sl = this.db.smartlinks?.find(s => s.id === id)
+  if (!sl) return
+  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(sl))))
+  const url = window.location.origin + '/link.html?d=' + payload
+  navigator.clipboard.writeText(url)
+  this.toast('Link copied!')
+},
+
 
   renderPromoLinks() {
     if(!this.db.promo_links) this.db.promo_links=[];

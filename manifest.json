@@ -2,8 +2,10 @@
   "name": "LabelManager OS",
   "short_name": "LabelManager",
   "description": "Independent Label Operating System — manage artists, demos, releases, royalties and more.",
+  "id": "/index.html",
   "start_url": "/",
   "scope": "/",
+  "display_override": ["fullscreen", "minimal-ui"],
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#11121a",
@@ -11,14 +13,14 @@
   "lang": "en",
   "categories": ["music", "business", "productivity"],
   "icons": [
-    { "src": "/assets/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
+    { "src": "/assets/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
     {
@@ -26,14 +28,42 @@
       "sizes": "1200x630",
       "type": "image/png",
       "label": "LabelManager OS Dashboard"
-    }
+    },
+    {
+      "src": "/assets/icons/twitter-card.png",
+      "sizes": "1200x600",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "LabelManager OS Dashboard"
+    }  
   ],
   "shortcuts": [
+    {
+      "name": "LabelManager",
+      "short_name": "lmgr",
+      "description": "LabelManager main site",
+      "url": "/",
+      "icons": [{ "src": "/assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
     {
       "name": "Submit Demo",
       "short_name": "Demo",
       "description": "Upload a demo track for A&R review",
       "url": "/upload.html",
+      "icons": [{ "src": "/assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Smart Link",
+      "short_name": "smartlink",
+      "description": "Smart Link tree for artists and release promotion",
+      "url": "/link.html",
+      "icons": [{ "src": "/assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Smart Link Slug",
+      "short_name": "smartlinkslug",
+      "description": "Smart Link tree for artists and release promotion",
+      "url": "/link/",
       "icons": [{ "src": "/assets/icons/icon-96.png", "sizes": "96x96" }]
     },
     {

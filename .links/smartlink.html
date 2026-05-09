@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Smart Link</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0e0f14;--card:#13141c;--b1:#1e2030;--text:#e8eaf0;--muted:#6b7280;--gold:#c9a84c;--teal:#4a9fa8;--ok:#3d9970}
+    body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .wrap{width:100%;max-width:460px}
+    .hero{text-align:center;margin-bottom:28px}
+    .hero-icon{width:60px;height:60px;border-radius:18px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.2)}
+    .hero h1{font-size:22px;font-weight:700;margin-bottom:4px}
+    .hero p{font-size:13px;color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--b1);border-radius:16px;padding:20px;margin-bottom:14px}
+    .links{display:flex;flex-direction:column;gap:10px}
+    .btn-link{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#1a1b25;border:1px solid var(--b1);border-radius:12px;color:var(--text);text-decoration:none;font-size:15px;font-weight:500;transition:all .15s;cursor:pointer}
+    .btn-link:hover{background:#21222f;border-color:var(--gold);transform:translateY(-1px)}
+    .plat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .arrow{color:var(--muted);margin-left:auto;font-size:18px}
+    .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;background:rgba(74,159,168,.12);color:var(--teal);border:1px solid rgba(74,159,168,.2)}
+    .presave{background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border-color:rgba(201,168,76,.25);text-align:center;padding:22px 20px}
+    .presave h3{color:var(--gold);font-size:16px;margin-bottom:6px}
+    .presave p{font-size:12px;color:var(--muted);margin-bottom:14px}
+    .btn-gold{background:var(--gold);color:#0e0f14;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+    .btn-gold:hover{opacity:.85}
+    .email-row{display:flex;gap:8px;margin-top:12px}
+    .email-inp{flex:1;background:#0e0f14;border:1px solid var(--b1);border-radius:8px;color:var(--text);padding:10px 12px;font-size:13px;outline:none}
+    .email-inp:focus{border-color:var(--gold)}
+    .email-sub{background:var(--gold);color:#0e0f14;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer}
+    .footer{text-align:center;font-size:11px;color:var(--muted);margin-top:20px}
+    .footer a{color:var(--muted);text-decoration:none}
+    .footer a:hover{color:var(--teal)}
+    .err{text-align:center;padding:56px 20px}
+    .err .emo{font-size:48px;margin-bottom:16px}
+    .err h2{font-size:20px;margin-bottom:8px}
+    .err p{font-size:13px;color:var(--muted);margin-top:6px}
+    .err a{color:var(--teal);text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="err"><div class="emo">⏳</div><h2>Loading…</h2></div>
+</div>
+<script>
+const PM={
+  'Spotify':     {e:'🎵',c:'#1DB954'},
+  'Apple Music': {e:'🍎',c:'#fa243c'},
+  'Beatport':    {e:'🎧',c:'#01FF95'},
+  'Bandcamp':    {e:'🎸',c:'#629aa9'},
+  'SoundCloud':  {e:'🔊',c:'#ff5500'},
+  'YouTube':     {e:'▶️',c:'#FF0000'},
+  'Tidal':       {e:'🌊',c:'#00FFFF'},
+  'Deezer':      {e:'🎶',c:'#784EC0'},
+  'Traxsource':  {e:'🎼',c:'#e84321'},
+  'Juno':        {e:'💿',c:'#cc0033'},
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function getSL(){
+  // Method 1: ?d= base64 encoded smartlink object (preferred)
+  const p=new URLSearchParams(window.location.search)
+  if(p.get('d')){
+    try{return JSON.parse(decodeURIComponent(escape(atob(p.get('d')))))}catch(e){}
+  }
+  // Method 2: same-domain localStorage fallback
+  const slug=p.get('slug')||window.location.pathname.replace(/\//g,'').replace('smartlink.html','')
+  if(!slug)return null
+  try{
+    const db=JSON.parse(localStorage.getItem('los_v3'))
+    if(db?.smart_links){
+      const found=db.smart_links.find(s=>s.slug===slug)
+      if(found)return found
+    }
+  }catch(e){}
+  return null
+}
+
+function render(sl){
+  const app=document.getElementById('app')
+  const accent=sl.accent||'c9a84c'
+  document.title=sl.metatitle||sl.title||'Smart Link'
+  if(sl.bgcolor)document.body.style.background='#'+sl.bgcolor
+  const dests=(sl.destinations||[]).filter(d=>d.active&&d.url)
+  let h=`
+  <div class="hero">
+    <div class="hero-icon" style="background:linear-gradient(135deg,#${accent}33,#${accent}0a)">🎵</div>
+    <h1>${esc(sl.metatitle||sl.title||'')}</h1>
+    <p>${sl.type?`<span class="badge">${esc(sl.type)}</span>`:''}</p>
+  </div>`
+
+  if(sl.presave?.active){
+    h+=`<div class="card presave">
+      <h3>⏰ Pre-Save</h3>
+      <p>Be the first to hear it when it drops</p>
+      <button class="btn-gold">Pre-Save on Spotify</button>
+    </div>`
+  }
+
+  if(dests.length){
+    h+='<div class="card"><div class="links">'
+    dests.forEach(d=>{
+      const m=PM[d.platform]||{e:'🔗',c:'#4a9fa8'}
+      h+=`<a class="btn-link" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">
+        <div class="plat-icon" style="background:${m.c}22">${m.e}</div>
+        <span>${esc(d.platform)}</span>
+        <span class="arrow">›</span>
+      </a>`
+    })
+    if(sl.emailcapture){
+      h+=`<div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--b1)">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Get notified about new releases</p>
+        <div class="email-row">
+          <input class="email-inp" id="em" type="email" placeholder="your@email.com"/>
+          <button class="email-sub" onclick="subEmail()">Notify me</button>
+        </div>
+        <p id="emOk" style="font-size:12px;color:var(--ok);margin-top:6px;display:none">✓ You're in!</p>
+      </div>`
+    }
+    h+='</div></div>'
+  }
+
+  h+=`<div class="footer">Powered by <a href="/" target="_blank">LabelManager</a></div>`
+  app.innerHTML=h
+}
+
+function subEmail(){
+  const v=document.getElementById('em')?.value?.trim()
+  if(!v||!v.includes('@'))return
+  document.getElementById('emOk').style.display='block'
+}
+
+function notFound(){
+  document.getElementById('app').innerHTML=`
+  <div class="err">
+    <div class="emo">🎵</div>
+    <h2>Link not found</h2>
+    <p>This smart link doesn't exist or has expired.</p>
+    <p style="margin-top:14px"><a href="/">← Back to LabelManager</a></p>
+  </div>`
+}
+
+// Boot
+(function(){
+  const sl=getSL()
+  if(sl)render(sl)
+  else notFound()
+})()
+</script>
+</body>
+</html>

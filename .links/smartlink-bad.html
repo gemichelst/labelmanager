@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Link</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0e0f14; --card: #13141c; --border: #1e2030;
+      --text: #e8eaf0; --muted: #6b7280; --gold: #c9a84c;
+      --teal: #4a9fa8; --ok: #3d9970; --b1: #1e2030;
+    }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif;
+           min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .wrap { width: 100%; max-width: 480px; }
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo-icon { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 12px;
+                 display: flex; align-items: center; justify-content: center; font-size: 28px;
+                 box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+    .artist { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+    .title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .links { display: flex; flex-direction: column; gap: 10px; }
+    .platform-btn {
+      display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+      background: #1a1b25; border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500;
+      transition: background .15s, border-color .15s, transform .1s;
+    }
+    .platform-btn:hover { background: #21222f; border-color: var(--gold); transform: translateY(-1px); }
+    .platform-btn:active { transform: translateY(0); }
+    .platform-icon { width: 36px; height: 36px; border-radius: 10px; display: flex;
+                     align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .platform-btn span { flex: 1; }
+    .platform-btn .arrow { color: var(--muted); font-size: 18px; }
+    .presave { background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.05));
+               border-color: rgba(201,168,76,.3); text-align: center; flex-direction: column;
+               align-items: center; padding: 20px; }
+    .presave-title { font-size: 16px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+    .presave-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+    .presave-btn { background: var(--gold); color: #0e0f14; border: none; border-radius: 10px;
+                   padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer;
+                   transition: opacity .15s; }
+    .presave-btn:hover { opacity: .85; }
+    .email-form { display: flex; gap: 8px; margin-top: 12px; width: 100%; }
+    .email-input { flex: 1; background: #0e0f14; border: 1px solid var(--border); border-radius: 8px;
+                   color: var(--text); padding: 10px 14px; font-size: 14px; outline: none; }
+    .email-input:focus { border-color: var(--gold); }
+    .email-btn { background: var(--gold); color: #0e0f14; border: none; border-radius: 8px;
+                 padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: 24px; }
+    .footer a { color: var(--muted); text-decoration: none; }
+    .footer a:hover { color: var(--teal); }
+    .not-found { text-align: center; padding: 48px 24px; }
+    .not-found h2 { font-size: 20px; margin-bottom: 8px; }
+    .not-found p { font-size: 13px; color: var(--muted); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px;
+             background: rgba(74,159,168,.15); color: var(--teal); border: 1px solid rgba(74,159,168,.2); }
+    .clicks { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+    @media (max-width: 500px) { .card { padding: 18px; } .title { font-size: 18px; } }
+  </style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="not-found">
+    <div style="font-size:40px;margin-bottom:16px">🔍</div>
+    <h2>Loading…</h2>
+    <p>Resolving smart link</p>
+  </div>
+</div>
+
+<script>
+const PLATFORM_META = {
+  'Spotify':      { icon: '🎵', bg: '#1DB954' },
+  'Apple Music':  { icon: '🍎', bg: '#fa243c' },
+  'Beatport':     { icon: '🎧', bg: '#01FF95' },
+  'Bandcamp':     { icon: '🎸', bg: '#629aa9' },
+  'SoundCloud':   { icon: '🔊', bg: '#ff5500' },
+  'YouTube':      { icon: '▶️', bg: '#FF0000' },
+  'Tidal':        { icon: '🌊', bg: '#00FFFF' },
+  'Deezer':       { icon: '🎶', bg: '#784EC0' },
+  'Amazon Music': { icon: '📦', bg: '#FF9900' },
+  'Traxsource':   { icon: '🎼', bg: '#e84321' },
+  'Juno':         { icon: '💿', bg: '#cc0033' },
+  'default':      { icon: '🔗', bg: '#4a9fa8' },
+}
+
+function getPlatMeta(name) {
+  return PLATFORM_META[name] || PLATFORM_META.default
+}
+
+// Read the slug from the URL
+// Supports: /void-ep  OR  /smartlink.html?slug=void-ep  OR  /?slug=void-ep
+function getSlug() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('slug')) return params.get('slug')
+  // Path-based: last segment
+  const parts = window.location.pathname.replace(/\/$/, '').split('/')
+  const last = parts[parts.length - 1]
+  if (last && last !== 'index.html' && last !== 'smartlink.html') return last
+  return null
+}
+
+function loadDB() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('los_v3'))
+    if (!raw || !raw.smart_links) return null
+    return raw
+  } catch(e) { return null }
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+function trackClick(db, sl) {
+  if (!db || !sl) return
+  sl.clicks = (sl.clicks || 0) + 1
+  localStorage.setItem('los_v3', JSON.stringify(db))
+}
+
+function render(sl, db) {
+  const app = document.getElementById('app')
+  const accent = sl.accent || 'c9a84c'
+  const bg = sl.bgcolor || '0e0f14'
+
+  // Update page meta
+  document.title = sl.metatitle || sl.title || 'Smart Link'
+  if (sl.metaimg) {
+    const og = document.createElement('meta')
+    og.setAttribute('property','og:image')
+    og.setAttribute('content', sl.metaimg)
+    document.head.appendChild(og)
+  }
+
+  document.body.style.background = '#' + bg
+
+  const activeDests = (sl.destinations || []).filter(d => d.active && d.url)
+  const artist = db ? db.artists?.find(a => a.id === sl.artistid) : null
+  const release = db ? db.releases?.find(r => r.id === sl.releaseid) : null
+
+  let html = `
+  <div class="logo">
+    <div class="logo-icon" style="background:linear-gradient(135deg,#${accent}33,#${accent}11)">🎵</div>
+    <div class="title">${esc(sl.metatitle || sl.title)}</div>
+    <div class="artist">${esc(artist?.name || release?.title || '')}</div>
+    ${sl.type ? `<span class="badge" style="margin-top:8px">${esc(sl.type)}</span>` : ''}
+  </div>`
+
+  // Pre-save block
+  if (sl.presave?.active) {
+    html += `
+    <div class="card presave">
+      <div class="presave-title">⏰ Pre-Save Now</div>
+      <div class="presave-sub">Be the first to hear it when it drops</div>
+      <button class="presave-btn" onclick="handlePresave()">Pre-Save on Spotify</button>
+    </div>`
+  }
+
+  // Platform links
+  if (activeDests.length) {
+    html += `<div class="card"><div class="links">`
+    activeDests.forEach(d => {
+      const meta = getPlatMeta(d.platform)
+      html += `
+      <a class="platform-btn" href="${esc(d.url)}" target="_blank" rel="noopener"
+         onclick="onLinkClick('${esc(d.platform)}')">
+        <div class="platform-icon" style="background:${meta.bg}22">${meta.icon}</div>
+        <span>${esc(d.platform)}</span>
+        <span class="arrow">›</span>
+      </a>`
+    })
+    html += `</div>`
+
+    // Email capture
+    if (sl.emailcapture) {
+      html += `
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Get notified about new releases</div>
+        <div class="email-form">
+          <input class="email-input" type="email" id="emailInput" placeholder="your@email.com" />
+          <button class="email-btn" onclick="submitEmail()">Notify me</button>
+        </div>
+        <div id="emailMsg" style="font-size:12px;color:var(--ok);margin-top:6px;display:none">✓ You're in!</div>
+      </div>`
+    }
+    html += `</div>`
+  }
+
+  if (sl.clicks !== undefined) {
+    html += `<div class="clicks">${(sl.clicks||0).toLocaleString()} link opens</div>`
+  }
+
+  html += `
+  <div class="footer">
+    Powered by <a href="/" target="_blank">LabelManager</a>
+  </div>`
+
+  app.innerHTML = html
+}
+
+function onLinkClick(platform) {
+  const db = loadDB()
+  const slug = getSlug()
+  if (!db || !slug) return
+  const sl = db.smart_links?.find(s => s.slug === slug)
+  if (sl) trackClick(db, sl)
+}
+
+function submitEmail() {
+  const val = document.getElementById('emailInput')?.value?.trim()
+  if (!val || !val.includes('@')) return
+  const msg = document.getElementById('emailMsg')
+  if (msg) { msg.style.display = 'block' }
+  // Could POST to an endpoint here
+}
+
+function handlePresave() {
+  alert('Pre-Save flow — connect your Spotify OAuth here')
+}
+
+function renderNotFound() {
+  document.getElementById('app').innerHTML = `
+  <div class="not-found">
+    <div style="font-size:48px;margin-bottom:16px">🎵</div>
+    <h2>Link not found</h2>
+    <p style="margin-top:8px">This smart link doesn't exist or has expired.</p>
+    <p style="margin-top:16px"><a href="/" style="color:var(--teal)">← Back to LabelManager</a></p>
+  </div>`
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+;(function init() {
+  const slug = getSlug()
+  if (!slug) { renderNotFound(); return }
+
+  // 1st try: read from same-domain localStorage
+  const db = loadDB()
+  if (db) {
+    const sl = db.smart_links?.find(s => s.slug === slug)
+    if (sl) {
+      trackClick(db, sl)
+      render(sl, db)
+      return
+    }
+  }
+
+  // 2nd try: read from URL hash data (for sharing across domains)
+  // Format: smartlink.html?slug=void-ep#data=<base64-json>
+  if (window.location.hash.startsWith('#data=')) {
+    try {
+      const encoded = window.location.hash.slice(6)
+      const sl = JSON.parse(atob(encoded))
+      render(sl, null)
+      return
+    } catch(e) {}
+  }
+
+  renderNotFound()
+})()
+</script>
+</body>
+</html>

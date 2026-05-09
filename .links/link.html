@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Smart Link · LabelManager</title>
+
+  <!-- Dynamic OG/Twitter meta injected via JS below -->
+  <meta id="metaTitle"    property="og:title"       content="Smart Link">
+  <meta id="metaDesc"     property="og:description"  content="Listen now">
+  <meta id="metaImg"      property="og:image"        content="">
+  <meta id="twitterCard"  name="twitter:card"        content="summary_large_image">
+  <meta id="twitterTitle" name="twitter:title"       content="Smart Link">
+
+  <style>
+    :root {
+      --acc:   #c9a84c;
+      --bg:    #0e0f14;
+      --s1:    #13141c;
+      --s2:    #1a1b26;
+      --s3:    #22233a;
+      --b1:    #2d3244;
+      --text:  #e8eaf0;
+      --muted: #5a5a72;
+      --ok:    #3d9970;
+      --teal:  #4a9fa8;
+      --err:   #c0524e;
+      --gold:  #c9a84c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: env(safe-area-inset-top, 24px) 16px env(safe-area-inset-bottom, 24px);
+    }
+
+    /* ── Hero gradient background ─────────────────────── */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% -10%, color-mix(in srgb, var(--acc) 18%, transparent), transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 80%, #4a9fa814, transparent 70%);
+      pointer-events: none;
+    }
+
+    .page { position: relative; z-index: 1; width: 100%; max-width: 440px; }
+
+    /* ── Card ─────────────────────────────────────────── */
+    .card {
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    /* ── Header hero ─────────────────────────────────── */
+    .hero {
+      position: relative;
+      padding: 36px 28px 28px;
+      text-align: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--acc) 14%, transparent), var(--s2) 70%);
+    }
+    .hero > * { position: relative; z-index: 1; }
+
+    .avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--acc), color-mix(in srgb, var(--acc) 50%, var(--teal)));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 800; color: #0a0a0f;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 32px color-mix(in srgb, var(--acc) 40%, transparent);
+      border: 2px solid color-mix(in srgb, var(--acc) 30%, transparent);
+      overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .hero-title {
+      font-size: 22px; font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .hero-sub {
+      font-size: 13px; color: var(--muted);
+      display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+    }
+    .hero-sub .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--b1); display: inline-block; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 20px; font-size: 10.5px; font-weight: 600;
+      background: var(--s3); border: 1px solid var(--b1); color: var(--muted);
+    }
+    .badge.new    { background: rgba(201,168,76,.12);  border-color: rgba(201,168,76,.25);  color: var(--gold); }
+    .badge.genre  { background: rgba(74,159,168,.1);   border-color: rgba(74,159,168,.2);   color: var(--teal); }
+
+    /* ── Cover art strip ─────────────────────────────── */
+    .cover-strip {
+      display: flex; gap: 8px; justify-content: center;
+      padding: 0 28px 20px; flex-wrap: wrap;
+    }
+    .cover-img {
+      width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+      border: 1px solid var(--b1);
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+
+    /* ── Links section ───────────────────────────────── */
+    .links-section { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+
+    .link-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border-radius: 14px;
+      background: var(--s3); border: 1px solid var(--b1);
+      color: var(--text); text-decoration: none;
+      font-size: 14px; font-weight: 600;
+      transition: background .15s, transform .1s, border-color .15s;
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .link-btn::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 6%, transparent), transparent);
+      opacity: 0; transition: opacity .15s;
+    }
+    .link-btn:hover { background: #282940; border-color: color-mix(in srgb, var(--acc) 30%, transparent); transform: translateY(-1px); }
+    .link-btn:hover::before { opacity: 1; }
+    .link-btn:active { transform: translateY(0); }
+
+    .link-btn .plat-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+      background: var(--s1);
+    }
+    .link-btn .plat-label { flex: 1; }
+    .link-btn .plat-action {
+      font-size: 11px; color: var(--muted); flex-shrink: 0;
+      display: flex; align-items: center; gap: 3px;
+    }
+
+    /* Platform color accents */
+    .plat-spotify   { background: rgba(30,215,96,.12) !important; }
+    .plat-apple     { background: rgba(252,60,68,.12)  !important; }
+    .plat-beatport  { background: rgba(1,253,1,.08)    !important; }
+    .plat-soundcloud{ background: rgba(255,85,0,.12)   !important; }
+    .plat-bandcamp  { background: rgba(29,99,123,.2)   !important; }
+    .plat-youtube   { background: rgba(255,0,0,.1)     !important; }
+    .plat-tidal     { background: rgba(0,200,255,.08)  !important; }
+    .plat-deezer    { background: rgba(162,0,255,.1)   !important; }
+    .plat-traxsource{ background: rgba(255,182,0,.1)   !important; }
+    .plat-junodownload{ background: rgba(0,120,200,.1) !important; }
+
+    /* ── Pre-save & Email capture ─────────────────────── */
+    .capture-section {
+      margin: 0 20px 20px;
+      background: var(--s1);
+      border: 1px solid var(--b1);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .capture-title {
+      font-size: 13px; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .capture-form { display: flex; gap: 8px; }
+    .email-inp {
+      flex: 1; padding: 10px 14px;
+      border-radius: 10px; border: 1px solid var(--b1);
+      background: var(--s2); color: var(--text);
+      font-size: 13px; outline: none;
+      transition: border-color .15s;
+    }
+    .email-inp:focus { border-color: var(--acc); }
+    .email-inp::placeholder { color: var(--muted); }
+    .capture-btn {
+      padding: 10px 18px; border-radius: 10px; border: none;
+      background: var(--acc); color: #0a0a0f;
+      font-weight: 700; font-size: 13px; cursor: pointer;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+    .capture-btn:hover { opacity: .88; }
+    .capture-msg { font-size: 11.5px; color: var(--ok); margin-top: 8px; height: 16px; }
+
+    /* ── Divider ─────────────────────────────────────── */
+    .divider { height: 1px; background: var(--b1); margin: 0 20px 16px; }
+
+    /* ── Release notes ───────────────────────────────── */
+    .release-notes {
+      margin: 0 20px 16px;
+      font-size: 12.5px; color: var(--muted); line-height: 1.6;
+      padding: 12px 14px;
+      background: var(--s1); border-radius: 10px;
+      border: 1px solid var(--b1);
+    }
+
+    /* ── Footer ─────────────────────────────────────── */
+    .footer {
+      padding: 14px 20px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--b1);
+    }
+    .footer-brand { font-size: 11px; color: #3a3a52; display: flex; align-items: center; gap: 5px; }
+    .footer-share { display: flex; gap: 8px; }
+    .share-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--s3); border: 1px solid var(--b1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px;
+      transition: background .15s;
+    }
+    .share-btn:hover { background: var(--b1); }
+
+    /* ── Not found ───────────────────────────────────── */
+    .not-found {
+      text-align: center; padding: 48px 28px;
+    }
+    .not-found .icon { font-size: 48px; margin-bottom: 16px; }
+    .not-found h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .not-found p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .not-found .slug { font-family: monospace; font-size: 11px; color: #3a3a52; margin-top: 12px; }
+
+    /* ── Loading ─────────────────────────────────────── */
+    .loading { text-align: center; padding: 60px 28px; color: var(--muted); font-size: 13px; }
+    .spinner {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--b1); border-top-color: var(--acc);
+      animation: spin .7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Analytics toast ─────────────────────────────── */
+    .click-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(8px);
+      background: var(--s3); border: 1px solid var(--b1);
+      border-radius: 20px; padding: 8px 16px;
+      font-size: 12px; color: var(--text);
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap; z-index: 100;
+    }
+    .click-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Powered banner ─────────────────────────────── */
+    .powered {
+      margin-top: 20px;
+      text-align: center; font-size: 11px; color: #2a2a3a;
+    }
+    .powered a { color: #3a3a52; text-decoration: none; }
+    .powered a:hover { color: var(--muted); }
+
+    @media (prefers-color-scheme: light) {
+      /* keeps dark — intentional for music/label aesthetic */
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <!-- Card renders here -->
+  <div class="card" id="card">
+    <div class="loading">
+      <div class="spinner"></div>
+      Loading…
+    </div>
+  </div>
+  <p class="powered">Powered by <a href="/" target="_blank">LabelManager OS</a></p>
+</div>
+
+<div class="click-toast" id="clickToast"></div>
+
+<script>
+// ── Helpers ────────────────────────────────────────────────────────────────
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB', { year:'numeric', month:'short', day:'numeric' }) : ''
+
+// ── Resolve slug from URL ─────────────────────────────────────────────────
+// Supports: /link/my-slug  OR  ?s=my-slug  OR  ?slug=my-slug
+const pathParts  = location.pathname.split('/link/')
+const pathSlug   = pathParts.length > 1 ? pathParts[1].replace(/\/+$/, '').split('/')[0] : ''
+const params     = new URLSearchParams(location.search)
+const slug       = pathSlug || params.get('s') || params.get('slug') || ''
+
+// ── Load DB from localStorage (same origin as main app) ───────────────────
+let db = null
+try {
+  const raw = localStorage.getItem('los_v3')
+  if (raw) db = JSON.parse(raw)
+} catch(e) {}
+
+// ── Platform helpers ──────────────────────────────────────────────────────
+const PLAT_ICONS = {
+  spotify:    { emoji: '🎵', css: 'plat-spotify',    label: 'Spotify' },
+  apple:      { emoji: '🍎', css: 'plat-apple',      label: 'Apple Music' },
+  beatport:   { emoji: '⚡', css: 'plat-beatport',   label: 'Beatport' },
+  soundcloud: { emoji: '☁️', css: 'plat-soundcloud', label: 'SoundCloud' },
+  bandcamp:   { emoji: '🎸', css: 'plat-bandcamp',   label: 'Bandcamp' },
+  youtube:    { emoji: '📺', css: 'plat-youtube',    label: 'YouTube' },
+  tidal:      { emoji: '🌊', css: 'plat-tidal',      label: 'Tidal' },
+  deezer:     { emoji: '🟣', css: 'plat-deezer',     label: 'Deezer' },
+  traxsource: { emoji: '🎛️', css: 'plat-traxsource', label: 'Traxsource' },
+  junodownload:{ emoji:'🎧', css: 'plat-junodownload',label: 'Juno Download' },
+}
+function getPlatInfo(url, name) {
+  const u = (url || '').toLowerCase()
+  const n = (name || '').toLowerCase()
+  for (const [key, val] of Object.entries(PLAT_ICONS)) {
+    if (u.includes(key) || n.includes(key)) return val
+  }
+  return { emoji: '🔗', css: '', label: name || 'Listen' }
+}
+
+// ── Analytics: log click to localStorage ─────────────────────────────────
+function trackClick(platform) {
+  try {
+    const raw = localStorage.getItem('los_v3')
+    if (!raw) return
+    const db2 = JSON.parse(raw)
+    if (!db2.smartlinkclicks) db2.smartlinkclicks = []
+    db2.smartlinkclicks.push({ slug, platform, ts: new Date().toISOString(), ua: navigator.userAgent.slice(0,80) })
+    // Also increment click counter on smart link
+    const sl2 = db2.smart_links?.find(s => s.slug === slug)
+    if (sl2) sl2.clicks = (sl2.clicks || 0) + 1
+    localStorage.setItem('los_v3', JSON.stringify(db2))
+  } catch(e) {}
+  // Show toast
+  const t = document.getElementById('clickToast')
+  t.textContent = '↗ Opening ' + platform
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 1800)
+}
+
+// ── Email capture ─────────────────────────────────────────────────────────
+function captureEmail() {
+  const inp = document.getElementById('emailInp')
+  const msg = document.getElementById('emailMsg')
+  const email = inp?.value?.trim()
+  if (!email || !email.includes('@')) {
+    if (msg) { msg.textContent = '⚠ Enter a valid email'; msg.style.color = 'var(--err)' }
+    return
+  }
+  try {
+    const raw = localStorage.getItem('los_v3')
+    if (!raw) return
+    const db2 = JSON.parse(raw)
+    if (!db2.smartlinkemails) db2.smartlinkemails = []
+    // Deduplicate per slug
+    const already = db2.smartlinkemails.some(e => e.slug === slug && e.email === email)
+    if (already) {
+      if (msg) { msg.textContent = "✓ You are already on the list!"; msg.style.color = 'var(--ok)' }
+      return
+    }
+    db2.smartlinkemails.push({ slug, email, ts: new Date().toISOString() })
+    localStorage.setItem('los_v3', JSON.stringify(db2))
+    inp.value = ''
+    if (msg) { msg.textContent = '✓ You are on the list!'; msg.style.color = 'var(--ok)' }
+  } catch(e) {
+    if (msg) { msg.textContent = 'Something went wrong'; msg.style.color = 'var(--err)' }
+  }
+}
+
+// ── Native share / fallback copy ──────────────────────────────────────────
+function sharePage(title) {
+  const url = location.href
+  if (navigator.share) {
+    navigator.share({ title, url }).catch(() => {})
+  } else {
+    navigator.clipboard?.writeText(url).then(() => {
+      const t = document.getElementById('clickToast')
+      t.textContent = '✓ Link copied!'
+      t.classList.add('show')
+      setTimeout(() => t.classList.remove('show'), 1800)
+    })
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+const card = document.getElementById('card')
+
+// No DB or no slug → not found
+if (!slug) {
+  card.innerHTML = `
+    <div class="not-found">
+      <div class="icon">🔗</div>
+      <h2>No link specified</h2>
+      <p>This URL doesn't contain a valid smart link identifier.</p>
+    </div>`
+} else if (!db) {
+  card.innerHTML = `
+    <div class="not-found">
+      <div class="icon">🎛️</div>
+      <h2>LabelManager not found</h2>
+      <p>This smart link lives on the same device as the LabelManager app.<br>
+         Open it in the same browser to make it work, or ask the label for a direct link.</p>
+      <p class="slug">${esc(slug)}</p>
+    </div>`
+} else {
+  const smartlinks = db.smart_links || []
+  const sl = smartlinks.find(s => s.slug === slug)
+
+  if (!sl) {
+    card.innerHTML = `
+      <div class="not-found">
+        <div class="icon">🔍</div>
+        <h2>Link not found</h2>
+        <p>The smart link <strong style="color:var(--text)">${esc(slug)}</strong> doesn't exist or has been removed.</p>
+      </div>`
+  } else {
+    // Resolve related entities
+    const artist  = db.artists?.find(a => a.id === sl.artistid)
+    const release = db.releases?.find(r => r.id === sl.releaseid)
+    const accent  = sl.accent || '#c9a84c'
+
+    // Apply accent color
+    document.documentElement.style.setProperty('--acc', accent)
+
+    // Update page title + meta
+    const pageTitle = sl.metatitle || sl.title || release?.title || artist?.name || 'Smart Link'
+    document.title  = pageTitle + ' · LabelManager'
+    document.getElementById('metaTitle').setAttribute('content', pageTitle)
+    document.getElementById('twitterTitle').setAttribute('content', pageTitle)
+    if (sl.metaimg) {
+      document.getElementById('metaImg').setAttribute('content', sl.metaimg)
+    }
+
+    const dests = (sl.destinations || []).filter(d => d.active !== false)
+    const genreList = artist?.genres?.slice(0,3).join(' · ') || ''
+
+    // ── Release type badge ────────────────────────────────────────────────
+    const typeBadge = release?.type
+      ? `<span class="badge genre">${esc(release.type)}</span>`
+      : ''
+    const newBadge = sl.presaveactive
+      ? `<span class="badge new">⏰ Pre-Save</span>`
+      : ''
+
+    // ── Avatar: cover image or initial ───────────────────────────────────
+    const coverMedia = db.media?.find(m => m.relatedto === sl.releaseid && m.type === 'Artwork')
+    const avatarInner = coverMedia?.file
+      ? `<img src="${esc(coverMedia.file)}" alt="Cover Art" onerror="this.style.display='none'">`
+      : (artist?.name?.[0]?.toUpperCase() || '♪')
+
+    // ── Destinations HTML ─────────────────────────────────────────────────
+    const linksHtml = dests.map(d => {
+      const plat = getPlatInfo(d.url, d.platform)
+      const actionLabel = sl.presaveactive ? 'Pre-Save' : 'Open'
+      return `
+        <a href="${esc(d.url)}" target="_blank" rel="noopener"
+           class="link-btn" onclick="trackClick('${esc(d.platform || '')}')">
+          <span class="plat-icon ${plat.css}">${plat.emoji}</span>
+          <span class="plat-label">${esc(d.platform || plat.label)}</span>
+          <span class="plat-action">${actionLabel} ↗</span>
+        </a>`
+    }).join('')
+
+    // ── Email/Pre-Save capture ────────────────────────────────────────────
+    const captureHtml = sl.emailcapture ? `
+      <div class="capture-section">
+        <div class="capture-title">
+          ${sl.presaveactive ? '⏰ Pre-Save & Follow' : '✉️ Get Updates'}
+        </div>
+        <div class="capture-form">
+          <input class="email-inp" id="emailInp" type="email"
+                 placeholder="your@email.com"
+                 onkeydown="if(event.key==='Enter') captureEmail()">
+          <button class="capture-btn" onclick="captureEmail()">
+            ${sl.presaveactive ? 'Pre-Save' : 'Follow'}
+          </button>
+        </div>
+        <div class="capture-msg" id="emailMsg"></div>
+      </div>` : ''
+
+    // ── Release date line ─────────────────────────────────────────────────
+    const relDate = release?.date ? `<span class="dot"></span> ${fmtDate(release.date)}` : ''
+    const relCat  = release?.catalog ? `<span class="dot"></span> ${esc(release.catalog)}` : ''
+
+    // ── Render full card ──────────────────────────────────────────────────
+    card.innerHTML = `
+      <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="avatar">${avatarInner}</div>
+        <div class="hero-title">${esc(sl.title || release?.title || artist?.name || 'Listen Now')}</div>
+        <div class="hero-sub">
+          ${artist ? `<span>${esc(artist.name)}</span>` : ''}
+          ${typeBadge}
+          ${newBadge}
+          ${genreList ? `<span class="dot"></span><span style="color:var(--acc)">${esc(genreList)}</span>` : ''}
+          ${relDate}
+          ${relCat}
+        </div>
+      </div>
+
+      ${dests.length ? `<div class="links-section">${linksHtml}</div>` : ''}
+
+      ${captureHtml}
+
+      ${sl.notes ? `<div class="release-notes">${esc(sl.notes)}</div>` : ''}
+
+      <div class="footer">
+        <div class="footer-brand">
+          <span>♪</span> LabelManager OS
+        </div>
+        <div class="footer-share">
+          <button class="share-btn" title="Share this link"
+                  onclick="sharePage('${esc(pageTitle).replace(/'/g,"\'")}')">🔗</button>
+        </div>
+      </div>`
+  }
+}
+</script>
+</body>
+</html>

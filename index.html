@@ -135,13 +135,16 @@
   <header class="topbar">
     <button class="hbg" onclick="LOS.openSb()"><i data-lucide="menu" style="width:16px"></i></button>
     <div class="topbar-title" id="tbTitle">Dashboard</div>
-    <div class="topbar-r">
+    <div class="topbar-l">
       <button class="btn btn-g" style="font-size:12px;gap:5px;" onclick="LOS.openSearch()">
         <i data-lucide="search" style="width:12px"></i> Search
         <kbd style="font-size:10px;opacity:.45;margin-left:3px">⌘K</kbd>
-      </button>
+      </button>      
+    </div>
+    <div class="topbar-r">
     <!-- Notification Bell (in header/topbar) -->
     <!-- <div class="notif-bell" id="notifBell" onclick="LOS.toggleNotifPanel()"> -->
+    <div id="role" onclick="LOS.cycleRole()"></div>
     <div class="notif-bell" id="notifBell" onclick="LOS.toggleNotifPanel(event)">
       <i data-lucide="bell" style="width:18px;color:var(--muted)"></i>
       <div class="notif-badge" id="notifBadge" style="display:none">0</div>
@@ -156,10 +159,9 @@
         <button class="btn btn-g" style="width:100%;font-size:12px" onclick="LOS.clearNotifs()">Clear all</button>
       </div>
     </div>
-      <div id="role" onclick="LOS.cycleRole()"></div>
-      <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
+      <!-- <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
         <i data-lucide="upload" style="width:13px"></i> Submit Demo
-      </button>
+      </button> -->
     </div>
   </header>
 

@@ -1,0 +1,14 @@
+Options -Indexes
+RewriteEngine On
+
+# Rewrite /link/* → link.html (query string wird weitergegeben)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^link/(.+)$  /link.html  [L,QSA]
+
+# Smart Links: /slug → /smartlink.html?slug=slug (nur wenn kein File/Dir)
+RewriteCond %{REQUEST_URI} !^/(index\.html|api|assets|smartlink\.html)
+RewriteRule ^([a-z0-9\-]+)$ /.links/smartlink.html?slug=$1 [L,QSA]
+RewriteRule ^smartlinklink/(.+) /.links/smartlink.html?slug=$1 [L,QSA]
+RewriteRule ^linkv2/(.+) /.links/link.html?slug=$1 [L,QSA]
+RewriteRule ^smartlinklinkbad/(.+) /.links/smartlink-bad.html?slug=$1 [L,QSA]
