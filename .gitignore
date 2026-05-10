@@ -1,2 +1,10 @@
 .DS_Store
 docs/*.md
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+*/+/*/*/.DS_Store
+*/*/*/*/*/.DS_Store
+.release
+.release/*
+assets/data/*

@@ -117,20 +117,18 @@ const SEED = {
   ar_scores: [],
   smart_links: [
     {
-      id:'_cw0kyac', title:'Test EP - SmartLink', release_id:'_l5s48b3', artist_id:'_vm2c3y0',
-      slug:'testep', type:'release',
+      id:'sl1', title:'EXAMPLE — Smart Link', release_id:'r1', artist_id:'a1',
+      slug:'void-ep', type:'release',
       destinations:[
-        {platform:'Instagram',   url:'https://instagram.com/micha.doerd', active:true},
-        {platform:'TikTok',  url:'https://www.tiktok.com/@gemichelst', active:true},
-        {platform:'JunoDownload',  url:'https://www.junodownload.com/artists/Doerd/',       active:true},
-        {platform:'Beatport',url:'https://www.beatport.com/de/artist/doerd/1438284', active:true},
-        {platform:'Traxsource',url:'https://www.traxsource.com/artist/991643/doerd', active:true},
-        {platform:'Soundcloud',url:'https://soundcloud.com/doert-solo', active:true},
+        {platform:'Spotify',   url:'https://open.spotify.com/album/example', active:true},
+        {platform:'Beatport',  url:'https://beatport.com/release/void-ep/1', active:true},
+        {platform:'Bandcamp',  url:'https://buntepanther.bandcamp.com',       active:true},
+        {platform:'Apple Music',url:'https://music.apple.com/album/example', active:true},
       ],
       presave_active:false, email_capture:true, clicks:0,
-      created:'2026-05-09', expires:'',
-      bg_color:'#0e0f14', accent:'#6f5f34',
-      meta_title:'Test EP by doerd', meta_img:''
+      created:'2026-04-01', expires:'',
+      bg_color:'#0e0f14', accent:'#c9a84c',
+      meta_title:'EP by Bunte Panther', meta_img:''
     }
   ],
   promo_links: [],
@@ -758,12 +756,20 @@ const LOS = {
   moveDemoStatus(id, status) {
     const d = this.db.demos.find(x=>x.id===id);
     if (!d) return;
+    const prevStatus=d.status;
     d.status = status;
     this.save(); this.renderANR(); this.renderDash();
     this.log(`Demo "${d.title}" → ${status}`,'A&R');
     const newD = this.db.demos.filter(x=>x.status==='Neu').length;
     document.getElementById('navAnr').textContent=newD;
     document.getElementById('navAnr').style.display=newD?'inline':'none';
+    if(prevStatus!==status){
+      this.fireWebhook('demo.statuschanged',{title:d.title,artist:d.artist_name||'External',previous_status:prevStatus,new_status:status,message:`Demo "${d.title}" moved: ${prevStatus} → ${status}`});
+      if(status==='Signed'){
+        this.pushNotification('demo_signed',`Demo "${d.title}" SIGNED! 🎉`,'anr');
+        this.fireWebhook('contract.signed',{title:d.title,artist:d.artist_name||'External',message:`🎉 "${d.title}" has been signed!`});
+      }
+    }
   },
   // dragStart(e, id) { this.dragId=id; e.dataTransfer.setData('text/plain',id); },
   //   // Drag start — auf der Karte
@@ -843,6 +849,8 @@ const LOS = {
     this.db.demos.push(d);
     this.save(); this.closeModal('add-demo'); this.renderAll();
     this.log(`Demo "${t}" submitted`,'A&R'); this.toast('Demo added');
+    this.pushNotification('demo_new',`New demo: "${d.title}" by ${d.artist_name||'External'}`,'anr');
+    this.fireWebhook('demo.new',{title:d.title,artist:d.artist_name||'External',genre:d.genre||'—',submitted:d.submitted,message:`New demo submission: "${d.title}"`});
   },
 
   // ── RELEASES ──────────────────────────────────────────────────────────
@@ -921,62 +929,33 @@ const LOS = {
     if (t) { t.done=done; this.save(); this.renderReleases(); this.log(`Task "${t.text}" ${done?'completed':'reopened'}`,'Releases'); }
   },
 
-  // saveRelease() {
-  //   const t = document.getElementById('mrT')?.value.trim();
-  //   if (!t) return this.toast('Title required','err');
-  //   const artId = ArtSel.getValue('asel-release');
-  //   if (!artId) return this.toast('Please select an artist','err');
-  //   const ty = document.getElementById('mrTy')?.value||'Single';
-  //   const r = {
-  //     id:uid(), title:t, artist_id:artId, type:ty,
-  //     cat:   document.getElementById('mrC')?.value,
-  //     date:  document.getElementById('mrD')?.value,
-  //     distributor: document.getElementById('mrDist')?.value,
-  //     status: document.getElementById('mrS')?.value||'Idea',
-  //     territory:'WW',
-  //     tasks: (TASK_TPL[ty]||TASK_TPL.Single).map((tx,i)=>({id:uid(),text:tx,done:false})),
-  //   };
-  //   this.db.releases.push(r);
-  //   this.save(); 
-  //   this.runAutomations('releasecreated', { releaseid: r.id });
-  //   this.closeModal('add-release');
-  //   this.renderAll();
-  //   this.log(`Release "${t}" created`,'Releases');
-  //   this.toast(`Release "${t}" created`);
-  //   buildRelSel('rsel-contract','',true);
-  //   buildRelSel('rsel-expense','',true);
-  //   buildRelSel('rsel-media','',true);
-  // },
-
   saveRelease() {
-  const t = document.getElementById('mrT')?.value.trim()
-  if (!t) return this.toast('Title required', 'err')
-  const artId = ArtSel.getValue('asel-release')
-  if (!artId) return this.toast('Please select an artist', 'err')
-  const ty = document.getElementById('mrTy')?.value || 'Single'
-  const r = {
-    id: uid(),
-    title: t,
-    artistid: artId,
-    type: ty,
-    cat: document.getElementById('mrC')?.value,
-    date: document.getElementById('mrD')?.value,
-    distributor: document.getElementById('mrDist')?.value,
-    status: document.getElementById('mrS')?.value || 'Idea',
-    territory: 'WW',
-    tasks: (TASKTPL[ty] || TASKTPL['Single']).map((tx, i) => ({ id: uid(), text: tx, done: false }))
-  }
-  this.db.releases.push(r)
-  this.save()
-  this.runAutomations('releasecreated', { releaseid: r.id })  // ← r.id statt rel.id
-  this.closeModal('add-release')
-  this.renderAll()
-  this.log(`Release '${t}' created`, 'Releases')
-  this.toast(`Release '${t}' created`)
-  buildRelSel('rsel-contract', '', true)
-  buildRelSel('rsel-expense', '', true)
-  buildRelSel('rsel-media', '', true)
-},
+    const t = document.getElementById('mrT')?.value.trim();
+    if (!t) return this.toast('Title required','err');
+    const artId = ArtSel.getValue('asel-release');
+    if (!artId) return this.toast('Please select an artist','err');
+    const ty = document.getElementById('mrTy')?.value||'Single';
+    const r = {
+      id:uid(), title:t, artist_id:artId, type:ty,
+      cat:   document.getElementById('mrC')?.value,
+      date:  document.getElementById('mrD')?.value,
+      distributor: document.getElementById('mrDist')?.value,
+      status: document.getElementById('mrS')?.value||'Idea',
+      territory:'WW',
+      tasks: (TASK_TPL[ty]||TASK_TPL.Single).map((tx,i)=>({id:uid(),text:tx,done:false})),
+    };
+    this.db.releases.push(r);
+    this.save();
+    this._runAutomations('release_created', { release_id: r.id });
+    this.closeModal('add-release'); this.renderAll();
+    this.log(`Release "${t}" created`,'Releases'); this.toast(`Release "${t}" created`);
+    this.pushNotification('release',`Release "${t}" created`,'releases');
+    const _rArt=this.db.artists.find(a=>a.id===artId);
+    this.fireWebhook('release.created',{title:t,artist:_rArt?.name||'—',type:ty,catalog:r.cat||'—',date:r.date||'TBD',message:`New release: "${t}" by ${_rArt?.name||'—'}`});
+    buildRelSel('rsel-contract','',true);
+    buildRelSel('rsel-expense','',true);
+    buildRelSel('rsel-media','',true);
+  },
 
   // ── CONTRACTS ─────────────────────────────────────────────────────────
   renderContracts() {
@@ -1861,6 +1840,8 @@ const LOS = {
     const art=this.db.artists.find(a=>a.id===artId);
     this.save(); this.closeModal('add-payout'); this.renderPayouts();
     this.log(`Payout ${fmtE(amt)} to ${art?.name} recorded`,'Finance'); this.toast('Payout recorded');
+    this.pushNotification('payout',`Payout ${fmtE(amt)} EUR to ${art?.name||'?'}`,'royalties');
+    this.fireWebhook('payout.created',{artist:art?.name||'—',amount:`${fmtE(amt)} EUR`,period:p.period||'—',method:p.method||'—',message:`Payout of ${fmtE(amt)} EUR to ${art?.name||'—'} recorded`});
   },
 
   // ── CATALOG & RIGHTS ──────────────────────────────────────────────────
@@ -2328,10 +2309,6 @@ const LOS = {
       const art=this.db.artists.find(a=>a.id===sl.artist_id);
       const rel=this.db.releases.find(r=>r.id===sl.release_id);
       const link=`${window.location.origin}/link/${sl.slug}`;
-      // const slData = btoa(JSON.stringify(sl))
-      // const link = window.location.origin + '/smartlink.html?slug=' + sl.slug + '#data=' + slData
-      // const slPayload = btoa(unescape(encodeURIComponent(JSON.stringify(sl))))
-      // const link = window.location.origin + '/smartlink.html?d=' + slPayload
       return `<div class="sl-card">
         <div class="sl-head" style="background:linear-gradient(135deg,${sl.accent||'#c9a84c'}22,${sl.accent||'#c9a84c'}08)">
           <div class="sl-head-bg"></div>
@@ -2356,7 +2333,7 @@ const LOS = {
           </div>
           <div class="flex gap2 mt3">
             <button class="btn btn-g" style="flex:1;font-size:11.5px;gap:5px;padding:5px"
-              onclick="window.open('${link}', '_blank')">
+              onclick="window.open('/link/${sl.slug}','_blank')">
               <i data-lucide="external-link" style="width:12px"></i> Preview
             </button>
             <button class="btn-ic" onclick="LOS.deleteItem('smart_links','${sl.id}')"><i data-lucide="trash-2" style="width:13px"></i></button>
@@ -2410,24 +2387,6 @@ const LOS = {
     if(d) d.active=!d.active;
     this.save(); this.renderSmartLinks();
   },
-
-  previewSmartLink(id) {
-    const sl = this.db.smartlinks?.find(s => s.id === id)
-    if (!sl) return
-    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(sl))))
-    const url = window.location.origin + '/link.html?d=' + payload
-    window.open(url, '_blank')
-  },
-
-copySmartLink(id) {
-  const sl = this.db.smartlinks?.find(s => s.id === id)
-  if (!sl) return
-  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(sl))))
-  const url = window.location.origin + '/link.html?d=' + payload
-  navigator.clipboard.writeText(url)
-  this.toast('Link copied!')
-},
-
 
   renderPromoLinks() {
     if(!this.db.promo_links) this.db.promo_links=[];
@@ -3495,7 +3454,7 @@ copySmartLink(id) {
   integTab(name, el) {
     document.querySelectorAll('#integTabs .tab').forEach(t=>t.classList.remove('on'));
     el.classList.add('on');
-    ['overview','webhooks','import','export','logs'].forEach(n=>{
+    ['overview','webhooks','import','export','logs','backup'].forEach(n=>{
       const d=document.getElementById('integ-'+n);
       if(d) d.style.display=n===name?'block':'none';
     });
@@ -3504,6 +3463,7 @@ copySmartLink(id) {
     if(name==='import')    { /* dropzone ready */ }
     if(name==='export')    { buildRelSel('rsel-distexport','',false); }
     if(name==='logs')      this.renderIntegLogs();
+    if(name==='backup')    this.renderBackupStats();
     lucide.createIcons();
   },
 
@@ -3601,24 +3561,66 @@ copySmartLink(id) {
     this.testWebhookById(whId, evt);
   },
 
+  // ── REAL DISCORD / WEBHOOK FIRE ──────────────────────────────────────
+  async fireWebhook(event, data={}) {
+    const whs=(this.db.webhooks||[]).filter(w=>w.active&&w.events?.includes(event));
+    if(!whs.length) return;
+    const label=(typeof LABEL_CONFIG!=='undefined')?LABEL_CONFIG.name:'LabelManager';
+    const colorMap={
+      'demo.new':0x4a9fa8,'demo.statuschanged':0x7c6fa8,
+      'release.created':0xc9a84c,'gig.confirmed':0x3d9970,
+      'payout.created':0x4a9fa8,'contract.expiring':0xc0524e,
+      'contract.signed':0x3d9970,'test':0x5a5a72
+    };
+    const color=colorMap[event]||0xc9a84c;
+    const fields=Object.entries(data)
+      .filter(([k,v])=>v!==undefined&&v!=='')
+      .map(([k,v])=>({name:k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),value:String(v).slice(0,1024),inline:true}));
+    const discordPayload={
+      username:`${label} OS`,
+      embeds:[{
+        title:`🎵 ${event.replace(/\./g,' › ')}`,
+        description:data.message||`Event fired from **${label}**`,
+        color,fields,
+        footer:{text:`LabelManager OS · ${label}`},
+        timestamp:new Date().toISOString()
+      }]
+    };
+    for(const wh of whs){
+      const logEntry={id:uid(),type:'webhook_fire',name:wh.name,event,status:'pending',ts:new Date().toLocaleString('de-DE')};
+      if(!this.db.integration_logs) this.db.integration_logs=[];
+      this.db.integration_logs.unshift(logEntry);
+      try {
+        const isDiscord=wh.platform==='Discord'||wh.url.includes('discord.com');
+        const body=isDiscord?JSON.stringify(discordPayload):JSON.stringify({event,label,timestamp:new Date().toISOString(),data});
+        const res=await fetch(wh.url,{method:'POST',headers:{'Content-Type':'application/json'},body});
+        logEntry.status=res.ok?'sent':`error ${res.status}`;
+        if(res.ok) this.toast(`✓ Webhook sent to ${wh.name}`);
+        else this.toast(`Webhook error ${res.status} for ${wh.name}`,'err');
+      } catch(e) {
+        logEntry.status='failed: '+e.message;
+        this.toast(`Webhook failed (${wh.name}): ${e.message}`,'err');
+      }
+      this.save(); this.renderIntegLogs();
+    }
+  },
+
   testWebhookById(whId, evt) {
     const wh=this.db.webhooks?.find(x=>x.id===whId);
     if(!wh) return this.toast('No webhook selected','err');
-    const payload={
-      event:     evt||'test',
-      label:     'Bunte Panther',
-      timestamp: new Date().toISOString(),
-      data:      evt?.startsWith('demo')?{demo_id:'demo-123',title:'Test Track',artist:'Test Artist',status:'new'}
-                :evt?.startsWith('release')?{release_id:'rel-123',title:'Test Release',type:'EP',status:'Idea'}
-                :evt?.startsWith('gig')?{event_id:'evt-123',name:'Test Gig',venue:'Berghain',date:'2026-06-01'}
-                :{message:'Ping from LabelManager'},
-    };
     const output=document.getElementById('webhookTestOutput');
     output.style.display='block';
-    output.textContent=`POST ${wh.url}\n\nPayload:\n${JSON.stringify(payload,null,2)}\n\n[Simulated — no real HTTP request in local mode]`;
-    if(!this.db.integration_logs) this.db.integration_logs=[];
-    this.db.integration_logs.push({id:uid(),type:'webhook_test',name:wh.name,event:evt||'test',status:'simulated',ts:new Date().toLocaleString('de-DE')});
-    this.save(); this.toast(`Test payload built for "${wh.name}"`);
+    output.textContent='⏳ Sending real POST to:\n'+wh.url+'\n\nPlease wait...';
+    const testData=evt?.startsWith('demo')
+      ?{demo_id:'demo-test',title:'Test Track',artist:'Test Artist',status:'Neu',message:'Test ping from LabelManager OS'}
+      :evt?.startsWith('release')
+      ?{release_id:'rel-test',title:'Test Release',type:'EP',status:'Idea',message:'Test ping from LabelManager OS'}
+      :evt?.startsWith('gig')
+      ?{event_id:'evt-test',name:'Test Gig',venue:'Berghain',date:'2026-06-01',message:'Test ping from LabelManager OS'}
+      :{message:'Test ping from LabelManager OS',source:'manual test button'};
+    this.fireWebhook(evt||'test',testData).then(()=>{
+      output.textContent='✓ Sent! Check your Discord channel #notify-🔔\n\nEvent: '+(evt||'test')+'\nWebhook: '+wh.name;
+    }).catch(e=>{ output.textContent='✗ Error: '+e.message; });
   },
 
   // Platform CSV Import
@@ -3761,6 +3763,17 @@ copySmartLink(id) {
     this.toast('Export downloaded');
   },
 
+  renderBackupStats() {
+    const d = this.db;
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    set('bkArtists',  (d.artists||[]).length);
+    set('bkReleases', (d.releases||[]).length);
+    set('bkDemos',    (d.demos||[]).length);
+    set('bkContacts', (d.contacts||[]).length);
+    set('bkEvents',   (d.events||[]).length);
+    set('bkMedia',    (d.media||[]).length);
+  },
+
   renderIntegLogs() {
     const logs=[...(this.db.integration_logs||[])].reverse();
     const STATUS_ICONS={success:'check-circle',generated:'package',simulated:'zap',error:'alert-circle'};
@@ -3785,6 +3798,65 @@ copySmartLink(id) {
    * Renders the logged-in user's avatar, name and role
    * in the sidebar footer (#sidebarUser).
    */
+  // ── IMPORT / EXPORT ───────────────────────────────────────────────────
+
+  exportDB() {
+    const label=(typeof LABEL_CONFIG!=='undefined')?LABEL_CONFIG.name:'LabelManager';
+    const snapshot={
+      _meta:{version:'losv3',label,exported_at:new Date().toISOString(),schema:1},
+      ...this.db
+    };
+    const blob=new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`${label.replace(/\s+/g,'-').toLowerCase()}_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    this.log('Full DB exported','System');
+    this.toast('💾 Backup downloaded');
+  },
+
+  importDBFile(inp) {
+    if(!inp.files?.[0]) return;
+    const file=inp.files[0];
+    const r=new FileReader();
+    r.onload=ev=>{
+      try {
+        const raw=JSON.parse(ev.target.result);
+        const data={...raw};
+        const meta=data._meta||{};
+        delete data._meta;
+        if(!Array.isArray(data.artists)) return this.toast('Invalid backup — no artists array','err');
+        const dbKeys=Object.keys(typeof SEED!=='undefined'?SEED:this.db);
+        const confirmed=confirm(
+          `Import backup?\n\nDate: ${meta.exported_at?.slice(0,10)||'unknown'}\nLabel: ${meta.label||'?'}\n`+
+          `Artists: ${data.artists?.length||0}  ·  Demos: ${data.demos?.length||0}  ·  Releases: ${data.releases?.length||0}\n\n`+
+          `⚠️  This will REPLACE your current data.`
+        );
+        if(!confirmed) return;
+        dbKeys.forEach(k=>{ if(data[k]!==undefined) this.db[k]=data[k]; });
+        this.save(); this.renderAll(); lucide.createIcons();
+        this.log(`DB imported from ${file.name}`,'System');
+        this.toast(`✓ Imported: ${data.artists?.length||0} artists, ${data.demos?.length||0} demos, ${data.releases?.length||0} releases`);
+      } catch(e){ this.toast('Import failed: '+e.message,'err'); }
+    };
+    r.readAsText(file);
+    inp.value='';
+  },
+
+  resetDB() {
+    if(!confirm('⚠️ RESET ALL DATA?\n\nThis deletes everything and restores the demo dataset.\n\nAre you absolutely sure?')) return;
+    if(!confirm('Last chance — this cannot be undone. Proceed?')) return;
+    if(typeof SEED!=='undefined'){
+      this.db=JSON.parse(JSON.stringify(SEED));
+    } else {
+      localStorage.removeItem('los_v3');
+      this.db=typeof loadDB==='function'?loadDB():this.db;
+    }
+    this.save(); this.renderAll(); lucide.createIcons();
+    this.log('DB reset to seed data','System');
+    this.toast('🔄 Database reset to defaults');
+  },
+
   renderSidebarUser() {
     const user = LMAuth._currentUser;
     if (!user) return;

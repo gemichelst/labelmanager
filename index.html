@@ -135,16 +135,13 @@
   <header class="topbar">
     <button class="hbg" onclick="LOS.openSb()"><i data-lucide="menu" style="width:16px"></i></button>
     <div class="topbar-title" id="tbTitle">Dashboard</div>
-    <div class="topbar-l">
+    <div class="topbar-r">
       <button class="btn btn-g" style="font-size:12px;gap:5px;" onclick="LOS.openSearch()">
         <i data-lucide="search" style="width:12px"></i> Search
         <kbd style="font-size:10px;opacity:.45;margin-left:3px">⌘K</kbd>
-      </button>      
-    </div>
-    <div class="topbar-r">
+      </button>
     <!-- Notification Bell (in header/topbar) -->
     <!-- <div class="notif-bell" id="notifBell" onclick="LOS.toggleNotifPanel()"> -->
-    <div id="role" onclick="LOS.cycleRole()"></div>
     <div class="notif-bell" id="notifBell" onclick="LOS.toggleNotifPanel(event)">
       <i data-lucide="bell" style="width:18px;color:var(--muted)"></i>
       <div class="notif-badge" id="notifBadge" style="display:none">0</div>
@@ -159,9 +156,10 @@
         <button class="btn btn-g" style="width:100%;font-size:12px" onclick="LOS.clearNotifs()">Clear all</button>
       </div>
     </div>
-      <!-- <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
+      <div id="role" onclick="LOS.cycleRole()"></div>
+      <button class="btn btn-p" onclick="LOS.openModal('add-demo')">
         <i data-lucide="upload" style="width:13px"></i> Submit Demo
-      </button> -->
+      </button>
     </div>
   </header>
 
@@ -1056,6 +1054,7 @@
         <div class="tab" onclick="LOS.integTab('import',this)">Platform Import</div>
         <div class="tab" onclick="LOS.integTab('export',this)">Distributor Export</div>
         <div class="tab" onclick="LOS.integTab('logs',this)">Logs</div>
+        <div class="tab" onclick="LOS.integTab('backup',this)">💾 Backup</div>
       </div>
 
       <!-- Integration Overview -->
@@ -1180,6 +1179,70 @@
         </div>
         <div class="card">
           <div id="integLogList" style="max-height:480px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- ─── BACKUP & TRANSFER ──────────────────────────────────── -->
+      <div id="integ-backup" style="display:none">
+        <div class="g2">
+          <!-- Export Card -->
+          <div class="card">
+            <div class="ct" style="display:flex;align-items:center;gap:8px">
+              <i data-lucide="download-cloud" style="width:16px;color:var(--teal)"></i>
+              Export Full Backup
+            </div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+              Download your entire LabelManager database as a JSON file. Import it on any device or browser to continue working.
+            </p>
+            <div style="background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:var(--muted)">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <span>Artists: <strong id="bkArtists" style="color:var(--text)">—</strong></span>
+                <span>Releases: <strong id="bkReleases" style="color:var(--text)">—</strong></span>
+                <span>Demos: <strong id="bkDemos" style="color:var(--text)">—</strong></span>
+                <span>Contacts: <strong id="bkContacts" style="color:var(--text)">—</strong></span>
+                <span>Events: <strong id="bkEvents" style="color:var(--text)">—</strong></span>
+                <span>Media: <strong id="bkMedia" style="color:var(--text)">—</strong></span>
+              </div>
+            </div>
+            <button class="btn btn-p" style="width:100%" onclick="LOS.exportDB()">
+              <i data-lucide="download" style="width:13px"></i> Download Backup (JSON)
+            </button>
+          </div>
+          <!-- Import Card -->
+          <div class="card">
+            <div class="ct" style="display:flex;align-items:center;gap:8px">
+              <i data-lucide="upload-cloud" style="width:16px;color:var(--gold)"></i>
+              Import / Restore Backup
+            </div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+              Restore a previously exported JSON backup. <strong style="color:var(--warn)">This will overwrite all current data.</strong>
+            </p>
+            <div class="dz" id="backupDz"
+                 ondragover="event.preventDefault();this.classList.add('ov')"
+                 ondragleave="this.classList.remove('ov')"
+                 ondrop="event.preventDefault();this.classList.remove('ov');LOS.importDBFile({files:event.dataTransfer.files})">
+              <label style="cursor:pointer;display:block">
+                <input type="file" accept=".json" style="display:none" onchange="LOS.importDBFile(this)">
+                <i data-lucide="file-json" style="width:28px;margin:0 auto 10px;display:block;color:var(--gold)"></i>
+                <div style="font-size:13px;color:var(--muted)" id="backupDzTxt">Drop backup .json here or click to browse</div>
+                <div style="font-size:11px;color:var(--b2);margin-top:4px">Only .json files exported from LabelManager OS</div>
+              </label>
+            </div>
+          </div>
+        </div>
+        <!-- Reset card full width -->
+        <div class="card mt4" style="border-color:rgba(192,82,78,.3)">
+          <div class="ct" style="display:flex;align-items:center;gap:8px">
+            <i data-lucide="rotate-ccw" style="width:16px;color:var(--err)"></i>
+            Reset to Factory Defaults
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+            Wipe all data and restore the built-in demo dataset.
+            <strong style="color:var(--err)"> This cannot be undone.</strong>
+          </p>
+          <button class="btn" style="background:rgba(192,82,78,.12);border:1px solid rgba(192,82,78,.4);color:var(--err)" onclick="LOS.resetDB()">
+            <i data-lucide="trash-2" style="width:13px"></i> Reset All Data
+          </button>
         </div>
       </div>
     </section>
@@ -2009,6 +2072,25 @@
   </div>
 </div>
 
+<!-- Backup Tab Stats Init -->
+<script>
+document.addEventListener('click', function(e){
+  if(!e.target || !e.target.getAttribute) return;
+  var oc = e.target.getAttribute('onclick') || '';
+  if(oc.indexOf("'backup'") === -1) return;
+  setTimeout(function(){
+    if(typeof LOS === 'undefined' || !LOS.db) return;
+    var d = LOS.db;
+    var set = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+    set('bkArtists',  (d.artists||[]).length);
+    set('bkReleases', (d.releases||[]).length);
+    set('bkDemos',    (d.demos||[]).length);
+    set('bkContacts', (d.contacts||[]).length);
+    set('bkEvents',   (d.events||[]).length);
+    set('bkMedia',    (d.media||[]).length);
+  }, 100);
+});
+</script>
 <!-- Service Worker Registration -->
 <script>
   if ('serviceWorker' in navigator) {
